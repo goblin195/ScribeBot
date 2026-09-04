@@ -36,14 +36,14 @@ struct TranscriptView: View {
     private var header: some View {
         HStack(spacing: 10) {
             if recorder.isRecording { RecDot() }
-            Eyebrow(text: recorder.isRecording ? "live · localagreement-2" : "transcript",
+            Eyebrow(text: recorder.isRecording ? "Live transcript" : "transcript",
                     color: recorder.isRecording ? P.bad : P.ink3)
             Spacer()
             if recorder.isRecording {
                 Text(clock(recorder.elapsed))
                     .font(T.mono(11, .medium)).foregroundStyle(P.ink2).monospacedDigit()
             }
-            Text("\(recorder.committed.count) committed")
+            Text("\(recorder.committed.count) lines")
                 .font(T.mono(10)).foregroundStyle(P.ink3)
         }
         .padding(.horizontal, 22).padding(.vertical, 13)
@@ -62,7 +62,7 @@ struct TranscriptView: View {
                 Image(systemName: "text.alignright")
                     .font(.system(size: 22, weight: .light)).foregroundStyle(P.ink3)
                 Text("No transcript yet.").font(T.body(13)).foregroundStyle(P.ink2)
-                Text("Start capture from the menu bar. Text appears about a second\nbehind the speaker, and only once two passes agree on it.")
+                Text("Start a recording from the menu bar.\nYour conversation will appear here as you speak.")
                     .font(T.body(11.5)).foregroundStyle(P.ink3)
                     .multilineTextAlignment(.center).lineSpacing(3)
             }

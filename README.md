@@ -62,7 +62,15 @@ algorithm has to guess. For two-party calls it is exact and free.
 - 📝 **Summaries and export**, plus a native SwiftUI menu-bar app.
 - 🔒 **No network calls at runtime.** At all.
 
-## Quick start
+## Download for Mac
+
+Get the complete **[Scribebot 0.1 DMG](https://github.com/goblin195/ScribeBot/releases/tag/v0.1)**
+for Apple Silicon and macOS 14.2+. Drag the app into Applications. Python,
+whisper.cpp, and the Hebrew model are included. This release is ad-hoc signed,
+not Apple-notarized; see the release notes for first-launch instructions.
+Optional summaries require a separate local Ollama installation.
+
+## Build from source
 
 ```sh
 brew install whisper-cpp                # the decoder

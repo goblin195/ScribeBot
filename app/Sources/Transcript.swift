@@ -92,7 +92,7 @@ enum Transcript {
         // Same reason as Recorder: a Finder-launched app resolves `env python3`
         // to Apple's 3.9, which cannot parse this project.
         p.executableURL = URL(fileURLWithPath: Paths.python)
-        p.arguments = [scribebotPy.path, "file", wav.path, "--segments"]
+        p.arguments = ["-B", scribebotPy.path, "file", wav.path, "--segments"]
         p.currentDirectoryURL = root
         let out = Pipe()
         p.standardOutput = out

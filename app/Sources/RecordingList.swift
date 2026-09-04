@@ -83,7 +83,7 @@ struct RecordingIndex: View {
                                 }
                                 .buttonStyle(.plain)
                                 .id(h.rec.id)
-                                Divider().overlay(P.rule.opacity(0.7))
+                                Spacer().frame(height: 5)
                             }
                         } header: {
                             DayHeader(group: g)
@@ -126,10 +126,10 @@ private struct DayHeader: View {
     let group: DayGroup
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Text(group.label.uppercased())
-                .font(T.mono(9.5, .semibold)).tracking(1.4).foregroundStyle(P.ink2)
+            Text(group.label)
+                .font(T.body(12, .semibold)).foregroundStyle(P.ink2)
             Rectangle().fill(P.rule).frame(height: 1).offset(y: -3)
-            Text("\(group.hits.count) · \(span(group.seconds))")
+            Text("\(group.hits.count)")
                 .font(T.mono(9)).foregroundStyle(P.ink3).monospacedDigit()
         }
         .padding(.horizontal, 16).padding(.top, 15).padding(.bottom, 6)
@@ -151,8 +151,8 @@ private struct RecordingRow: View {
             Rectangle()
                 .fill(selected ? P.accent : .clear)
                 .frame(width: focused && selected ? 3 : 2)
-            VStack(alignment: .leading, spacing: 4) {
-                BidiText(text: rec.title, font: T.body(13, selected ? .semibold : .medium),
+            VStack(alignment: .leading, spacing: 9) {
+                BidiText(text: rec.title, font: T.body(14, selected ? .semibold : .medium),
                          color: P.ink)
                     .lineLimit(2)
                 HStack(spacing: 7) {
@@ -181,10 +181,13 @@ private struct RecordingRow: View {
                     .padding(.top, 1)
                 }
             }
-            .padding(.leading, 12).padding(.trailing, 14).padding(.vertical, 9)
+            .padding(.leading, 12).padding(.trailing, 14).padding(.vertical, 16)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(selected ? P.surface : (hover ? P.surface2.opacity(0.75) : .clear))
+        .background(selected ? P.accentSoft : (hover ? P.surface2.opacity(0.75) : .clear))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(selected ? P.accent.opacity(0.2) : .clear))
+        .padding(.horizontal, 10)
         .contentShape(Rectangle())
         .onHover { hover = $0 }
     }
@@ -209,8 +212,8 @@ struct SidesBadge: View {
         HStack(spacing: 3) {
             bar(sides.them)
             bar(sides.you)
-            Text(sides.label.uppercased())
-                .font(T.mono(8.5, .medium)).tracking(0.7)
+            Text(sides.label)
+                .font(T.body(10, .medium))
                 .foregroundStyle(sides == .both ? P.ink3 : P.warn)
         }
         .help(sides == .both
@@ -232,29 +235,24 @@ private struct EmptyLibrary: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Eyebrow(text: "no tapes yet")
-            Text("Nothing has been recorded on this Mac.")
-                .font(T.disp(15)).foregroundStyle(P.ink).padding(.top, 7)
-            Text("Scribebot captures two streams per meeting and keeps them apart, so the transcript knows who spoke without guessing.")
-                .font(T.body(12)).foregroundStyle(P.ink2).lineSpacing(3).padding(.top, 6)
+            Image(systemName: "waveform.circle")
+                .font(.system(size: 42, weight: .light)).foregroundStyle(P.accent)
+                .padding(.bottom, 18)
+            Text("Space for your conversations")
+                .font(T.disp(23)).foregroundStyle(P.ink)
+            Text("Record a meeting and return to every word. Your audio and transcripts stay on this Mac.")
+                .font(T.body(13)).foregroundStyle(P.ink2).lineSpacing(5).padding(.top, 10)
                 .fixedSize(horizontal: false, vertical: true)
-
-            Divider().overlay(P.rule).padding(.vertical, 14)
-
-            Fact(k: "them", v: "<id>.wav", note: "the call's audio, off the process tap")
-            Fact(k: "you", v: "<id>-you.wav", note: "your microphone, recorded apart")
-            Fact(k: "text", v: "<id>.txt", note: "speaker-labelled, written after the call")
-
-            Divider().overlay(P.rule).padding(.vertical, 14)
+            Spacer().frame(height: 24)
 
             if perms.readyToRecord {
-                Text("Start a capture and the first tape lands here the moment you stop it.")
+                Text("Your first recording will appear here.")
                     .font(T.body(11.5)).foregroundStyle(P.ink3).lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-                Button("START CAPTURE") { recorder.start() }
+                Button("New recording") { recorder.start() }
                     .buttonStyle(FlatButton()).padding(.top, 10)
             } else {
-                Text("System-audio recording has not been granted yet, so there is nothing to capture. Grant it in Permissions and the far side becomes audible.")
+                Text("Allow system audio in Permissions to start recording.")
                     .font(T.body(11.5)).foregroundStyle(P.warn).lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -318,8 +316,8 @@ struct ColumnHeader: View {
                 Spacer()
                 Text(right).font(T.mono(10)).foregroundStyle(P.ink3).monospacedDigit()
             }
-            .padding(.horizontal, 16).padding(.vertical, 13)
-            .background(P.surface2)
+            .padding(.horizontal, 20).padding(.vertical, 20)
+            .background(P.ground)
             Divider().overlay(P.rule)
         }
     }

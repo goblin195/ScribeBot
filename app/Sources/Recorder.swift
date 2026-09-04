@@ -188,7 +188,7 @@ final class Recorder: ObservableObject {
                 guard FileManager.default.fileExists(atPath: url.path) else { return "" }
                 let p = Process()
                 p.executableURL = URL(fileURLWithPath: Paths.python)
-                p.arguments = [Paths.scribebotPy.path, "file", url.path]
+                p.arguments = ["-B", Paths.scribebotPy.path, "file", url.path]
                 p.currentDirectoryURL = Paths.root
                 let out = Pipe()
                 p.standardOutput = out
@@ -272,13 +272,10 @@ final class Recorder: ObservableObject {
     /// we are writing to disk so only one tap is ever open.
     private func startTranscriber(label: String = "") -> FileHandle? {
         guard FileManager.default.fileExists(atPath: Paths.livePy.path) else { return nil }
-        let venv = Paths.root.appendingPathComponent(".venv/bin/python3")
-        let python = FileManager.default.isExecutableFile(atPath: venv.path)
-            ? venv : URL(fileURLWithPath: "/usr/bin/python3")
-
+        let python = URL(fileURLWithPath: Paths.python)
         let p = Process()
         p.executableURL = python
-        var a = [Paths.livePy.path, "--stdin", "--provisional"]
+        var a = ["-B", Paths.livePy.path, "--stdin", "--provisional"]
         if !label.isEmpty { a.append("--label=" + label) }
         p.arguments = a
         p.currentDirectoryURL = Paths.root

@@ -1,6 +1,4 @@
-// Menu-bar-only app (LSUIElement). The status item is a SwiftUI scene; the
-// three real windows are AppKit-owned so that an agent-less app can still open
-// one at launch and so each keeps its own size and position.
+// A regular Dock app with an additional menu-bar recording shortcut.
 import SwiftUI
 
 extension Notification.Name {
@@ -56,7 +54,7 @@ final class Windows {
         w.isReleasedWhenClosed = false
         w.backgroundColor = NSColor(name: nil) { ap in
             ap.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
-                ? NSColor(hex: "0F1413") : NSColor(hex: "F6F7F6")
+                ? NSColor(hex: "1D1D1C") : NSColor(hex: "F2F1EF")
         }
         w.contentView = NSHostingView(rootView: content(id))
         w.center()
@@ -81,8 +79,16 @@ final class Windows {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        MainActor.assumeIsolated {
+            NotificationCenter.default.post(name: .openMainWindow, object: nil)
+        }
+        return true
+    }
+
     func applicationDidFinishLaunching(_ n: Notification) {
         MainActor.assumeIsolated {
+            NSApp.setActivationPolicy(.regular)
             let env = ProcessInfo.processInfo.environment
             // ponytail: screenshot hook. The -AppleInterfaceStyle argument domain
             // is no longer honoured, and flipping the system theme to check ours
@@ -93,11 +99,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 AppState.shared.library.seedDemo(MeetingIndex.shared)
             }
             let wanted = (env["SCRIBEBOT_OPEN"] ?? "").split(separator: ",").map(String.init)
-            if wanted.contains("main") {
+            if wanted.isEmpty || wanted.contains("main") {
                 NotificationCenter.default.post(name: .openMainWindow, object: nil)
             } else {
-                // A Window scene would otherwise restore itself on every launch,
-                // which is wrong for a menu-bar app: the window is opened on demand.
+                // Explicit preview hooks may request only a secondary window.
                 mainWindow()?.close()
             }
             if wanted.isEmpty {
@@ -129,8 +134,7 @@ struct ScribebotApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        // The real window. Dock-less like the rest of the app, but a proper
-        // resizable document window with its own frame autosave.
+        // The main document window retains its size and position between launches.
         Window("Scribebot", id: "main") {
             MainWindowView(library: state.library, recorder: state.recorder, perms: state.perms)
         }

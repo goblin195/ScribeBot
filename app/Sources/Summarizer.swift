@@ -126,12 +126,10 @@ final class Summarizer: ObservableObject {
     private nonisolated func spawn(script: URL, transcript: String) async -> Output {
         await withCheckedContinuation { k in
             DispatchQueue.global(qos: .userInitiated).async {
-                let venv = Paths.root.appendingPathComponent(".venv/bin/python3")
-                let python = FileManager.default.isExecutableFile(atPath: venv.path)
-                    ? venv : URL(fileURLWithPath: "/usr/bin/python3")
+                let python = URL(fileURLWithPath: Paths.python)
                 let p = Process()
                 p.executableURL = python
-                p.arguments = [script.path, transcript]
+                p.arguments = ["-B", script.path, transcript]
                 p.currentDirectoryURL = Paths.root
                 var env = ProcessInfo.processInfo.environment
                 env["PYTHONUNBUFFERED"] = "1"

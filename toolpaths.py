@@ -8,6 +8,7 @@ fell back to the live preview, and the recording looked like it "stopped in the
 middle". Resolve once, absolutely, and say so plainly when it is missing.
 """
 import os, shutil
+from pathlib import Path
 
 # Where package managers put binaries that a GUI process will never see.
 _EXTRA = ("/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin")
@@ -18,6 +19,9 @@ def resolve(name: str, env_var: str) -> str:
     override = os.environ.get(env_var)
     if override:
         return override
+    bundled = Path(__file__).resolve().parent / "bin" / name
+    if bundled.is_file() and os.access(bundled, os.X_OK):
+        return str(bundled)
     found = shutil.which(name) or shutil.which(name, path=os.pathsep.join(_EXTRA))
     if found:
         return found

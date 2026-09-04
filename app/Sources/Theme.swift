@@ -1,5 +1,3 @@
-// Visual language lifted from docs/progress.html: cool slate neutrals, one teal
-// accent, monospace for anything that is a label rather than prose.
 import SwiftUI
 import AppKit
 
@@ -13,7 +11,8 @@ extension NSColor {
     }
 }
 
-/// One token = one light/dark pair, resolved per appearance like the CSS vars.
+/// Soft stone surfaces and charcoal controls, with color reserved for status.
+/// Every token resolves independently for light and dark appearance.
 enum P {
     static func pair(_ light: String, _ dark: String) -> Color {
         Color(nsColor: NSColor(name: nil) { ap in
@@ -21,33 +20,30 @@ enum P {
                 ? NSColor(hex: dark) : NSColor(hex: light)
         })
     }
-    static let ground     = pair("F6F7F6", "0F1413")
-    static let surface    = pair("FFFFFF", "161B1A")
-    static let surface2   = pair("ECEFEE", "1D2422")
-    static let sunk       = pair("E3E7E5", "111716")
-    static let ink        = pair("16191A", "E7EDEB")
-    static let ink2       = pair("57615E", "94A09D")
-    static let ink3       = pair("828C89", "6E7A77")
-    static let rule       = pair("D7DCDA", "2A3230")
-    static let ruleStrong = pair("BFC7C4", "3A4442")
-    static let accent     = pair("0D6E63", "54BFB1")
-    static let accentSoft = pair("DCEAE7", "16302D")
+    static let ground     = pair("F2F1EF", "1D1D1C")
+    static let surface    = pair("FCFBF9", "252524")
+    static let surface2   = pair("EAE9E6", "2D2D2B")
+    static let sunk       = pair("DEDDDA", "191918")
+    static let ink        = pair("292928", "F1F0EC")
+    static let ink2       = pair("62625E", "BCBCB5")
+    static let ink3       = pair("70706B", "A4A49D")
+    static let rule       = pair("DAD9D5", "3B3B37")
+    static let ruleStrong = pair("C5C4BF", "51514B")
+    static let accent     = pair("30312F", "E5E5DC")
+    static let accentSoft = pair("DDDED7", "383A33")
     static let ok         = pair("2F6F3E", "74C084")
     static let okSoft     = pair("DFEBE1", "162A1B")
     static let warn       = pair("A05F00", "DFA54A")
     static let warnSoft   = pair("F6E8D2", "302516")
     static let bad        = pair("A33A2A", "E38570")
     static let badSoft    = pair("F5E0DB", "301B16")
-    static let idle       = pair("7E8885", "7E8885")
-    /// Label on a filled accent button. White reads on the dark teal of the
-    /// light theme and disappears on the light teal of the dark one.
-    static let onAccent   = pair("FFFFFF", "07100E")
-    static let idleSoft   = pair("E6E9E8", "1E2523")
+    static let idle       = pair("70706B", "BCBCB5")
+    /// Filled controls reverse their text color with the appearance.
+    static let onAccent   = pair("FCFBF9", "252622")
+    static let idleSoft   = pair("DEDDDA", "2D2D2B")
 }
 
-// IBM Plex is not installed on this machine, so the roles are mapped onto the
-// system faces that carry the same intent: monospace for machine labels, a
-// tightly tracked bold for display, SF's Hebrew coverage for prose.
+// Native typography preserves Hebrew coverage and follows macOS rendering.
 enum T {
     static func mono(_ size: CGFloat, _ w: Font.Weight = .regular) -> Font {
         .system(size: size, weight: w, design: .monospaced)
@@ -58,14 +54,13 @@ enum T {
     }
 }
 
-/// The uppercase mono kicker used above every block in progress.html.
+/// Quiet section labels keep the transcript at the top of the hierarchy.
 struct Eyebrow: View {
     let text: String
     var color: Color = P.ink3
     var body: some View {
-        Text(text.uppercased())
-            .font(T.mono(9.5, .medium))
-            .tracking(1.5)
+        Text(text.prefix(1).uppercased() + text.dropFirst())
+            .font(T.body(11, .semibold))
             .foregroundStyle(color)
     }
 }
@@ -94,26 +89,26 @@ struct Pill: View {
         }
     }
     var body: some View {
-        Text(text.uppercased())
-            .font(T.mono(9, .medium)).tracking(1.1)
+        Text(text.prefix(1).uppercased() + text.dropFirst())
+            .font(T.body(10, .medium))
             .foregroundStyle(fg)
-            .padding(.horizontal, 6).padding(.vertical, 3)
-            .background(bg, in: RoundedRectangle(cornerRadius: 2))
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(bg, in: Capsule())
     }
 }
 
-/// Flat teal button — no capsule, no gradient, matches the doc's hard edges.
+/// Shared controls use generous hit targets and a restrained accent.
 struct FlatButton: ButtonStyle {
     var tint: Color = P.accent
     var filled = true
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(T.mono(11, .medium)).tracking(0.6)
+            .font(T.body(12, .semibold))
             .foregroundStyle(filled ? P.onAccent : tint)
-            .padding(.horizontal, 12).padding(.vertical, 6)
-            .background(filled ? tint : Color.clear, in: RoundedRectangle(cornerRadius: 3))
-            .overlay(RoundedRectangle(cornerRadius: 3)
-                .stroke(filled ? Color.clear : tint.opacity(0.5), lineWidth: 1))
+            .padding(.horizontal, 14).padding(.vertical, 10)
+            .background(filled ? tint : Color.clear, in: RoundedRectangle(cornerRadius: 9))
+            .overlay(RoundedRectangle(cornerRadius: 9)
+                .stroke(filled ? Color.clear : tint.opacity(0.25), lineWidth: 1))
             .opacity(configuration.isPressed ? 0.65 : 1)
             .contentShape(Rectangle())
     }

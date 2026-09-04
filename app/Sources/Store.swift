@@ -23,6 +23,12 @@ enum Paths {
     /// The checkout that owns the capture helper and the python pipeline.
     /// Walk up from the bundle so the app works from app/ or anywhere else.
     static let root: URL = {
+        if let resources = Bundle.main.resourceURL {
+            let bundled = resources.appendingPathComponent("Runtime")
+            if FileManager.default.fileExists(atPath: bundled.appendingPathComponent("live.py").path) {
+                return bundled
+            }
+        }
         var dir = Bundle.main.bundleURL
         for _ in 0..<6 {
             dir.deleteLastPathComponent()
@@ -47,12 +53,12 @@ enum Paths {
     /// "stop transcribing in the middle". Terminal runs were fine, which is
     /// exactly why it survived so long.
     static let python: String = {
-        let candidates = ["/opt/homebrew/bin/python3", "/usr/local/bin/python3",
+        let candidates = [root.appendingPathComponent("python/bin/python3").path, "/opt/homebrew/bin/python3", "/usr/local/bin/python3",
                           "/usr/bin/python3"]
         for path in candidates where FileManager.default.isExecutableFile(atPath: path) {
             let p = Process()
             p.executableURL = URL(fileURLWithPath: path)
-            p.arguments = ["-c", "import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)"]
+            p.arguments = ["-B", "-c", "import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)"]
             p.standardOutput = FileHandle.nullDevice
             p.standardError = FileHandle.nullDevice
             if (try? p.run()) != nil {
@@ -230,6 +236,16 @@ final class Library: ObservableObject {
         let t = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
         cache[r.id] = (t, stamp ?? .distantPast)
         return t
+    }
+
+    func delete(_ r: Recording, selection: RecordingDeletion) throws {
+        guard demoTranscripts[r.id] == nil else {
+            throw NSError(domain: "Scribebot", code: 3, userInfo: [NSLocalizedDescriptionKey: "Demo calls cannot be deleted."])
+        }
+        defer { reload() }
+        try selection.perform(id: r.id, wav: r.wav, directory: Paths.recordings) { url in
+            try FileManager.default.trashItem(at: url, resultingItemURL: nil)
+        }
     }
 
     func reveal(_ r: Recording) {

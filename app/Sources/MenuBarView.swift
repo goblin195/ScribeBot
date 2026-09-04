@@ -85,7 +85,7 @@ struct MenuBarView: View {
 
     private var idleBody: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Nothing is being recorded.")
+            Text("Ready for your next conversation.")
                 .font(T.body(13)).foregroundStyle(P.ink2)
             if let e = recorder.lastError {
                 Text(e).font(T.mono(10)).foregroundStyle(P.bad)
@@ -94,7 +94,7 @@ struct MenuBarView: View {
             Button(action: { recorder.start() }) {
                 HStack(spacing: 7) {
                     Image(systemName: "record.circle").font(.system(size: 11, weight: .semibold))
-                    Text("START CAPTURE")
+                    Text("New recording")
                 }
             }
             .buttonStyle(FlatButton())
@@ -117,7 +117,7 @@ struct MenuBarView: View {
                     .font(T.mono(26, .medium)).foregroundStyle(P.ink)
                     .monospacedDigit()
                 Spacer()
-                Text("16 kHz · mono").font(T.mono(9.5)).foregroundStyle(P.ink3)
+                Text("Recording").font(T.mono(9.5)).foregroundStyle(P.ink3)
             }
             LevelMeter(level: recorder.level)
             if !recorder.provisional.isEmpty || !recorder.committed.isEmpty {
@@ -130,7 +130,7 @@ struct MenuBarView: View {
             Button(action: { recorder.stop() }) {
                 HStack(spacing: 7) {
                     Image(systemName: "stop.fill").font(.system(size: 10, weight: .semibold))
-                    Text("STOP & SAVE")
+                    Text("Stop & save")
                 }
             }
             .buttonStyle(FlatButton(tint: P.bad))

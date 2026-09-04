@@ -10,7 +10,6 @@ struct PeopleIndex: View {
     let indexed: Bool
     @FocusState private var listFocused: Bool
 
-    private var maxRec: Int { max(people.first?.recordings ?? 0, 1) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,7 +21,7 @@ struct PeopleIndex: View {
                     Eyebrow(text: "0 matches")
                     BidiText(text: "No attendee is named “\(query)”.",
                              font: T.body(13, .medium), color: P.ink)
-                    Text("Names come from the invitations in bench/meetings.json, addresses stripped.")
+                    Text("Search uses names from your calendar invitations.")
                         .font(T.body(11.5)).foregroundStyle(P.ink3).lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer()
@@ -39,14 +38,13 @@ struct PeopleIndex: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(people.enumerated()), id: \.element.id) { i, p in
+                    ForEach(people) { p in
                         Button { selected = p.name; listFocused = true } label: {
-                            PersonRow(rank: i + 1, person: p, share: Double(p.recordings) / Double(maxRec),
-                                      selected: selected == p.name, focused: listFocused)
+                            PersonRow(person: p, selected: selected == p.name)
                         }
                         .buttonStyle(.plain)
                         .id(p.name)
-                        Divider().overlay(P.rule.opacity(0.7))
+                        Spacer().frame(height: 5)
                     }
                 }
             }
@@ -73,47 +71,41 @@ struct PeopleIndex: View {
 }
 
 private struct PersonRow: View {
-    let rank: Int
     let person: Person
-    let share: Double
     let selected: Bool
-    let focused: Bool
     @State private var hover = false
 
+    private var initials: String {
+        person.name.split(separator: " ").prefix(2).compactMap { $0.first }
+            .map(String.init).joined().uppercased()
+    }
+
     var body: some View {
-        HStack(spacing: 0) {
-            Rectangle()
-                .fill(selected ? P.accent : .clear)
-                .frame(width: focused && selected ? 3 : 2)
-            Text(String(format: "%03d", rank))
-                .font(T.mono(9)).foregroundStyle(P.ink3.opacity(0.65))
-                .frame(width: 30, alignment: .trailing)
-            BidiText(text: person.name, font: T.body(12.5, selected ? .semibold : .regular),
-                     color: P.ink)
-                .lineLimit(1)
-                .padding(.leading, 9)
-            Spacer(minLength: 8)
-            // A short fixed track, not a full-width rule: this is a meter, and
-            // a meter that spans the row reads as an underline instead.
-            HStack(spacing: 0) {
-                Rectangle().fill(person.recordings > 0 ? P.accent : P.rule)
-                    .frame(width: max(1, 46 * share))
-                Rectangle().fill(P.sunk)
+        HStack(spacing: 12) {
+            Text(initials)
+                .font(T.body(12, .semibold)).foregroundStyle(P.accent)
+                .frame(width: 36, height: 36)
+                .background(P.accentSoft, in: Circle())
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 6) {
+                BidiText(text: person.name, font: T.body(14, .medium), color: P.ink)
+                    .lineLimit(2)
+                Text("\(person.meetings) meetings")
+                    .font(T.body(11)).foregroundStyle(P.ink2)
             }
-            .frame(width: 46, height: 3)
-            VStack(alignment: .trailing, spacing: 1) {
-                Text("\(person.recordings) rec")
-                    .font(T.mono(10, .medium)).monospacedDigit()
-                    .foregroundStyle(person.recordings > 0 ? P.accent : P.ink3)
-                Text("\(person.meetings) mtg")
-                    .font(T.mono(9)).foregroundStyle(P.ink3).monospacedDigit()
+            if person.recordings > 0 {
+                Label("\(person.recordings)", systemImage: "waveform")
+                    .font(T.body(11, .medium)).foregroundStyle(P.accent)
+                    .accessibilityLabel("\(person.recordings) recordings")
             }
-            .frame(width: 52, alignment: .trailing)
-            .padding(.leading, 9).padding(.trailing, 14)
         }
-        .padding(.vertical, 8)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(selected ? P.surface : (hover ? P.surface2.opacity(0.75) : .clear))
+        .background(selected ? P.accentSoft : (hover ? P.surface2 : .clear),
+                    in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12)
+            .stroke(selected ? P.accent.opacity(0.2) : .clear))
+        .padding(.horizontal, 10)
         .contentShape(Rectangle())
         .onHover { hover = $0 }
     }
@@ -160,8 +152,8 @@ struct PersonDetail: View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 8) {
                 Eyebrow(text: "attendee")
-                BidiText(text: person.name, font: T.disp(20), color: P.ink)
-                HStack(spacing: 0) {
+                BidiText(text: person.name, font: T.disp(28), color: P.ink)
+                FlowLayout(spacing: 18) {
                     Stat(k: "meetings", v: "\(person.meetings)")
                     Stat(k: "recorded", v: "\(person.recordings)",
                          tint: person.recordings > 0 ? P.accent : P.ink3)
@@ -172,7 +164,7 @@ struct PersonDetail: View {
                 }
                 .padding(.top, 3)
             }
-            .padding(.horizontal, 22).padding(.top, 20).padding(.bottom, 16)
+            .padding(.horizontal, 30).padding(.top, 30).padding(.bottom, 24)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(P.surface)
 
@@ -211,17 +203,17 @@ private struct MeetingRow: View {
                 }
                 .frame(width: 54, alignment: .trailing)
                 VStack(alignment: .leading, spacing: 3) {
-                    BidiText(text: meeting.title, font: T.body(12.5), color: P.ink)
+                    BidiText(text: meeting.title, font: T.body(14), color: P.ink)
                         .lineLimit(2)
                     Text("\(meeting.people.count) invited")
-                        .font(T.mono(9)).foregroundStyle(P.ink3)
+                        .font(T.body(11)).foregroundStyle(P.ink2)
                 }
                 Spacer(minLength: 6)
                 if rec != nil {
                     Pill(text: "recorded", kind: .run)
                 }
             }
-            .padding(.horizontal, 20).padding(.vertical, 10)
+            .padding(.horizontal, 30).padding(.vertical, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(hover && rec != nil ? P.surface2.opacity(0.8) : .clear)
             .contentShape(Rectangle())

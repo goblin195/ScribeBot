@@ -29,6 +29,10 @@ func parseTranscript(_ raw: String) -> [Utterance] {
 
 struct RecordingDetail: View {
     let rec: Recording
+    var deletionAllowed = true
+    @State private var showingDelete = false
+    @State private var deleteSelection: RecordingDeletion = .both
+    @State private var deleteError: String?
     @ObservedObject var library: Library
     @ObservedObject var index: MeetingIndex
 
@@ -39,7 +43,7 @@ struct RecordingDetail: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             masthead
-            Divider().overlay(P.ruleStrong)
+            Divider().overlay(P.rule)
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     if let m = meeting { attendees(m) }
@@ -49,6 +53,42 @@ struct RecordingDetail: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(P.ground)
+        .sheet(isPresented: $showingDelete) {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Delete call files?").font(T.disp(22)).foregroundStyle(P.ink)
+                BidiText(text: rec.title, font: T.body(14), color: P.ink2)
+                Picker("Delete", selection: $deleteSelection) {
+                    ForEach(RecordingDeletion.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+                Text(deleteSelection.explanation)
+                    .font(T.body(13)).foregroundStyle(P.ink2)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("You can recover the files from Trash.")
+                    .font(T.body(12)).foregroundStyle(P.ink2)
+                HStack {
+                    Spacer()
+                    Button("Cancel") { showingDelete = false }
+                        .keyboardShortcut(.cancelAction)
+                    Button("Move to Trash", role: .destructive) {
+                        guard deletionAllowed else { return }
+                        showingDelete = false
+                        do { try library.delete(rec, selection: deleteSelection) }
+                        catch { deleteError = error.localizedDescription }
+                    }
+                    .disabled(!deletionAllowed)
+                }
+            }
+            .padding(28).frame(width: 420).background(P.surface)
+        }
+        .alert("Could not finish deleting", isPresented: Binding(
+            get: { deleteError != nil }, set: { if !$0 { deleteError = nil } })) {
+                Button("OK") { deleteError = nil }
+            } message: {
+                Text((deleteError ?? "") + " Any files already moved can be recovered from Trash.")
+            }
     }
 
     // MARK: - Masthead
@@ -61,28 +101,32 @@ struct RecordingDetail: View {
                 Spacer()
                 SidesBadge(sides: sides)
             }
-            BidiText(text: rec.title, font: T.disp(20), color: P.ink)
+            BidiText(text: rec.title, font: T.disp(28), color: P.ink)
                 .fixedSize(horizontal: false, vertical: true)
 
-            HStack(alignment: .top, spacing: 0) {
+            FlowLayout(spacing: 18) {
                 Stat(k: "started", v: rec.startedAt.formatted(date: .omitted, time: .shortened))
                 Stat(k: "duration", v: rec.durationText)
                 Stat(k: "sources", v: "\(sides == .both ? 2 : sides == .missing ? 0 : 1) of 2",
                      tint: sides == .both ? P.ink : sides == .missing ? P.bad : P.warn)
-                Stat(k: "audio", v: "16 kHz mono")
-                Stat(k: "lines", v: "\(lines.count)")
+
             }
             .padding(.top, 3)
 
             HStack(spacing: 8) {
+                Button { deleteSelection = .both; showingDelete = true } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .buttonStyle(FlatButton(tint: P.bad, filled: false))
+                .disabled(!deletionAllowed)
+                .help(deletionAllowed ? "Choose which call files to delete" : "Wait for recording and transcription to finish")
                 Button("Reveal in Finder") { library.reveal(rec) }
                     .buttonStyle(FlatButton(filled: false))
-                Text(rec.id).font(T.mono(9)).foregroundStyle(P.ink3)
-                    .textSelection(.enabled).lineLimit(1)
+
             }
             .padding(.top, 4)
         }
-        .padding(.horizontal, 22).padding(.top, 20).padding(.bottom, 16)
+        .padding(.horizontal, 30).padding(.top, 30).padding(.bottom, 24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(P.surface)
     }
@@ -92,7 +136,7 @@ struct RecordingDetail: View {
     private func attendees(_ m: CalMeeting) -> some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 8) {
-                Eyebrow(text: "in the room · \(m.people.count)", color: P.accent)
+                Eyebrow(text: "Invited participants (\(m.people.count))", color: P.accent)
                 Rectangle().fill(P.rule).frame(height: 1)
                 if !m.location.isEmpty {
                     BidiText(text: m.location, font: T.mono(9), color: P.ink3)
@@ -101,11 +145,10 @@ struct RecordingDetail: View {
             }
             FlowLayout(spacing: 5) {
                 ForEach(m.people, id: \.self) { name in
-                    BidiText(text: name, font: T.mono(10.5), color: P.ink2)
+                    BidiText(text: name, font: T.body(12), color: P.ink2)
                         .fixedSize()
                         .padding(.horizontal, 7).padding(.vertical, 3)
-                        .background(P.surface2)
-                        .overlay(Rectangle().stroke(P.rule, lineWidth: 1))
+                        .background(P.surface2, in: Capsule())
                 }
             }
             if m.title != rec.title {
@@ -127,14 +170,16 @@ struct RecordingDetail: View {
                 Eyebrow(text: "no transcript")
                 Text(sides == .missing
                      ? "The audio for this recording is gone, so there is nothing left to transcribe."
-                     : "The audio is on disk but was never transcribed — the batch pass did not finish, or python3 was unavailable when it stopped.")
+                     : "The transcript is not available yet. Your audio is saved on this Mac.")
                     .font(T.body(12)).foregroundStyle(P.ink2).lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(22)
             .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Transcript").font(T.body(15, .semibold)).foregroundStyle(P.ink2)
+                    .padding(.horizontal, 30).padding(.top, 18)
                 ForEach(lines) { u in UtteranceRow(u: u) }
             }
             .padding(.vertical, 8)
@@ -145,19 +190,25 @@ struct RecordingDetail: View {
 private struct UtteranceRow: View {
     let u: Utterance
     var body: some View {
-        HStack(alignment: .top, spacing: 11) {
-            // The speaker tag is chrome and stays left in both directions.
-            VStack(spacing: 4) {
-                Text((u.side?.rawValue ?? "—").uppercased())
-                    .font(T.mono(8.5, .semibold)).tracking(1)
-                    .foregroundStyle(u.side?.color ?? P.ink3)
-                Rectangle().fill((u.side?.color ?? P.rule).opacity(0.45)).frame(width: 2)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: u.side == .you ? "person.fill" : "waveform")
+                    .font(.system(size: 11, weight: .semibold))
+                    .frame(width: 28, height: 28)
+                    .background((u.side?.color ?? P.ink3).opacity(0.12), in: Circle())
+                Text(u.side?.rawValue ?? "Speaker")
+                    .font(T.body(12, .semibold))
             }
-            .frame(width: 34, alignment: .trailing)
-            .padding(.top, 3)
-            BidiText(text: u.text, font: T.body(14), color: P.ink)
+            .foregroundStyle(u.side?.color ?? P.ink2)
+            BidiText(text: u.text, font: T.body(16), color: P.ink)
+                .lineSpacing(7)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal, 22).padding(.vertical, 7)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(P.surface, in: RoundedRectangle(cornerRadius: 14))
+        .padding(.horizontal, 30)
+        .padding(.bottom, 2)
     }
 }
 

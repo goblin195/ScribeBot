@@ -72,12 +72,10 @@ enum TranscriptExport {
     }
 
     private static func shell(script: URL, args: [String]) -> String? {
-        let venv = Paths.root.appendingPathComponent(".venv/bin/python3")
-        let python = FileManager.default.isExecutableFile(atPath: venv.path)
-            ? venv : URL(fileURLWithPath: "/usr/bin/python3")
+        let python = URL(fileURLWithPath: Paths.python)
         let p = Process()
         p.executableURL = python
-        p.arguments = [script.path] + args
+        p.arguments = ["-B", script.path] + args
         p.currentDirectoryURL = Paths.root
         let e = Pipe()
         p.standardError = e
