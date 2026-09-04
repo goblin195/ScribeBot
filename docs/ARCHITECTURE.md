@@ -78,7 +78,12 @@ command name works in your shell and fails inside a Finder-launched app — see
 Hebrew ASR transliterates English technical vocabulary: `SSE` becomes
 `אס אס אי`, `Kubernetes` becomes `קוברנטיס`. The restorer maps known
 transliterations back, matching **exact aliases only** (`bench/aliases.json`,
-13 terms today).
+1237 terms today).
+
+Three spellings were deliberately excluded when the dictionary was imported:
+`קלאוד` is the ordinary transliteration of *cloud*, not Claude, and would
+rewrite "עוברים לקלאוד" into "עוברים ל-Claude"; `דוקר` also means "stabs"; and
+`סים` also means "sim". Each term kept its other spellings.
 
 It used to do fuzzy romanization matching. That scored better on the benchmark
 and corrupted real data — it rewrote 15.4% of a sample of real calendar strings,

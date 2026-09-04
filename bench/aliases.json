@@ -1,55 +1,4152 @@
 {
   "CrowdStrike": [
-    "קראודסטרייק"
+    "קראודסטרייק",
+    "קראוד סטרייק",
+    "קראודסטריק",
+    "קראוד סטריק"
   ],
   "Symantec": [
-    "סימנטק"
+    "סימנטק",
+    "סימנטק סקיוריטי"
   ],
   "Claude": [
-    "קלוד"
+    "קלוד",
+    "קלואד"
   ],
   "Kubernetes": [
     "קוברנטיס",
-    "קוברנטס"
+    "קוברנטס",
+    "קוברנטיז",
+    "קיוברנטיס"
   ],
   "Docker": [
-    "דוקר"
+    "דאקר"
   ],
   "ProxySG": [
-    "פרוקסי אס ג'י"
+    "פרוקסי אס ג'י",
+    "פרוקסי אס גי",
+    "פרוקסי אסג'י"
   ],
   "Entra": [
-    "אנטרה"
+    "אנטרה",
+    "אנטרה איידי"
   ],
   "CISO": [
-    "סיסו"
+    "סיסו",
+    "סי איי אס או",
+    "סיזו"
   ],
   "Palo Alto": [
-    "פאלו אלטו"
+    "פאלו אלטו",
+    "פלו אלטו",
+    "פאלואלטו"
   ],
   "SIEM": [
-    "סים",
-    "סיאם"
+    "סיאם",
+    "אס איי אי אם",
+    "אס איי אם"
   ],
   "SASE": [
-    "סאסי"
+    "סאסי",
+    "סאסה",
+    "אס איי אס אי"
   ],
   "XDR": [
-    "אקס דיאר"
+    "אקס די אר",
+    "אקס דיאר",
+    "אקסדי אר"
   ],
   "proxy": [
-    "פרוקסי"
+    "פרוקסי",
+    "פרוקסי שרת"
   ],
   "gateway": [
     "גטווי",
-    "גייטוואי"
+    "גייטוואי",
+    "גייטווי"
   ],
   "guardrails": [
     "גארד ריילס",
-    "גארדריילס"
+    "גארדריילס",
+    "גארד-ריילס"
   ],
   "DevOps": [
     "דב-אופס",
-    "דבאופס"
+    "דבאופס",
+    "דב אופס"
+  ],
+  "SentinelOne": [
+    "סנטינלוואן"
+  ],
+  "Fortinet": [
+    "פורטיnet"
+  ],
+  "FortiGate": [
+    "פורטיגייט"
+  ],
+  "Check Point": [
+    "צ'ק פוינט",
+    "צ'קפוינט"
+  ],
+  "Cloudflare": [
+    "קלאודflare"
+  ],
+  "Trellix": [
+    "טרליקס"
+  ],
+  "FireEye": [
+    "פיירEye"
+  ],
+  "Mandiant": [
+    "מנדיאנט"
+  ],
+  "Microsoft Defender": [
+    "מיקרוsoft דיפנדר",
+    "מיקרוsoftדיפנדר"
+  ],
+  "Defender for Endpoint": [
+    "דיפנדר for Endpoint",
+    "דיפנדרforEndpoint"
+  ],
+  "Defender for Cloud": [
+    "דיפנדר for קלאוד",
+    "דיפנדרforקלאוד"
+  ],
+  "Defender for Identity": [
+    "דיפנדר for איידנטיטי",
+    "דיפנדרforאיידנטיטי"
+  ],
+  "IBM Guardium": [
+    "IBM גארדium",
+    "IBMגארדium"
+  ],
+  "Guardium": [
+    "גארדium"
+  ],
+  "CyberArk": [
+    "סייברArk"
+  ],
+  "BeyondTrust": [
+    "Beyondטראסט"
+  ],
+  "Okta": [
+    "אוקטה"
+  ],
+  "Ping Identity": [
+    "Ping איידנטיטי",
+    "Pingאיידנטיטי"
+  ],
+  "SailPoint": [
+    "Sailפוינט"
+  ],
+  "Saviynt": [
+    "סביינט"
+  ],
+  "Proofpoint": [
+    "פרוףpoint"
+  ],
+  "Mimecast": [
+    "מיימקאסט"
+  ],
+  "Forcepoint": [
+    "פורסpoint"
+  ],
+  "Trend Micro": [
+    "טרנד מיקרו",
+    "טרנדמיקרו"
+  ],
+  "ESET": [
+    "אי אס אי טי",
+    "איאסאיטי"
+  ],
+  "Bitdefender": [
+    "ביטdefender"
+  ],
+  "Rapid7": [
+    "ראפיד7"
+  ],
+  "Qualys": [
+    "קוואליס"
+  ],
+  "Tenable": [
+    "טנבל"
+  ],
+  "Wiz": [
+    "וויז"
+  ],
+  "Orca Security": [
+    "Orca סקיוריטי",
+    "Orcaסקיוריטי"
+  ],
+  "Aqua Security": [
+    "Aqua סקיוריטי",
+    "Aquaסקיוריטי"
+  ],
+  "Sysdig": [
+    "סיסדיג"
+  ],
+  "Prisma Cloud": [
+    "פריזמה קלאוד",
+    "פריזמהקלאוד"
+  ],
+  "Prisma Access": [
+    "פריזמה אקסס",
+    "פריזמהאקסס"
+  ],
+  "Cortex XDR": [
+    "קורטקס XDR",
+    "קורטקסXDR"
+  ],
+  "Cortex XSIAM": [
+    "קורטקס XSIAM",
+    "קורטקסXSIAM"
+  ],
+  "Cortex XSOAR": [
+    "קורטקס XSOAR",
+    "קורטקסXSOAR"
+  ],
+  "Unit 42": [
+    "Unit42"
+  ],
+  "Armis": [
+    "ארמיס"
+  ],
+  "Claroty": [
+    "קלארוטי"
+  ],
+  "Nozomi Networks": [
+    "נוזומי נטוורקס",
+    "נוזומינטוורקס"
+  ],
+  "Darktrace": [
+    "דארקtrace"
+  ],
+  "Vectra AI": [
+    "וקטרה איי איי",
+    "וקטרהאייאיי",
+    "וקטרה AI"
+  ],
+  "ExtraHop": [
+    "אקסטרהHop"
+  ],
+  "Corelight": [
+    "קורlight"
+  ],
+  "F5": [
+    "אף 5",
+    "אף5"
+  ],
+  "BIG-IP": [
+    "בי איי ג׳י-איי פי",
+    "בי איי ג׳י איי פי",
+    "ביאייג׳י-אייפי",
+    "בי איי ג'י-איי פי"
+  ],
+  "NGINX": [
+    "אן ג׳י איי אן אקס",
+    "אןג׳יאייאןאקס",
+    "אן ג'י איי אן אקס"
+  ],
+  "Imperva": [
+    "אימפרבה"
+  ],
+  "Akamai": [
+    "אקמאי"
+  ],
+  "Radware": [
+    "רדוואר"
+  ],
+  "Citrix": [
+    "סיטריקס"
+  ],
+  "VMware": [
+    "וי אם וור",
+    "ויאםוור"
+  ],
+  "Broadcom VMware": [
+    "Broadcom וי אם וור",
+    "Broadcomויאםוור"
+  ],
+  "Cisco": [
+    "סיסקו"
+  ],
+  "Cisco ISE": [
+    "סיסקו ISE",
+    "סיסקוISE"
+  ],
+  "Cisco Umbrella": [
+    "סיסקו Umbrella",
+    "סיסקוUmbrella"
+  ],
+  "Cisco Secure Access": [
+    "סיסקו Secure אקסס",
+    "סיסקוSecureאקסס"
+  ],
+  "Juniper": [
+    "ג'וניפר"
+  ],
+  "Aruba": [
+    "ארובה"
+  ],
+  "HPE Aruba": [
+    "HPE ארובה",
+    "HPEארובה"
+  ],
+  "Extreme Networks": [
+    "Extreme נטוורקס",
+    "Extremeנטוורקס"
+  ],
+  "Illumio": [
+    "אילומיו"
+  ],
+  "AlgoSec": [
+    "אלגוסק"
+  ],
+  "Tufin": [
+    "טופין"
+  ],
+  "FireMon": [
+    "פיירMon"
+  ],
+  "Cato Networks": [
+    "קאטו נטוורקס",
+    "קאטונטוורקס"
+  ],
+  "Island": [
+    "איילנד"
+  ],
+  "Menlo Security": [
+    "מנלו סקיוריטי",
+    "מנלוסקיוריטי"
+  ],
+  "Portkey": [
+    "פורטקי"
+  ],
+  "Lakera": [
+    "לאקרה"
+  ],
+  "Koi Security": [
+    "Koi סקיוריטי",
+    "Koiסקיוריטי"
+  ],
+  "Upwind": [
+    "אפווינד"
+  ],
+  "Legit Security": [
+    "Legit סקיוריטי",
+    "Legitסקיוריטי"
+  ],
+  "Snyk": [
+    "סניק"
+  ],
+  "Checkmarx": [
+    "צ'קmarx"
+  ],
+  "Veracode": [
+    "ורהקוד"
+  ],
+  "SonarQube": [
+    "סונאר קיוב",
+    "סונארקיוב"
+  ],
+  "Semgrep": [
+    "סם גרפ",
+    "סםגרפ"
+  ],
+  "Apiiro": [
+    "אפירו"
+  ],
+  "OX Security": [
+    "OX סקיוריטי",
+    "OXסקיוריטי"
+  ],
+  "Endor Labs": [
+    "Endor לאבס",
+    "Endorלאבס"
+  ],
+  "Cribl": [
+    "קריבל"
+  ],
+  "Chronosphere": [
+    "כרונוספיר"
+  ],
+  "ClickHouse": [
+    "קליקהאוס"
+  ],
+  "Datadog": [
+    "דאטהdog"
+  ],
+  "Splunk": [
+    "ספלנק"
+  ],
+  "Elastic": [
+    "אלסטיק"
+  ],
+  "Sumo Logic": [
+    "Sumo לוג'יק",
+    "Sumoלוג'יק"
+  ],
+  "Grafana Labs": [
+    "גרפנה לאבס",
+    "גרפנהלאבס"
+  ],
+  "Prometheus": [
+    "פרומתאוס"
+  ],
+  "New Relic": [
+    "NewRelic"
+  ],
+  "PagerDuty": [
+    "פייג'ר דיוטי",
+    "פייג'רדיוטי"
+  ],
+  "ServiceNow": [
+    "סרביס נאו",
+    "סרביסנאו"
+  ],
+  "Snowflake": [
+    "סנופלייק"
+  ],
+  "Databricks": [
+    "דאטהbricks"
+  ],
+  "MongoDB": [
+    "מונגו די בי",
+    "מונגודיבי"
+  ],
+  "Redis": [
+    "רדיס"
+  ],
+  "GitHub": [
+    "גיטהאב"
+  ],
+  "GitLab": [
+    "גיטלאב"
+  ],
+  "Bitbucket": [
+    "ביטbucket"
+  ],
+  "Jenkins": [
+    "ג'נקינס"
+  ],
+  "Argo CD": [
+    "ArgoCD"
+  ],
+  "Terraform": [
+    "טרהפורם"
+  ],
+  "Ansible": [
+    "אנסיבל"
+  ],
+  "OpenShift": [
+    "אופןShift"
+  ],
+  "OpenAI": [
+    "אופןאיי איי",
+    "אופןאייאיי",
+    "אופןAI"
+  ],
+  "Anthropic": [
+    "אנתרופיק"
+  ],
+  "Google Gemini": [
+    "גוגל Gemini",
+    "גוגלGemini"
+  ],
+  "Microsoft Copilot": [
+    "מיקרוsoft Copilot",
+    "מיקרוsoftCopilot"
+  ],
+  "Mistral": [
+    "מיסטראל"
+  ],
+  "Cohere": [
+    "קוהיר"
+  ],
+  "Hugging Face": [
+    "HuggingFace"
+  ],
+  "NVIDIA": [
+    "אנבידיה"
+  ],
+  "AMD": [
+    "איי אם די",
+    "אייאםדי"
+  ],
+  "AWS": [
+    "איי דאבליו אס",
+    "איידאבליואס"
+  ],
+  "Google Cloud": [
+    "גוגל קלאוד",
+    "גוגלקלאוד"
+  ],
+  "GCP": [
+    "ג׳י סי פי",
+    "ג׳יסיפי",
+    "ג'י סי פי"
+  ],
+  "Oracle Cloud": [
+    "אורקל קלאוד",
+    "אורקלקלאוד"
+  ],
+  "OCI": [
+    "או סי איי",
+    "אוסיאיי"
+  ],
+  "EDR": [
+    "אי די אר",
+    "אידיאר"
+  ],
+  "NDR": [
+    "אן די אר",
+    "אןדיאר"
+  ],
+  "MDR": [
+    "אם די אר",
+    "אםדיאר"
+  ],
+  "SOAR": [
+    "אס או איי אר",
+    "אסאואייאר"
+  ],
+  "SOC": [
+    "אס או סי",
+    "אסאוסי"
+  ],
+  "MSSP": [
+    "אם אס אס פי",
+    "אםאסאספי"
+  ],
+  "MDR service": [
+    "MDRservice"
+  ],
+  "DLP": [
+    "די אל פי",
+    "דיאלפי"
+  ],
+  "CASB": [
+    "סי איי אס בי",
+    "סיאייאסבי"
+  ],
+  "SSE": [
+    "אס אס אי",
+    "אסאסאי"
+  ],
+  "ZTNA": [
+    "זי טי אן איי",
+    "זיטיאןאיי"
+  ],
+  "Zero Trust": [
+    "Zero טראסט",
+    "Zeroטראסט"
+  ],
+  "Zero Trust Network Access": [
+    "Zero טראסט נטוורק אקסס",
+    "Zeroטראסטנטוורקאקסס"
+  ],
+  "NAC": [
+    "אן איי סי",
+    "אןאייסי"
+  ],
+  "WAF": [
+    "דאבליו איי אף",
+    "דאבליואייאף"
+  ],
+  "WAAP": [
+    "דאבליו איי איי פי",
+    "דאבליואייאייפי",
+    "דאבליו AI פי"
+  ],
+  "API Security": [
+    "API סקיוריטי",
+    "APIסקיוריטי"
+  ],
+  "DSPM": [
+    "די אס פי אם",
+    "דיאספיאם"
+  ],
+  "CSPM": [
+    "סי אס פי אם",
+    "סיאספיאם"
+  ],
+  "CWPP": [
+    "סי דאבליו פי פי",
+    "סידאבליופיפי"
+  ],
+  "CNAPP": [
+    "סי אן איי פי פי",
+    "סיאןאייפיפי"
+  ],
+  "CIEM": [
+    "סי איי אי אם",
+    "סיאייאיאם"
+  ],
+  "KSPM": [
+    "קיי אס פי אם",
+    "קייאספיאם"
+  ],
+  "ASPM": [
+    "איי אס פי אם",
+    "אייאספיאם"
+  ],
+  "SSPM": [
+    "אס אס פי אם",
+    "אסאספיאם"
+  ],
+  "ITDR": [
+    "איי טי די אר",
+    "אייטידיאר"
+  ],
+  "EASM": [
+    "אי איי אס אם",
+    "איאייאסאם"
+  ],
+  "CAASM": [
+    "סי איי איי אס אם",
+    "סיאייאייאסאם",
+    "סי AI אס אם"
+  ],
+  "ASM": [
+    "איי אס אם",
+    "אייאסאם"
+  ],
+  "BAS": [
+    "בי איי אס",
+    "ביאייאס"
+  ],
+  "XDR platform": [
+    "XDRplatform"
+  ],
+  "endpoint security": [
+    "endpointsecurity"
+  ],
+  "endpoint protection": [
+    "endpointprotection"
+  ],
+  "endpoint detection and response": [
+    "endpointdetectionandresponse"
+  ],
+  "network detection and response": [
+    "networkdetectionandresponse"
+  ],
+  "managed detection and response": [
+    "manageddetectionandresponse"
+  ],
+  "threat detection": [
+    "threatdetection"
+  ],
+  "threat hunting": [
+    "threathunting"
+  ],
+  "incident response": [
+    "incidentresponse"
+  ],
+  "digital forensics": [
+    "digitalforensics"
+  ],
+  "DFIR": [
+    "די אף איי אר",
+    "דיאףאייאר"
+  ],
+  "threat intelligence": [
+    "threatintelligence"
+  ],
+  "threat actor": [
+    "threatactor"
+  ],
+  "IOC": [
+    "איי או סי",
+    "אייאוסי"
+  ],
+  "IOA": [
+    "איי או איי",
+    "אייאואיי"
+  ],
+  "TTP": [
+    "טי טי פי",
+    "טיטיפי"
+  ],
+  "MITRE ATT&CK": [
+    "MITREATT&CK"
+  ],
+  "ATT&CK framework": [
+    "ATT&CKframework"
+  ],
+  "kill chain": [
+    "killchain"
+  ],
+  "cyber kill chain": [
+    "cyberkillchain"
+  ],
+  "lateral movement": [
+    "lateralmovement"
+  ],
+  "privilege escalation": [
+    "privilegeescalation"
+  ],
+  "credential dumping": [
+    "credentialdumping"
+  ],
+  "initial access": [
+    "initialaccess"
+  ],
+  "command and control": [
+    "commandandcontrol"
+  ],
+  "C2": [
+    "סי 2",
+    "סי2"
+  ],
+  "data exfiltration": [
+    "dataexfiltration"
+  ],
+  "spear phishing": [
+    "spearphishing"
+  ],
+  "BEC": [
+    "בי אי סי",
+    "ביאיסי"
+  ],
+  "business email compromise": [
+    "businessemailcompromise"
+  ],
+  "zero-day": [
+    "zero day"
+  ],
+  "CVE": [
+    "סי וי אי",
+    "סיויאי"
+  ],
+  "CVSS": [
+    "סי וי אס אס",
+    "סיויאסאס"
+  ],
+  "vulnerability management": [
+    "vulnerabilitymanagement"
+  ],
+  "patch management": [
+    "patchmanagement"
+  ],
+  "attack surface": [
+    "attacksurface"
+  ],
+  "attack path": [
+    "attackpath"
+  ],
+  "risk score": [
+    "riskscore"
+  ],
+  "false positive": [
+    "falsepositive"
+  ],
+  "false negative": [
+    "falsenegative"
+  ],
+  "alert fatigue": [
+    "alertfatigue"
+  ],
+  "detection rule": [
+    "detectionrule"
+  ],
+  "correlation rule": [
+    "correlationrule"
+  ],
+  "use case": [
+    "usecase"
+  ],
+  "IOC enrichment": [
+    "IOCenrichment"
+  ],
+  "CEF": [
+    "סי אי אף",
+    "סיאיאף"
+  ],
+  "LEEF": [
+    "אל אי אי אף",
+    "אלאיאיאף"
+  ],
+  "JSON": [
+    "ג׳יי אס או אן",
+    "ג׳ייאסאואן",
+    "ג'יי אס או אן"
+  ],
+  "YAML": [
+    "וואי איי אם אל",
+    "וואיאייאםאל"
+  ],
+  "XML": [
+    "אקס אם אל",
+    "אקסאםאל"
+  ],
+  "regular expression": [
+    "regularexpression"
+  ],
+  "packet capture": [
+    "packetcapture"
+  ],
+  "PCAP": [
+    "פי סי איי פי",
+    "פיסיאייפי"
+  ],
+  "DPI": [
+    "די פי איי",
+    "דיפיאיי"
+  ],
+  "deep packet inspection": [
+    "deeppacketinspection"
+  ],
+  "TLS inspection": [
+    "TLSinspection"
+  ],
+  "SSL inspection": [
+    "SSLinspection"
+  ],
+  "PKI": [
+    "פי קיי איי",
+    "פיקייאיי"
+  ],
+  "CA": [
+    "סי איי",
+    "סיאיי"
+  ],
+  "certificate authority": [
+    "certificateauthority"
+  ],
+  "HSM": [
+    "אייץ׳ אס אם",
+    "אייץ׳אסאם"
+  ],
+  "KMS": [
+    "קיי אם אס",
+    "קייאםאס"
+  ],
+  "secret management": [
+    "secretmanagement"
+  ],
+  "secrets vault": [
+    "secretsvault"
+  ],
+  "AES": [
+    "איי אי אס",
+    "אייאיאס"
+  ],
+  "RSA": [
+    "אר אס איי",
+    "אראסאיי"
+  ],
+  "ECC": [
+    "אי סי סי",
+    "איסיסי"
+  ],
+  "SHA-256": [
+    "אס אייץ׳ איי-2 5 6",
+    "אס אייץ׳ איי 2 5 6",
+    "אסאייץ׳איי-256"
+  ],
+  "least privilege": [
+    "leastprivilege"
+  ],
+  "privileged access": [
+    "privilegedaccess"
+  ],
+  "PAM": [
+    "פי איי אם",
+    "פיאייאם"
+  ],
+  "IAM": [
+    "איי איי אם",
+    "אייאייאם",
+    "AI אם"
+  ],
+  "IGA": [
+    "איי ג׳י איי",
+    "אייג׳יאיי",
+    "איי ג'י איי"
+  ],
+  "MFA": [
+    "אם אף איי",
+    "אםאףאיי"
+  ],
+  "2FA": [
+    "2 אף איי",
+    "2אףאיי"
+  ],
+  "SSO": [
+    "אס אס או",
+    "אסאסאו"
+  ],
+  "SAML": [
+    "אס איי אם אל",
+    "אסאייאםאל"
+  ],
+  "OIDC": [
+    "או איי די סי",
+    "אואיידיסי"
+  ],
+  "LDAP": [
+    "אל די איי פי",
+    "אלדיאייפי"
+  ],
+  "Active Directory": [
+    "ActiveDirectory"
+  ],
+  "Microsoft Entra ID": [
+    "מיקרוsoft Entra ID",
+    "מיקרוsoftEntraID"
+  ],
+  "SCIM": [
+    "אס סי איי אם",
+    "אססיאייאם"
+  ],
+  "RBAC": [
+    "אר בי איי סי",
+    "ארביאייסי"
+  ],
+  "ABAC": [
+    "איי בי איי סי",
+    "אייביאייסי"
+  ],
+  "JIT access": [
+    "JITaccess"
+  ],
+  "JEA": [
+    "ג׳יי אי איי",
+    "ג׳ייאיאיי",
+    "ג'יי אי איי"
+  ],
+  "FIDO2": [
+    "אף איי די או 2",
+    "אףאיידיאו2"
+  ],
+  "conditional access": [
+    "conditionalaccess"
+  ],
+  "identity provider": [
+    "identityprovider"
+  ],
+  "service provider": [
+    "serviceprovider"
+  ],
+  "SP": [
+    "אס פי",
+    "אספי"
+  ],
+  "directory service": [
+    "directoryservice"
+  ],
+  "next-generation firewall": [
+    "next generation firewall",
+    "next-generationfirewall"
+  ],
+  "NGFW": [
+    "אן ג׳י אף דאבליו",
+    "אןג׳יאףדאבליו",
+    "אן ג'י אף דאבליו"
+  ],
+  "IPS": [
+    "איי פי אס",
+    "אייפיאס"
+  ],
+  "IDS": [
+    "איי די אס",
+    "איידיאס"
+  ],
+  "IDS/IPS": [
+    "איי די אס/איי פי אס",
+    "איידיאס/אייפיאס"
+  ],
+  "VPN": [
+    "וי פי אן",
+    "ויפיאן"
+  ],
+  "SSL VPN": [
+    "אס אס אל וי פי אן",
+    "אסאסאלויפיאן"
+  ],
+  "remote access VPN": [
+    "remoteaccessVPN"
+  ],
+  "site-to-site VPN": [
+    "site to site VPN",
+    "site-to-siteVPN"
+  ],
+  "SD-WAN": [
+    "אס די-דאבליו איי אן",
+    "אס די דאבליו איי אן",
+    "אסדי-דאבליואייאן"
+  ],
+  "WAN": [
+    "דאבליו איי אן",
+    "דאבליואייאן"
+  ],
+  "LAN": [
+    "אל איי אן",
+    "אלאייאן"
+  ],
+  "VLAN": [
+    "וי אל איי אן",
+    "ויאלאייאן"
+  ],
+  "VXLAN": [
+    "וי אקס אל איי אן",
+    "ויאקסאלאייאן"
+  ],
+  "BGP": [
+    "בי ג׳י פי",
+    "ביג׳יפי",
+    "בי ג'י פי"
+  ],
+  "OSPF": [
+    "או אס פי אף",
+    "אואספיאף"
+  ],
+  "NAT": [
+    "אן איי טי",
+    "אןאייטי"
+  ],
+  "PAT": [
+    "פי איי טי",
+    "פיאייטי"
+  ],
+  "DNS": [
+    "די אן אס",
+    "דיאןאס"
+  ],
+  "DHCP": [
+    "די אייץ׳ סי פי",
+    "דיאייץ׳סיפי"
+  ],
+  "IP address": [
+    "IPaddress"
+  ],
+  "subnet mask": [
+    "subnetmask"
+  ],
+  "CIDR": [
+    "סי איי די אר",
+    "סיאיידיאר"
+  ],
+  "default gateway": [
+    "defaultgateway"
+  ],
+  "reverse proxy": [
+    "reverseproxy"
+  ],
+  "forward proxy": [
+    "forwardproxy"
+  ],
+  "load balancer": [
+    "loadbalancer"
+  ],
+  "L4": [
+    "אל 4",
+    "אל4"
+  ],
+  "L7": [
+    "אל 7",
+    "אל7"
+  ],
+  "Layer 4": [
+    "Layer4"
+  ],
+  "Layer 7": [
+    "Layer7"
+  ],
+  "HTTP": [
+    "אייץ׳ טי טי פי",
+    "אייץ׳טיטיפי"
+  ],
+  "HTTPS": [
+    "אייץ׳ טי טי פי אס",
+    "אייץ׳טיטיפיאס"
+  ],
+  "TLS": [
+    "טי אל אס",
+    "טיאלאס"
+  ],
+  "SSL": [
+    "אס אס אל",
+    "אסאסאל"
+  ],
+  "TCP": [
+    "טי סי פי",
+    "טיסיפי"
+  ],
+  "UDP": [
+    "יו די פי",
+    "יודיפי"
+  ],
+  "ICMP": [
+    "איי סי אם פי",
+    "אייסיאםפי"
+  ],
+  "QUIC": [
+    "קיו יו איי סי",
+    "קיויואייסי"
+  ],
+  "network segmentation": [
+    "networksegmentation"
+  ],
+  "east-west traffic": [
+    "east west traffic",
+    "east-westtraffic"
+  ],
+  "north-south traffic": [
+    "north south traffic",
+    "north-southtraffic"
+  ],
+  "packet loss": [
+    "packetloss"
+  ],
+  "high availability": [
+    "highavailability"
+  ],
+  "HA": [
+    "אייץ׳ איי",
+    "אייץ׳איי"
+  ],
+  "active-active": [
+    "active active"
+  ],
+  "active-passive": [
+    "active passive"
+  ],
+  "virtual IP": [
+    "virtualIP"
+  ],
+  "VIP": [
+    "וי איי פי",
+    "ויאייפי"
+  ],
+  "DNS filtering": [
+    "DNSfiltering"
+  ],
+  "URL filtering": [
+    "URLfiltering"
+  ],
+  "web filtering": [
+    "webfiltering"
+  ],
+  "RBI": [
+    "אר בי איי",
+    "ארביאיי"
+  ],
+  "remote browser isolation": [
+    "remotebrowserisolation"
+  ],
+  "cloud security": [
+    "cloudsecurity"
+  ],
+  "public cloud": [
+    "publiccloud"
+  ],
+  "private cloud": [
+    "privatecloud"
+  ],
+  "hybrid cloud": [
+    "hybridcloud"
+  ],
+  "multi-cloud": [
+    "multi cloud"
+  ],
+  "virtual machine": [
+    "virtualmachine"
+  ],
+  "VM": [
+    "וי אם",
+    "ויאם"
+  ],
+  "container image": [
+    "containerimage"
+  ],
+  "container registry": [
+    "containerregistry"
+  ],
+  "service account": [
+    "serviceaccount"
+  ],
+  "ingress controller": [
+    "ingresscontroller"
+  ],
+  "service mesh": [
+    "servicemesh"
+  ],
+  "Helm chart": [
+    "Helmchart"
+  ],
+  "EKS": [
+    "אי קיי אס",
+    "איקייאס"
+  ],
+  "AKS": [
+    "איי קיי אס",
+    "אייקייאס"
+  ],
+  "GKE": [
+    "ג׳י קיי אי",
+    "ג׳יקייאי",
+    "ג'י קיי אי"
+  ],
+  "ECS": [
+    "אי סי אס",
+    "איסיאס"
+  ],
+  "EC2": [
+    "אי סי 2",
+    "איסי2"
+  ],
+  "S3": [
+    "אס 3",
+    "אס3"
+  ],
+  "VPC": [
+    "וי פי סי",
+    "ויפיסי"
+  ],
+  "CloudTrail": [
+    "קלאודTrail"
+  ],
+  "CloudWatch": [
+    "קלאודWatch"
+  ],
+  "IAM role": [
+    "IAMrole"
+  ],
+  "security group": [
+    "securitygroup"
+  ],
+  "NACL": [
+    "אן איי סי אל",
+    "אןאייסיאל"
+  ],
+  "Route 53": [
+    "Route53"
+  ],
+  "RDS": [
+    "אר די אס",
+    "ארדיאס"
+  ],
+  "SNS": [
+    "אס אן אס",
+    "אסאןאס"
+  ],
+  "SQS": [
+    "אס קיו אס",
+    "אסקיואס"
+  ],
+  "Azure VM": [
+    "AzureVM"
+  ],
+  "Azure Functions": [
+    "AzureFunctions"
+  ],
+  "Azure Storage": [
+    "AzureStorage"
+  ],
+  "Azure Key Vault": [
+    "AzureKeyVault"
+  ],
+  "Azure DevOps": [
+    "AzureDevOps"
+  ],
+  "Azure Policy": [
+    "AzurePolicy"
+  ],
+  "Azure Arc": [
+    "AzureArc"
+  ],
+  "Google Kubernetes Engine": [
+    "גוגל Kubernetes Engine",
+    "גוגלKubernetesEngine"
+  ],
+  "Cloud Run": [
+    "קלאוד Run",
+    "קלאודRun"
+  ],
+  "Cloud Functions": [
+    "קלאוד Functions",
+    "קלאודFunctions"
+  ],
+  "Cloud Storage": [
+    "קלאוד Storage",
+    "קלאודStorage"
+  ],
+  "Cloud Armor": [
+    "קלאוד Armor",
+    "קלאודArmor"
+  ],
+  "CloudFormation": [
+    "קלאודFormation"
+  ],
+  "infrastructure as code": [
+    "infrastructureascode"
+  ],
+  "CI/CD": [
+    "סי איי/סי די",
+    "סיאיי/סידי"
+  ],
+  "build pipeline": [
+    "buildpipeline"
+  ],
+  "deployment pipeline": [
+    "deploymentpipeline"
+  ],
+  "source code": [
+    "sourcecode"
+  ],
+  "merge request": [
+    "mergerequest"
+  ],
+  "pull request": [
+    "pullrequest"
+  ],
+  "PR": [
+    "פי אר",
+    "פיאר"
+  ],
+  "dependency scanning": [
+    "dependencyscanning"
+  ],
+  "SCA": [
+    "אס סי איי",
+    "אססיאיי"
+  ],
+  "SBOM": [
+    "אס בי או אם",
+    "אסביאואם"
+  ],
+  "software bill of materials": [
+    "softwarebillofmaterials"
+  ],
+  "container scanning": [
+    "containerscanning"
+  ],
+  "image scanning": [
+    "imagescanning"
+  ],
+  "secret scanning": [
+    "secretscanning"
+  ],
+  "code scanning": [
+    "codescanning"
+  ],
+  "SAST": [
+    "אס איי אס טי",
+    "אסאייאסטי"
+  ],
+  "DAST": [
+    "די איי אס טי",
+    "דיאייאסטי"
+  ],
+  "IAST": [
+    "איי איי אס טי",
+    "אייאייאסטי",
+    "AI אס טי"
+  ],
+  "RASP": [
+    "אר איי אס פי",
+    "אראייאספי"
+  ],
+  "AI": [
+    "איי איי",
+    "אייאיי"
+  ],
+  "Artificial Intelligence": [
+    "ArtificialIntelligence"
+  ],
+  "machine learning": [
+    "machinelearning"
+  ],
+  "ML": [
+    "אם אל",
+    "אםאל"
+  ],
+  "deep learning": [
+    "deeplearning"
+  ],
+  "neural network": [
+    "neuralnetwork"
+  ],
+  "LLM": [
+    "אל אל אם",
+    "אלאלאם"
+  ],
+  "Large Language Model": [
+    "LargeLanguageModel"
+  ],
+  "Generative AI": [
+    "Generative איי איי",
+    "Generativeאייאיי"
+  ],
+  "GenAI": [
+    "Genאיי איי",
+    "Genאייאיי"
+  ],
+  "foundation model": [
+    "foundationmodel"
+  ],
+  "fine-tuning": [
+    "fine tuning"
+  ],
+  "fine tuning": [
+    "finetuning"
+  ],
+  "RLHF": [
+    "אר אל אייץ׳ אף",
+    "אראלאייץ׳אף"
+  ],
+  "RAG": [
+    "אר איי ג׳י",
+    "אראייג׳י",
+    "אר איי ג'י"
+  ],
+  "retrieval augmented generation": [
+    "retrievalaugmentedgeneration"
+  ],
+  "vector database": [
+    "vectordatabase"
+  ],
+  "vector store": [
+    "vectorstore"
+  ],
+  "system prompt": [
+    "systemprompt"
+  ],
+  "user prompt": [
+    "userprompt"
+  ],
+  "prompt engineering": [
+    "promptengineering"
+  ],
+  "prompt injection": [
+    "promptinjection"
+  ],
+  "indirect prompt injection": [
+    "indirectpromptinjection"
+  ],
+  "context window": [
+    "contextwindow"
+  ],
+  "token limit": [
+    "tokenlimit"
+  ],
+  "top p": [
+    "topp"
+  ],
+  "chat completion": [
+    "chatcompletion"
+  ],
+  "function calling": [
+    "functioncalling"
+  ],
+  "tool calling": [
+    "toolcalling"
+  ],
+  "MCP": [
+    "אם סי פי",
+    "אםסיפי"
+  ],
+  "Model Context Protocol": [
+    "ModelContextProtocol"
+  ],
+  "AI agent": [
+    "איי איי agent",
+    "אייאייagent"
+  ],
+  "agentic AI": [
+    "agentic איי איי",
+    "agenticאייאיי"
+  ],
+  "multi-agent": [
+    "multi agent"
+  ],
+  "AI gateway": [
+    "איי איי gateway",
+    "אייאייgateway"
+  ],
+  "LLM gateway": [
+    "LLMgateway"
+  ],
+  "model routing": [
+    "modelrouting"
+  ],
+  "smart routing": [
+    "smartrouting"
+  ],
+  "fallback model": [
+    "fallbackmodel"
+  ],
+  "model provider": [
+    "modelprovider"
+  ],
+  "model endpoint": [
+    "modelendpoint"
+  ],
+  "API key": [
+    "APIkey"
+  ],
+  "rate limit": [
+    "ratelimit"
+  ],
+  "token usage": [
+    "tokenusage"
+  ],
+  "cost control": [
+    "costcontrol"
+  ],
+  "model monitoring": [
+    "modelmonitoring"
+  ],
+  "AI governance": [
+    "איי איי governance",
+    "אייאייgovernance"
+  ],
+  "AI security": [
+    "איי איי security",
+    "אייאייsecurity"
+  ],
+  "AI firewall": [
+    "איי איי firewall",
+    "אייאייfirewall"
+  ],
+  "AI red teaming": [
+    "איי איי red teaming",
+    "אייאייredteaming"
+  ],
+  "model security": [
+    "modelsecurity"
+  ],
+  "AI posture management": [
+    "איי איי posture management",
+    "אייאייposturemanagement"
+  ],
+  "shadow AI": [
+    "shadow איי איי",
+    "shadowאייאיי"
+  ],
+  "AI discovery": [
+    "איי איי discovery",
+    "אייאייdiscovery"
+  ],
+  "AI inventory": [
+    "איי איי inventory",
+    "אייאייinventory"
+  ],
+  "AI risk": [
+    "איי איי risk",
+    "אייאייrisk"
+  ],
+  "AI policy": [
+    "איי איי policy",
+    "אייאייpolicy"
+  ],
+  "AI DLP": [
+    "איי איי DLP",
+    "אייאייDLP"
+  ],
+  "AI-SPM": [
+    "איי איי-SPM",
+    "איי איי SPM",
+    "אייאיי-SPM"
+  ],
+  "model poisoning": [
+    "modelpoisoning"
+  ],
+  "data poisoning": [
+    "datapoisoning"
+  ],
+  "training data": [
+    "trainingdata"
+  ],
+  "sensitive data": [
+    "sensitivedata"
+  ],
+  "PII": [
+    "פי איי איי",
+    "פיאייאיי",
+    "פי AI"
+  ],
+  "PHI": [
+    "פי אייץ׳ איי",
+    "פיאייץ׳איי"
+  ],
+  "PCI": [
+    "פי סי איי",
+    "פיסיאיי"
+  ],
+  "prompt leakage": [
+    "promptleakage"
+  ],
+  "system prompt leakage": [
+    "systempromptleakage"
+  ],
+  "data leakage": [
+    "dataleakage"
+  ],
+  "model extraction": [
+    "modelextraction"
+  ],
+  "model inversion": [
+    "modelinversion"
+  ],
+  "adversarial attack": [
+    "adversarialattack"
+  ],
+  "AI supply chain": [
+    "איי איי supply chain",
+    "אייאייsupplychain"
+  ],
+  "MCP server": [
+    "MCPserver"
+  ],
+  "MCP client": [
+    "MCPclient"
+  ],
+  "tool permission": [
+    "toolpermission"
+  ],
+  "tool approval": [
+    "toolapproval"
+  ],
+  "Claude Code": [
+    "Claude קוד",
+    "Claudeקוד"
+  ],
+  "Claude Desktop": [
+    "ClaudeDesktop"
+  ],
+  "Claude Enterprise": [
+    "ClaudeEnterprise"
+  ],
+  "ChatGPT Enterprise": [
+    "ChatGPTEnterprise"
+  ],
+  "OpenAI API": [
+    "אופןאיי איי API",
+    "אופןאייאייAPI",
+    "אופןAI API"
+  ],
+  "Anthropic API": [
+    "אנתרופיק API",
+    "אנתרופיקAPI"
+  ],
+  "Gemini Enterprise": [
+    "GeminiEnterprise"
+  ],
+  "GitHub Copilot": [
+    "גיטהאב Copilot",
+    "גיטהאבCopilot"
+  ],
+  "OpenRouter": [
+    "אופןRouter"
+  ],
+  "Amazon Bedrock": [
+    "AmazonBedrock"
+  ],
+  "Azure OpenAI": [
+    "Azure אופןאיי איי",
+    "Azureאופןאייאיי",
+    "Azure אופןAI"
+  ],
+  "Vertex AI": [
+    "Vertex איי איי",
+    "Vertexאייאיי"
+  ],
+  "Azure AI Foundry": [
+    "Azure איי איי Foundry",
+    "AzureאייאייFoundry"
+  ],
+  "DB": [
+    "די בי",
+    "דיבי"
+  ],
+  "SQL": [
+    "אס קיו אל",
+    "אסקיואל"
+  ],
+  "Oracle": [
+    "אורקל"
+  ],
+  "Oracle RAC": [
+    "אורקל RAC",
+    "אורקלRAC"
+  ],
+  "Microsoft SQL Server": [
+    "מיקרוsoft SQL Server",
+    "מיקרוsoftSQLServer"
+  ],
+  "SQL Server": [
+    "SQLServer"
+  ],
+  "Elasticsearch": [
+    "אלסטיקsearch"
+  ],
+  "OpenSearch": [
+    "אופןSearch"
+  ],
+  "data warehouse": [
+    "datawarehouse"
+  ],
+  "data lake": [
+    "datalake"
+  ],
+  "data lakehouse": [
+    "datalakehouse"
+  ],
+  "ETL": [
+    "אי טי אל",
+    "איטיאל"
+  ],
+  "ELT": [
+    "אי אל טי",
+    "איאלטי"
+  ],
+  "Apache Kafka": [
+    "ApacheKafka"
+  ],
+  "stored procedure": [
+    "storedprocedure"
+  ],
+  "POC": [
+    "פי או סי",
+    "פיאוסי"
+  ],
+  "proof of concept": [
+    "proofofconcept"
+  ],
+  "development environment": [
+    "developmentenvironment"
+  ],
+  "test environment": [
+    "testenvironment"
+  ],
+  "demo environment": [
+    "demoenvironment"
+  ],
+  "business case": [
+    "businesscase"
+  ],
+  "RFP": [
+    "אר אף פי",
+    "אראףפי"
+  ],
+  "RFI": [
+    "אר אף איי",
+    "אראףאיי"
+  ],
+  "RFQ": [
+    "אר אף קיו",
+    "אראףקיו"
+  ],
+  "HLD": [
+    "אייץ׳ אל די",
+    "אייץ׳אלדי"
+  ],
+  "LLD": [
+    "אל אל די",
+    "אלאלדי"
+  ],
+  "API integration": [
+    "APIintegration"
+  ],
+  "professional services": [
+    "professionalservices"
+  ],
+  "PS": [
+    "פי אס",
+    "פיאס"
+  ],
+  "SLA": [
+    "אס אל איי",
+    "אסאלאיי"
+  ],
+  "per user": [
+    "peruser"
+  ],
+  "per endpoint": [
+    "perendpoint"
+  ],
+  "per workload": [
+    "perworkload"
+  ],
+  "per GB": [
+    "perGB"
+  ],
+  "cross-sell": [
+    "cross sell"
+  ],
+  "ARR": [
+    "איי אר אר",
+    "אייאראר"
+  ],
+  "MRR": [
+    "אם אר אר",
+    "אםאראר"
+  ],
+  "TCV": [
+    "טי סי וי",
+    "טיסיוי"
+  ],
+  "ACV": [
+    "איי סי וי",
+    "אייסיוי"
+  ],
+  "ROI": [
+    "אר או איי",
+    "אראואיי"
+  ],
+  "TCO": [
+    "טי סי או",
+    "טיסיאו"
+  ],
+  "enterprise customer": [
+    "enterprisecustomer"
+  ],
+  "decision maker": [
+    "decisionmaker"
+  ],
+  "technical owner": [
+    "technicalowner"
+  ],
+  "business owner": [
+    "businessowner"
+  ],
+  "CIO": [
+    "סי איי או",
+    "סיאייאו"
+  ],
+  "CTO": [
+    "סי טי או",
+    "סיטיאו"
+  ],
+  "SOC manager": [
+    "SOCmanager"
+  ],
+  "security architect": [
+    "securityarchitect"
+  ],
+  "security engineer": [
+    "securityengineer"
+  ],
+  "sales engineer": [
+    "salesengineer"
+  ],
+  "solution architect": [
+    "solutionarchitect"
+  ],
+  "account manager": [
+    "accountmanager"
+  ],
+  "customer success": [
+    "customersuccess"
+  ],
+  "must have": [
+    "musthave"
+  ],
+  "nice to have": [
+    "nicetohave"
+  ],
+  "on-prem": [
+    "on prem"
+  ],
+  "on-premises": [
+    "on premises"
+  ],
+  "cloud-native": [
+    "cloud native"
+  ],
+  "air-gapped": [
+    "air gapped"
+  ],
+  "air gap": [
+    "airgap"
+  ],
+  "sovereign cloud": [
+    "sovereigncloud"
+  ],
+  "Microsoft 365": [
+    "מיקרוsoft 365",
+    "מיקרוsoft365"
+  ],
+  "Office 365": [
+    "Office365"
+  ],
+  "M365": [
+    "אם 3 6 5",
+    "אם365"
+  ],
+  "O365": [
+    "או 3 6 5",
+    "או365"
+  ],
+  "Microsoft Sentinel": [
+    "מיקרוsoft סנטינל",
+    "מיקרוsoftסנטינל"
+  ],
+  "Sentinel": [
+    "סנטינל"
+  ],
+  "Defender XDR": [
+    "דיפנדר XDR",
+    "דיפנדרXDR"
+  ],
+  "Defender for Office 365": [
+    "דיפנדר for Office 365",
+    "דיפנדרforOffice365"
+  ],
+  "Exchange Online": [
+    "ExchangeOnline"
+  ],
+  "SharePoint Online": [
+    "Shareפוינט Online",
+    "ShareפוינטOnline"
+  ],
+  "OneDrive": [
+    "וואןDrive"
+  ],
+  "Windows 11": [
+    "Windows11"
+  ],
+  "Windows Server": [
+    "WindowsServer"
+  ],
+  "Active Directory Domain Services": [
+    "ActiveDirectoryDomainServices"
+  ],
+  "AD DS": [
+    "איי די די אס",
+    "איידידיאס"
+  ],
+  "Group Policy": [
+    "GroupPolicy"
+  ],
+  "GPO": [
+    "ג׳י פי או",
+    "ג׳יפיאו",
+    "ג'י פי או"
+  ],
+  "PowerShell script": [
+    "PowerShellscript"
+  ],
+  "SCCM": [
+    "אס סי סי אם",
+    "אססיסיאם"
+  ],
+  "Configuration Manager": [
+    "ConfigurationManager"
+  ],
+  "MECM": [
+    "אם אי סי אם",
+    "אםאיסיאם"
+  ],
+  "WSUS": [
+    "דאבליו אס יו אס",
+    "דאבליואסיואס"
+  ],
+  "SMTP": [
+    "אס אם טי פי",
+    "אסאםטיפי"
+  ],
+  "IMAP": [
+    "איי אם איי פי",
+    "אייאםאייפי"
+  ],
+  "POP3": [
+    "פי או פי 3",
+    "פיאופי3"
+  ],
+  "SNMP": [
+    "אס אן אם פי",
+    "אסאןאםפי"
+  ],
+  "SSH": [
+    "אס אס אייץ׳",
+    "אסאסאייץ׳"
+  ],
+  "RDP": [
+    "אר די פי",
+    "ארדיפי"
+  ],
+  "SMB": [
+    "אס אם בי",
+    "אסאםבי"
+  ],
+  "NFS": [
+    "אן אף אס",
+    "אןאףאס"
+  ],
+  "FTP": [
+    "אף טי פי",
+    "אףטיפי"
+  ],
+  "SFTP": [
+    "אס אף טי פי",
+    "אסאףטיפי"
+  ],
+  "SCP": [
+    "אס סי פי",
+    "אססיפי"
+  ],
+  "NTLM": [
+    "אן טי אל אם",
+    "אןטיאלאם"
+  ],
+  "RADIUS": [
+    "אר איי די איי יו אס",
+    "אראיידיאיייואס"
+  ],
+  "TACACS+": [
+    "טי איי סי איי סי אס",
+    "טיאייסיאייסיאס"
+  ],
+  "REST": [
+    "אר אי אס טי",
+    "אראיאסטי"
+  ],
+  "REST API": [
+    "אר אי אס טי איי פי איי",
+    "אראיאסטיאייפיאיי"
+  ],
+  "API gateway": [
+    "APIgateway"
+  ],
+  "message queue": [
+    "messagequeue"
+  ],
+  "service principal": [
+    "serviceprincipal"
+  ],
+  "managed identity": [
+    "managedidentity"
+  ],
+  "certificate pinning": [
+    "certificatepinning"
+  ],
+  "mutual TLS": [
+    "mutualTLS"
+  ],
+  "Palo Alto Networks PAN-OS": [
+    "פאלו אלטו נטוורקס PAN-OS",
+    "פאלו אלטו נטוורקס PAN OS",
+    "פאלואלטונטוורקסPAN-OS"
+  ],
+  "Palo Alto Networks Panorama": [
+    "פאלו אלטו נטוורקס Panorama",
+    "פאלואלטונטוורקסPanorama"
+  ],
+  "Palo Alto Networks Prisma Access": [
+    "פאלו אלטו נטוורקס פריזמה אקסס",
+    "פאלואלטונטוורקספריזמהאקסס"
+  ],
+  "Palo Alto Networks Prisma Cloud": [
+    "פאלו אלטו נטוורקס פריזמה קלאוד",
+    "פאלואלטונטוורקספריזמהקלאוד"
+  ],
+  "Palo Alto Networks Cortex XDR": [
+    "פאלו אלטו נטוורקס קורטקס XDR",
+    "פאלואלטונטוורקסקורטקסXDR"
+  ],
+  "Palo Alto Networks Cortex XSIAM": [
+    "פאלו אלטו נטוורקס קורטקס XSIAM",
+    "פאלואלטונטוורקסקורטקסXSIAM"
+  ],
+  "Palo Alto Networks Cortex XSOAR": [
+    "פאלו אלטו נטוורקס קורטקס XSOAR",
+    "פאלואלטונטוורקסקורטקסXSOAR"
+  ],
+  "Palo Alto Networks AIOps": [
+    "פאלו אלטו נטוורקס איי אייOps",
+    "פאלואלטונטוורקסאייאייOps",
+    "פאלו אלטו נטוורקס AIOps"
+  ],
+  "Palo Alto Networks Strata Cloud Manager": [
+    "פאלו אלטו נטוורקס Strata קלאוד Manager",
+    "פאלואלטונטוורקסStrataקלאודManager"
+  ],
+  "Palo Alto Networks SCM": [
+    "פאלו אלטו נטוורקס SCM",
+    "פאלואלטונטוורקסSCM"
+  ],
+  "Palo Alto Networks GlobalProtect": [
+    "פאלו אלטו נטוורקס GlobalProtect",
+    "פאלואלטונטוורקסGlobalProtect"
+  ],
+  "Palo Alto Networks WildFire": [
+    "פאלו אלטו נטוורקס Wildפייר",
+    "פאלואלטונטוורקסWildפייר"
+  ],
+  "Palo Alto Networks Advanced URL Filtering": [
+    "פאלו אלטו נטוורקס Advanced URL Filtering",
+    "פאלואלטונטוורקסAdvancedURLFiltering"
+  ],
+  "Palo Alto Networks Advanced Threat Prevention": [
+    "פאלו אלטו נטוורקס Advanced Threat Prevention",
+    "פאלואלטונטוורקסAdvancedThreatPrevention"
+  ],
+  "Palo Alto Networks Enterprise DLP": [
+    "פאלו אלטו נטוורקס Enterprise DLP",
+    "פאלואלטונטוורקסEnterpriseDLP"
+  ],
+  "Palo Alto Networks SaaS Security": [
+    "פאלו אלטו נטוורקס SaaS סקיוריטי",
+    "פאלואלטונטוורקסSaaSסקיוריטי"
+  ],
+  "Palo Alto Networks Prisma Browser": [
+    "פאלו אלטו נטוורקס פריזמה Browser",
+    "פאלואלטונטוורקספריזמהBrowser"
+  ],
+  "Fortinet FortiGate": [
+    "פורטיnet פורטיגייט",
+    "פורטיnetפורטיגייט"
+  ],
+  "Fortinet FortiManager": [
+    "פורטיnet פורטיManager",
+    "פורטיnetפורטיManager"
+  ],
+  "Fortinet FortiAnalyzer": [
+    "פורטיnet פורטיAnalyzer",
+    "פורטיnetפורטיAnalyzer"
+  ],
+  "Fortinet FortiClient": [
+    "פורטיnet פורטיClient",
+    "פורטיnetפורטיClient"
+  ],
+  "Fortinet FortiEDR": [
+    "פורטיnet פורטיEDR",
+    "פורטיnetפורטיEDR"
+  ],
+  "Fortinet FortiNDR": [
+    "פורטיnet פורטיNDR",
+    "פורטיnetפורטיNDR"
+  ],
+  "Fortinet FortiSIEM": [
+    "פורטיnet פורטיSIEM",
+    "פורטיnetפורטיSIEM"
+  ],
+  "Fortinet FortiSOAR": [
+    "פורטיnet פורטיSOAR",
+    "פורטיnetפורטיSOAR"
+  ],
+  "Fortinet FortiSASE": [
+    "פורטיnet פורטיSASE",
+    "פורטיnetפורטיSASE"
+  ],
+  "Fortinet FortiWeb": [
+    "פורטיnet פורטיWeb",
+    "פורטיnetפורטיWeb"
+  ],
+  "Fortinet FortiMail": [
+    "פורטיnet פורטיMail",
+    "פורטיnetפורטיMail"
+  ],
+  "Fortinet FortiSandbox": [
+    "פורטיnet פורטיSandbox",
+    "פורטיnetפורטיSandbox"
+  ],
+  "Fortinet FortiProxy": [
+    "פורטיnet פורטיProxy",
+    "פורטיnetפורטיProxy"
+  ],
+  "Fortinet FortiAuthenticator": [
+    "פורטיnet פורטיAuthenticator",
+    "פורטיnetפורטיAuthenticator"
+  ],
+  "Fortinet FortiToken": [
+    "פורטיnet פורטיToken",
+    "פורטיnetפורטיToken"
+  ],
+  "Check Point Quantum": [
+    "צ'ק פוינט Quantum",
+    "צ'קפוינטQuantum"
+  ],
+  "Check Point Harmony": [
+    "צ'ק פוינט Harmony",
+    "צ'קפוינטHarmony"
+  ],
+  "Check Point CloudGuard": [
+    "צ'ק פוינט קלאודגארד",
+    "צ'קפוינטקלאודגארד"
+  ],
+  "Check Point Infinity": [
+    "צ'ק פוינט Infinity",
+    "צ'קפוינטInfinity"
+  ],
+  "Check Point SmartConsole": [
+    "צ'ק פוינט SmartConsole",
+    "צ'קפוינטSmartConsole"
+  ],
+  "Check Point Smart-1": [
+    "צ'ק פוינט Smart-1",
+    "צ'ק פוינט Smart 1",
+    "צ'קפוינטSmart-1"
+  ],
+  "Check Point ThreatCloud": [
+    "צ'ק פוינט Threatקלאוד",
+    "צ'קפוינטThreatקלאוד"
+  ],
+  "Check Point Harmony Endpoint": [
+    "צ'ק פוינט Harmony Endpoint",
+    "צ'קפוינטHarmonyEndpoint"
+  ],
+  "Check Point Harmony Email": [
+    "צ'ק פוינט Harmony Email",
+    "צ'קפוינטHarmonyEmail"
+  ],
+  "Check Point Harmony SASE": [
+    "צ'ק פוינט Harmony SASE",
+    "צ'קפוינטHarmonySASE"
+  ],
+  "Check Point CloudGuard CNAPP": [
+    "צ'ק פוינט קלאודגארד CNAPP",
+    "צ'קפוינטקלאודגארדCNAPP"
+  ],
+  "Check Point CloudGuard WAF": [
+    "צ'ק פוינט קלאודגארד WAF",
+    "צ'קפוינטקלאודגארדWAF"
+  ],
+  "Microsoft Defender XDR": [
+    "מיקרוsoft דיפנדר XDR",
+    "מיקרוsoftדיפנדרXDR"
+  ],
+  "Microsoft Defender for Endpoint": [
+    "מיקרוsoft דיפנדר for Endpoint",
+    "מיקרוsoftדיפנדרforEndpoint"
+  ],
+  "Microsoft Defender for Cloud": [
+    "מיקרוsoft דיפנדר for קלאוד",
+    "מיקרוsoftדיפנדרforקלאוד"
+  ],
+  "Microsoft Defender for Identity": [
+    "מיקרוsoft דיפנדר for איידנטיטי",
+    "מיקרוsoftדיפנדרforאיידנטיטי"
+  ],
+  "Microsoft Defender for Office 365": [
+    "מיקרוsoft דיפנדר for Office 365",
+    "מיקרוsoftדיפנדרforOffice365"
+  ],
+  "Microsoft Entra Private Access": [
+    "מיקרוsoft Entra Private אקסס",
+    "מיקרוsoftEntraPrivateאקסס"
+  ],
+  "Microsoft Entra Internet Access": [
+    "מיקרוsoft Entra Internet אקסס",
+    "מיקרוsoftEntraInternetאקסס"
+  ],
+  "Microsoft Purview": [
+    "מיקרוsoft Purview",
+    "מיקרוsoftPurview"
+  ],
+  "Microsoft Intune": [
+    "מיקרוsoft Intune",
+    "מיקרוsoftIntune"
+  ],
+  "Microsoft Security Copilot": [
+    "מיקרוsoft סקיוריטי Copilot",
+    "מיקרוsoftסקיוריטיCopilot"
+  ],
+  "Cisco Secure Firewall": [
+    "סיסקו Secure פיירwall",
+    "סיסקוSecureפיירwall"
+  ],
+  "Cisco Firepower": [
+    "סיסקו פיירpower",
+    "סיסקופיירpower"
+  ],
+  "Cisco Duo": [
+    "סיסקו Duo",
+    "סיסקוDuo"
+  ],
+  "Cisco XDR": [
+    "סיסקו XDR",
+    "סיסקוXDR"
+  ],
+  "Cisco Secure Endpoint": [
+    "סיסקו Secure Endpoint",
+    "סיסקוSecureEndpoint"
+  ],
+  "Cisco Secure Network Analytics": [
+    "סיסקו Secure נטוורק Analytics",
+    "סיסקוSecureנטוורקAnalytics"
+  ],
+  "Cisco ThousandEyes": [
+    "סיסקו ThousandEyes",
+    "סיסקוThousandEyes"
+  ],
+  "Cisco Meraki": [
+    "סיסקו Meraki",
+    "סיסקוMeraki"
+  ],
+  "F5 BIG-IP LTM": [
+    "אף 5 בי איי ג׳י-איי פי אל טי אם",
+    "אף 5 בי איי ג׳י איי פי אל טי אם",
+    "אף5ביאייג׳י-אייפיאלטיאם",
+    "אף 5 בי איי ג'י-איי פי אל טי אם"
+  ],
+  "F5 BIG-IP APM": [
+    "אף 5 בי איי ג׳י-איי פי איי פי אם",
+    "אף 5 בי איי ג׳י איי פי איי פי אם",
+    "אף5ביאייג׳י-אייפיאייפיאם",
+    "אף 5 בי איי ג'י-איי פי איי פי אם"
+  ],
+  "F5 BIG-IP ASM": [
+    "אף 5 בי איי ג׳י-איי פי איי אס אם",
+    "אף 5 בי איי ג׳י איי פי איי אס אם",
+    "אף5ביאייג׳י-אייפיאייאסאם",
+    "אף 5 בי איי ג'י-איי פי איי אס אם"
+  ],
+  "F5 Advanced WAF": [
+    "F5AdvancedWAF"
+  ],
+  "F5 Distributed Cloud": [
+    "F5 Distributed קלאוד",
+    "F5Distributedקלאוד"
+  ],
+  "F5 XC": [
+    "אף 5 אקס סי",
+    "אף5אקססי"
+  ],
+  "F5 NGINX Plus": [
+    "F5NGINXPlus"
+  ],
+  "F5 BIG-IQ": [
+    "אף 5 בי איי ג׳י-איי קיו",
+    "אף 5 בי איי ג׳י איי קיו",
+    "אף5ביאייג׳י-אייקיו",
+    "אף 5 בי איי ג'י-איי קיו"
+  ],
+  "Broadcom Symantec DLP": [
+    "BroadcomSymantecDLP"
+  ],
+  "Broadcom Symantec Endpoint Security": [
+    "Broadcom Symantec Endpoint סקיוריטי",
+    "BroadcomSymantecEndpointסקיוריטי"
+  ],
+  "Broadcom ProxySG": [
+    "BroadcomProxySG"
+  ],
+  "Broadcom Web Security Service": [
+    "Broadcom Web סקיוריטי Service",
+    "BroadcomWebסקיוריטיService"
+  ],
+  "Broadcom WSS": [
+    "BroadcomWSS"
+  ],
+  "Broadcom CloudSOC": [
+    "Broadcom קלאודSOC",
+    "BroadcomקלאודSOC"
+  ],
+  "Broadcom VIP Authentication": [
+    "BroadcomVIPAuthentication"
+  ],
+  "Broadcom SiteMinder": [
+    "BroadcomSiteMinder"
+  ],
+  "IBM Guardium Data Protection": [
+    "IBM גארדium דאטה Protection",
+    "IBMגארדiumדאטהProtection"
+  ],
+  "IBM Guardium Insights": [
+    "IBM גארדium Insights",
+    "IBMגארדiumInsights"
+  ],
+  "IBM QRadar": [
+    "IBMQRadar"
+  ],
+  "IBM QRadar SIEM": [
+    "IBMQRadarSIEM"
+  ],
+  "IBM QRadar SOAR": [
+    "IBMQRadarSOAR"
+  ],
+  "AWS IAM": [
+    "איי דאבליו אס איי איי אם",
+    "איידאבליואסאייאייאם",
+    "איי דאבליו אס AI אם"
+  ],
+  "AWS EC2": [
+    "איי דאבליו אס אי סי 2",
+    "איידאבליואסאיסי2"
+  ],
+  "AWS S3": [
+    "איי דאבליו אס אס 3",
+    "איידאבליואסאס3"
+  ],
+  "AWS VPC": [
+    "איי דאבליו אס וי פי סי",
+    "איידאבליואסויפיסי"
+  ],
+  "AWS GuardDuty": [
+    "AWS גארדDuty",
+    "AWSגארדDuty"
+  ],
+  "AWS Security Hub": [
+    "AWS סקיוריטי Hub",
+    "AWSסקיוריטיHub"
+  ],
+  "AWS Inspector": [
+    "AWSInspector"
+  ],
+  "AWS Macie": [
+    "AWSMacie"
+  ],
+  "AWS WAF": [
+    "איי דאבליו אס דאבליו איי אף",
+    "איידאבליואסדאבליואייאף"
+  ],
+  "AWS Shield": [
+    "AWSShield"
+  ],
+  "AWS CloudTrail": [
+    "AWS קלאודTrail",
+    "AWSקלאודTrail"
+  ],
+  "AWS CloudWatch": [
+    "AWS קלאודWatch",
+    "AWSקלאודWatch"
+  ],
+  "AWS KMS": [
+    "איי דאבליו אס קיי אם אס",
+    "איידאבליואסקייאםאס"
+  ],
+  "AWS Secrets Manager": [
+    "AWSSecretsManager"
+  ],
+  "AWS Bedrock": [
+    "AWSBedrock"
+  ],
+  "Azure Entra ID": [
+    "AzureEntraID"
+  ],
+  "Azure Defender for Cloud": [
+    "Azure דיפנדר for קלאוד",
+    "Azureדיפנדרforקלאוד"
+  ],
+  "Azure Sentinel": [
+    "Azure סנטינל",
+    "Azureסנטינל"
+  ],
+  "Azure Firewall": [
+    "Azure פיירwall",
+    "Azureפיירwall"
+  ],
+  "Azure Application Gateway": [
+    "Azure Application גייטway",
+    "AzureApplicationגייטway"
+  ],
+  "Azure Front Door": [
+    "AzureFrontDoor"
+  ],
+  "Azure AKS": [
+    "AzureAKS"
+  ],
+  "Azure Storage Account": [
+    "AzureStorageAccount"
+  ],
+  "Azure Log Analytics": [
+    "AzureLogAnalytics"
+  ],
+  "Google Cloud GKE": [
+    "גוגל קלאוד GKE",
+    "גוגלקלאודGKE"
+  ],
+  "Google Cloud Cloud Armor": [
+    "גוגל קלאוד קלאוד Armor",
+    "גוגלקלאודקלאודArmor"
+  ],
+  "Google Cloud Security Command Center": [
+    "גוגל קלאוד סקיוריטי Command Center",
+    "גוגלקלאודסקיוריטיCommandCenter"
+  ],
+  "Google Cloud Vertex AI": [
+    "גוגל קלאוד Vertex איי איי",
+    "גוגלקלאודVertexאייאיי",
+    "גוגל קלאוד Vertex AI"
+  ],
+  "Google Cloud BigQuery": [
+    "גוגל קלאוד BigQuery",
+    "גוגלקלאודBigQuery"
+  ],
+  "Google Cloud Cloud Run": [
+    "גוגל קלאוד קלאוד Run",
+    "גוגלקלאודקלאודRun"
+  ],
+  "Google Cloud Cloud Functions": [
+    "גוגל קלאוד קלאוד Functions",
+    "גוגלקלאודקלאודFunctions"
+  ],
+  "Google Cloud IAM": [
+    "גוגל קלאוד IAM",
+    "גוגלקלאודIAM"
+  ],
+  "Google Cloud VPC Service Controls": [
+    "גוגל קלאוד VPC Service Controls",
+    "גוגלקלאודVPCServiceControls"
+  ],
+  "endpoint platform": [
+    "endpointplatform"
+  ],
+  "endpoint console": [
+    "endpointconsole"
+  ],
+  "endpoint manager": [
+    "endpointmanager"
+  ],
+  "endpoint agent": [
+    "endpointagent"
+  ],
+  "endpoint sensor": [
+    "endpointsensor"
+  ],
+  "endpoint collector": [
+    "endpointcollector"
+  ],
+  "endpoint connector": [
+    "endpointconnector"
+  ],
+  "endpoint gateway": [
+    "endpointgateway"
+  ],
+  "endpoint policy": [
+    "endpointpolicy"
+  ],
+  "endpoint rule": [
+    "endpointrule"
+  ],
+  "endpoint profile": [
+    "endpointprofile"
+  ],
+  "endpoint tenant": [
+    "endpointtenant"
+  ],
+  "endpoint workspace": [
+    "endpointworkspace"
+  ],
+  "endpoint cluster": [
+    "endpointcluster"
+  ],
+  "endpoint node": [
+    "endpointnode"
+  ],
+  "endpoint server": [
+    "endpointserver"
+  ],
+  "endpoint client": [
+    "endpointclient"
+  ],
+  "endpoint endpoint": [
+    "endpointendpoint"
+  ],
+  "endpoint workload": [
+    "endpointworkload"
+  ],
+  "network security": [
+    "networksecurity"
+  ],
+  "network platform": [
+    "networkplatform"
+  ],
+  "network console": [
+    "networkconsole"
+  ],
+  "network manager": [
+    "networkmanager"
+  ],
+  "network agent": [
+    "networkagent"
+  ],
+  "network sensor": [
+    "networksensor"
+  ],
+  "network collector": [
+    "networkcollector"
+  ],
+  "network connector": [
+    "networkconnector"
+  ],
+  "network gateway": [
+    "networkgateway"
+  ],
+  "network policy": [
+    "networkpolicy"
+  ],
+  "network rule": [
+    "networkrule"
+  ],
+  "network profile": [
+    "networkprofile"
+  ],
+  "network tenant": [
+    "networktenant"
+  ],
+  "network workspace": [
+    "networkworkspace"
+  ],
+  "network cluster": [
+    "networkcluster"
+  ],
+  "network node": [
+    "networknode"
+  ],
+  "network server": [
+    "networkserver"
+  ],
+  "network client": [
+    "networkclient"
+  ],
+  "network endpoint": [
+    "networkendpoint"
+  ],
+  "network workload": [
+    "networkworkload"
+  ],
+  "cloud platform": [
+    "cloudplatform"
+  ],
+  "cloud console": [
+    "cloudconsole"
+  ],
+  "cloud manager": [
+    "cloudmanager"
+  ],
+  "cloud agent": [
+    "cloudagent"
+  ],
+  "cloud sensor": [
+    "cloudsensor"
+  ],
+  "cloud collector": [
+    "cloudcollector"
+  ],
+  "cloud connector": [
+    "cloudconnector"
+  ],
+  "cloud gateway": [
+    "cloudgateway"
+  ],
+  "cloud policy": [
+    "cloudpolicy"
+  ],
+  "cloud rule": [
+    "cloudrule"
+  ],
+  "cloud profile": [
+    "cloudprofile"
+  ],
+  "cloud tenant": [
+    "cloudtenant"
+  ],
+  "cloud workspace": [
+    "cloudworkspace"
+  ],
+  "cloud cluster": [
+    "cloudcluster"
+  ],
+  "cloud node": [
+    "cloudnode"
+  ],
+  "cloud server": [
+    "cloudserver"
+  ],
+  "cloud client": [
+    "cloudclient"
+  ],
+  "cloud endpoint": [
+    "cloudendpoint"
+  ],
+  "cloud workload": [
+    "cloudworkload"
+  ],
+  "identity security": [
+    "identitysecurity"
+  ],
+  "identity platform": [
+    "identityplatform"
+  ],
+  "identity console": [
+    "identityconsole"
+  ],
+  "identity manager": [
+    "identitymanager"
+  ],
+  "identity agent": [
+    "identityagent"
+  ],
+  "identity sensor": [
+    "identitysensor"
+  ],
+  "identity collector": [
+    "identitycollector"
+  ],
+  "identity connector": [
+    "identityconnector"
+  ],
+  "identity gateway": [
+    "identitygateway"
+  ],
+  "identity policy": [
+    "identitypolicy"
+  ],
+  "identity rule": [
+    "identityrule"
+  ],
+  "identity profile": [
+    "identityprofile"
+  ],
+  "identity tenant": [
+    "identitytenant"
+  ],
+  "identity workspace": [
+    "identityworkspace"
+  ],
+  "identity cluster": [
+    "identitycluster"
+  ],
+  "identity node": [
+    "identitynode"
+  ],
+  "identity server": [
+    "identityserver"
+  ],
+  "identity client": [
+    "identityclient"
+  ],
+  "identity endpoint": [
+    "identityendpoint"
+  ],
+  "identity workload": [
+    "identityworkload"
+  ],
+  "email security": [
+    "emailsecurity"
+  ],
+  "email platform": [
+    "emailplatform"
+  ],
+  "email console": [
+    "emailconsole"
+  ],
+  "email manager": [
+    "emailmanager"
+  ],
+  "email agent": [
+    "emailagent"
+  ],
+  "email sensor": [
+    "emailsensor"
+  ],
+  "email collector": [
+    "emailcollector"
+  ],
+  "email connector": [
+    "emailconnector"
+  ],
+  "email gateway": [
+    "emailgateway"
+  ],
+  "email policy": [
+    "emailpolicy"
+  ],
+  "email rule": [
+    "emailrule"
+  ],
+  "email profile": [
+    "emailprofile"
+  ],
+  "email tenant": [
+    "emailtenant"
+  ],
+  "email workspace": [
+    "emailworkspace"
+  ],
+  "email cluster": [
+    "emailcluster"
+  ],
+  "email node": [
+    "emailnode"
+  ],
+  "email server": [
+    "emailserver"
+  ],
+  "email client": [
+    "emailclient"
+  ],
+  "email endpoint": [
+    "emailendpoint"
+  ],
+  "email workload": [
+    "emailworkload"
+  ],
+  "web security": [
+    "websecurity"
+  ],
+  "web platform": [
+    "webplatform"
+  ],
+  "web console": [
+    "webconsole"
+  ],
+  "web manager": [
+    "webmanager"
+  ],
+  "web agent": [
+    "webagent"
+  ],
+  "web sensor": [
+    "websensor"
+  ],
+  "web collector": [
+    "webcollector"
+  ],
+  "web connector": [
+    "webconnector"
+  ],
+  "web gateway": [
+    "webgateway"
+  ],
+  "web policy": [
+    "webpolicy"
+  ],
+  "web rule": [
+    "webrule"
+  ],
+  "web profile": [
+    "webprofile"
+  ],
+  "web tenant": [
+    "webtenant"
+  ],
+  "web workspace": [
+    "webworkspace"
+  ],
+  "web cluster": [
+    "webcluster"
+  ],
+  "web node": [
+    "webnode"
+  ],
+  "web server": [
+    "webserver"
+  ],
+  "web client": [
+    "webclient"
+  ],
+  "web endpoint": [
+    "webendpoint"
+  ],
+  "web workload": [
+    "webworkload"
+  ],
+  "data security": [
+    "datasecurity"
+  ],
+  "data platform": [
+    "dataplatform"
+  ],
+  "data console": [
+    "dataconsole"
+  ],
+  "data manager": [
+    "datamanager"
+  ],
+  "data agent": [
+    "dataagent"
+  ],
+  "data sensor": [
+    "datasensor"
+  ],
+  "data collector": [
+    "datacollector"
+  ],
+  "data connector": [
+    "dataconnector"
+  ],
+  "data gateway": [
+    "datagateway"
+  ],
+  "data policy": [
+    "datapolicy"
+  ],
+  "data rule": [
+    "datarule"
+  ],
+  "data profile": [
+    "dataprofile"
+  ],
+  "data tenant": [
+    "datatenant"
+  ],
+  "data workspace": [
+    "dataworkspace"
+  ],
+  "data cluster": [
+    "datacluster"
+  ],
+  "data node": [
+    "datanode"
+  ],
+  "data server": [
+    "dataserver"
+  ],
+  "data client": [
+    "dataclient"
+  ],
+  "data endpoint": [
+    "dataendpoint"
+  ],
+  "data workload": [
+    "dataworkload"
+  ],
+  "application security": [
+    "applicationsecurity"
+  ],
+  "application platform": [
+    "applicationplatform"
+  ],
+  "application console": [
+    "applicationconsole"
+  ],
+  "application manager": [
+    "applicationmanager"
+  ],
+  "application agent": [
+    "applicationagent"
+  ],
+  "application sensor": [
+    "applicationsensor"
+  ],
+  "application collector": [
+    "applicationcollector"
+  ],
+  "application connector": [
+    "applicationconnector"
+  ],
+  "application gateway": [
+    "applicationgateway"
+  ],
+  "application policy": [
+    "applicationpolicy"
+  ],
+  "application rule": [
+    "applicationrule"
+  ],
+  "application profile": [
+    "applicationprofile"
+  ],
+  "application tenant": [
+    "applicationtenant"
+  ],
+  "application workspace": [
+    "applicationworkspace"
+  ],
+  "application cluster": [
+    "applicationcluster"
+  ],
+  "application node": [
+    "applicationnode"
+  ],
+  "application server": [
+    "applicationserver"
+  ],
+  "application client": [
+    "applicationclient"
+  ],
+  "application endpoint": [
+    "applicationendpoint"
+  ],
+  "application workload": [
+    "applicationworkload"
+  ],
+  "API security": [
+    "APIsecurity"
+  ],
+  "API platform": [
+    "APIplatform"
+  ],
+  "API console": [
+    "APIconsole"
+  ],
+  "API manager": [
+    "APImanager"
+  ],
+  "API agent": [
+    "APIagent"
+  ],
+  "API sensor": [
+    "APIsensor"
+  ],
+  "API collector": [
+    "APIcollector"
+  ],
+  "API connector": [
+    "APIconnector"
+  ],
+  "API policy": [
+    "APIpolicy"
+  ],
+  "API rule": [
+    "APIrule"
+  ],
+  "API profile": [
+    "APIprofile"
+  ],
+  "API tenant": [
+    "APItenant"
+  ],
+  "API workspace": [
+    "APIworkspace"
+  ],
+  "API cluster": [
+    "APIcluster"
+  ],
+  "API node": [
+    "APInode"
+  ],
+  "API server": [
+    "APIserver"
+  ],
+  "API client": [
+    "APIclient"
+  ],
+  "API endpoint": [
+    "APIendpoint"
+  ],
+  "API workload": [
+    "APIworkload"
+  ],
+  "container security": [
+    "containersecurity"
+  ],
+  "container platform": [
+    "containerplatform"
+  ],
+  "container console": [
+    "containerconsole"
+  ],
+  "container manager": [
+    "containermanager"
+  ],
+  "container agent": [
+    "containeragent"
+  ],
+  "container sensor": [
+    "containersensor"
+  ],
+  "container collector": [
+    "containercollector"
+  ],
+  "container connector": [
+    "containerconnector"
+  ],
+  "container gateway": [
+    "containergateway"
+  ],
+  "container policy": [
+    "containerpolicy"
+  ],
+  "container rule": [
+    "containerrule"
+  ],
+  "container profile": [
+    "containerprofile"
+  ],
+  "container tenant": [
+    "containertenant"
+  ],
+  "container workspace": [
+    "containerworkspace"
+  ],
+  "container cluster": [
+    "containercluster"
+  ],
+  "container node": [
+    "containernode"
+  ],
+  "container server": [
+    "containerserver"
+  ],
+  "container client": [
+    "containerclient"
+  ],
+  "container endpoint": [
+    "containerendpoint"
+  ],
+  "container workload": [
+    "containerworkload"
+  ],
+  "Kubernetes security": [
+    "Kubernetessecurity"
+  ],
+  "Kubernetes platform": [
+    "Kubernetesplatform"
+  ],
+  "Kubernetes console": [
+    "Kubernetesconsole"
+  ],
+  "Kubernetes manager": [
+    "Kubernetesmanager"
+  ],
+  "Kubernetes agent": [
+    "Kubernetesagent"
+  ],
+  "Kubernetes sensor": [
+    "Kubernetessensor"
+  ],
+  "Kubernetes collector": [
+    "Kubernetescollector"
+  ],
+  "Kubernetes connector": [
+    "Kubernetesconnector"
+  ],
+  "Kubernetes gateway": [
+    "Kubernetesgateway"
+  ],
+  "Kubernetes policy": [
+    "Kubernetespolicy"
+  ],
+  "Kubernetes rule": [
+    "Kubernetesrule"
+  ],
+  "Kubernetes profile": [
+    "Kubernetesprofile"
+  ],
+  "Kubernetes tenant": [
+    "Kubernetestenant"
+  ],
+  "Kubernetes workspace": [
+    "Kubernetesworkspace"
+  ],
+  "Kubernetes cluster": [
+    "Kubernetescluster"
+  ],
+  "Kubernetes node": [
+    "Kubernetesnode"
+  ],
+  "Kubernetes server": [
+    "Kubernetesserver"
+  ],
+  "Kubernetes client": [
+    "Kubernetesclient"
+  ],
+  "Kubernetes endpoint": [
+    "Kubernetesendpoint"
+  ],
+  "Kubernetes workload": [
+    "Kubernetesworkload"
+  ],
+  "AI platform": [
+    "איי איי platform",
+    "אייאייplatform"
+  ],
+  "AI console": [
+    "איי איי console",
+    "אייאייconsole"
+  ],
+  "AI manager": [
+    "איי איי manager",
+    "אייאייmanager"
+  ],
+  "AI sensor": [
+    "איי איי sensor",
+    "אייאייsensor"
+  ],
+  "AI collector": [
+    "איי איי collector",
+    "אייאייcollector"
+  ],
+  "AI connector": [
+    "איי איי connector",
+    "אייאייconnector"
+  ],
+  "AI rule": [
+    "איי איי rule",
+    "אייאייrule"
+  ],
+  "AI profile": [
+    "איי איי profile",
+    "אייאייprofile"
+  ],
+  "AI tenant": [
+    "איי איי tenant",
+    "אייאייtenant"
+  ],
+  "AI workspace": [
+    "איי איי workspace",
+    "אייאייworkspace"
+  ],
+  "AI cluster": [
+    "איי איי cluster",
+    "אייאייcluster"
+  ],
+  "AI node": [
+    "איי איי node",
+    "אייאייnode"
+  ],
+  "AI server": [
+    "איי איי server",
+    "אייאייserver"
+  ],
+  "AI client": [
+    "איי איי client",
+    "אייאייclient"
+  ],
+  "AI endpoint": [
+    "איי איי endpoint",
+    "אייאייendpoint"
+  ],
+  "AI workload": [
+    "איי איי workload",
+    "אייאייworkload"
+  ],
+  "LLM security": [
+    "LLMsecurity"
+  ],
+  "LLM platform": [
+    "LLMplatform"
+  ],
+  "LLM console": [
+    "LLMconsole"
+  ],
+  "LLM manager": [
+    "LLMmanager"
+  ],
+  "LLM agent": [
+    "LLMagent"
+  ],
+  "LLM sensor": [
+    "LLMsensor"
+  ],
+  "LLM collector": [
+    "LLMcollector"
+  ],
+  "LLM connector": [
+    "LLMconnector"
+  ],
+  "LLM policy": [
+    "LLMpolicy"
+  ],
+  "LLM rule": [
+    "LLMrule"
+  ],
+  "LLM profile": [
+    "LLMprofile"
+  ],
+  "LLM tenant": [
+    "LLMtenant"
+  ],
+  "LLM workspace": [
+    "LLMworkspace"
+  ],
+  "LLM cluster": [
+    "LLMcluster"
+  ],
+  "LLM node": [
+    "LLMnode"
+  ],
+  "LLM server": [
+    "LLMserver"
+  ],
+  "LLM client": [
+    "LLMclient"
+  ],
+  "LLM endpoint": [
+    "LLMendpoint"
+  ],
+  "LLM workload": [
+    "LLMworkload"
+  ],
+  "SOC security": [
+    "SOCsecurity"
+  ],
+  "SOC platform": [
+    "SOCplatform"
+  ],
+  "SOC console": [
+    "SOCconsole"
+  ],
+  "SOC agent": [
+    "SOCagent"
+  ],
+  "SOC sensor": [
+    "SOCsensor"
+  ],
+  "SOC collector": [
+    "SOCcollector"
+  ],
+  "SOC connector": [
+    "SOCconnector"
+  ],
+  "SOC gateway": [
+    "SOCgateway"
+  ],
+  "SOC policy": [
+    "SOCpolicy"
+  ],
+  "SOC rule": [
+    "SOCrule"
+  ],
+  "SOC profile": [
+    "SOCprofile"
+  ],
+  "SOC tenant": [
+    "SOCtenant"
+  ],
+  "SOC workspace": [
+    "SOCworkspace"
+  ],
+  "SOC cluster": [
+    "SOCcluster"
+  ],
+  "SOC node": [
+    "SOCnode"
+  ],
+  "SOC server": [
+    "SOCserver"
+  ],
+  "SOC client": [
+    "SOCclient"
+  ],
+  "SOC endpoint": [
+    "SOCendpoint"
+  ],
+  "SOC workload": [
+    "SOCworkload"
+  ],
+  "SIEM security": [
+    "SIEMsecurity"
+  ],
+  "SIEM platform": [
+    "SIEMplatform"
+  ],
+  "SIEM console": [
+    "SIEMconsole"
+  ],
+  "SIEM manager": [
+    "SIEMmanager"
+  ],
+  "SIEM agent": [
+    "SIEMagent"
+  ],
+  "SIEM sensor": [
+    "SIEMsensor"
+  ],
+  "SIEM collector": [
+    "SIEMcollector"
+  ],
+  "SIEM connector": [
+    "SIEMconnector"
+  ],
+  "SIEM gateway": [
+    "SIEMgateway"
+  ],
+  "SIEM policy": [
+    "SIEMpolicy"
+  ],
+  "SIEM rule": [
+    "SIEMrule"
+  ],
+  "SIEM profile": [
+    "SIEMprofile"
+  ],
+  "SIEM tenant": [
+    "SIEMtenant"
+  ],
+  "SIEM workspace": [
+    "SIEMworkspace"
+  ],
+  "SIEM cluster": [
+    "SIEMcluster"
+  ],
+  "SIEM node": [
+    "SIEMnode"
+  ],
+  "SIEM server": [
+    "SIEMserver"
+  ],
+  "SIEM client": [
+    "SIEMclient"
+  ],
+  "SIEM endpoint": [
+    "SIEMendpoint"
+  ],
+  "SIEM workload": [
+    "SIEMworkload"
+  ],
+  "DLP security": [
+    "DLPsecurity"
+  ],
+  "DLP platform": [
+    "DLPplatform"
+  ],
+  "DLP console": [
+    "DLPconsole"
+  ],
+  "DLP manager": [
+    "DLPmanager"
+  ],
+  "DLP agent": [
+    "DLPagent"
+  ],
+  "DLP sensor": [
+    "DLPsensor"
+  ],
+  "DLP collector": [
+    "DLPcollector"
+  ],
+  "DLP connector": [
+    "DLPconnector"
+  ],
+  "DLP gateway": [
+    "DLPgateway"
+  ],
+  "DLP policy": [
+    "DLPpolicy"
+  ],
+  "DLP rule": [
+    "DLPrule"
+  ],
+  "DLP profile": [
+    "DLPprofile"
+  ],
+  "DLP tenant": [
+    "DLPtenant"
+  ],
+  "DLP workspace": [
+    "DLPworkspace"
+  ],
+  "DLP cluster": [
+    "DLPcluster"
+  ],
+  "DLP node": [
+    "DLPnode"
+  ],
+  "DLP server": [
+    "DLPserver"
+  ],
+  "DLP client": [
+    "DLPclient"
+  ],
+  "DLP endpoint": [
+    "DLPendpoint"
+  ],
+  "DLP workload": [
+    "DLPworkload"
+  ],
+  "SASE security": [
+    "SASEsecurity"
+  ],
+  "SASE platform": [
+    "SASEplatform"
+  ],
+  "SASE console": [
+    "SASEconsole"
+  ],
+  "SASE manager": [
+    "SASEmanager"
+  ],
+  "SASE agent": [
+    "SASEagent"
+  ],
+  "SASE sensor": [
+    "SASEsensor"
+  ],
+  "SASE collector": [
+    "SASEcollector"
+  ],
+  "SASE connector": [
+    "SASEconnector"
+  ],
+  "SASE gateway": [
+    "SASEgateway"
+  ],
+  "SASE policy": [
+    "SASEpolicy"
+  ],
+  "SASE rule": [
+    "SASErule"
+  ],
+  "SASE profile": [
+    "SASEprofile"
+  ],
+  "SASE tenant": [
+    "SASEtenant"
+  ],
+  "SASE workspace": [
+    "SASEworkspace"
+  ],
+  "SASE cluster": [
+    "SASEcluster"
+  ],
+  "SASE node": [
+    "SASEnode"
+  ],
+  "SASE server": [
+    "SASEserver"
+  ],
+  "SASE client": [
+    "SASEclient"
+  ],
+  "SASE endpoint": [
+    "SASEendpoint"
+  ],
+  "SASE workload": [
+    "SASEworkload"
+  ],
+  "SSE security": [
+    "SSEsecurity"
+  ],
+  "SSE platform": [
+    "SSEplatform"
+  ],
+  "SSE console": [
+    "SSEconsole"
+  ],
+  "SSE manager": [
+    "SSEmanager"
+  ],
+  "SSE agent": [
+    "SSEagent"
+  ],
+  "SSE sensor": [
+    "SSEsensor"
+  ],
+  "SSE collector": [
+    "SSEcollector"
+  ],
+  "SSE connector": [
+    "SSEconnector"
+  ],
+  "SSE gateway": [
+    "SSEgateway"
+  ],
+  "SSE policy": [
+    "SSEpolicy"
+  ],
+  "SSE rule": [
+    "SSErule"
+  ],
+  "SSE profile": [
+    "SSEprofile"
+  ],
+  "SSE tenant": [
+    "SSEtenant"
+  ],
+  "SSE workspace": [
+    "SSEworkspace"
+  ],
+  "SSE cluster": [
+    "SSEcluster"
+  ],
+  "SSE node": [
+    "SSEnode"
+  ],
+  "SSE server": [
+    "SSEserver"
+  ],
+  "SSE client": [
+    "SSEclient"
+  ],
+  "SSE endpoint": [
+    "SSEendpoint"
+  ],
+  "SSE workload": [
+    "SSEworkload"
+  ],
+  "ZTNA security": [
+    "ZTNAsecurity"
+  ],
+  "ZTNA platform": [
+    "ZTNAplatform"
+  ],
+  "ZTNA console": [
+    "ZTNAconsole"
+  ],
+  "ZTNA manager": [
+    "ZTNAmanager"
+  ],
+  "ZTNA agent": [
+    "ZTNAagent"
+  ],
+  "ZTNA sensor": [
+    "ZTNAsensor"
+  ],
+  "ZTNA collector": [
+    "ZTNAcollector"
+  ],
+  "ZTNA connector": [
+    "ZTNAconnector"
+  ],
+  "ZTNA gateway": [
+    "ZTNAgateway"
+  ],
+  "ZTNA policy": [
+    "ZTNApolicy"
+  ],
+  "ZTNA rule": [
+    "ZTNArule"
+  ],
+  "ZTNA profile": [
+    "ZTNAprofile"
+  ],
+  "ZTNA tenant": [
+    "ZTNAtenant"
+  ],
+  "ZTNA workspace": [
+    "ZTNAworkspace"
+  ],
+  "ZTNA cluster": [
+    "ZTNAcluster"
+  ],
+  "ZTNA node": [
+    "ZTNAnode"
+  ],
+  "ZTNA server": [
+    "ZTNAserver"
+  ],
+  "ZTNA client": [
+    "ZTNAclient"
+  ],
+  "ZTNA endpoint": [
+    "ZTNAendpoint"
+  ],
+  "ZTNA workload": [
+    "ZTNAworkload"
+  ],
+  "CNAPP security": [
+    "CNAPPsecurity"
+  ],
+  "CNAPP platform": [
+    "CNAPPplatform"
+  ],
+  "CNAPP console": [
+    "CNAPPconsole"
+  ],
+  "CNAPP manager": [
+    "CNAPPmanager"
+  ],
+  "CNAPP agent": [
+    "CNAPPagent"
+  ],
+  "CNAPP sensor": [
+    "CNAPPsensor"
+  ],
+  "CNAPP collector": [
+    "CNAPPcollector"
+  ],
+  "CNAPP connector": [
+    "CNAPPconnector"
+  ],
+  "CNAPP gateway": [
+    "CNAPPgateway"
+  ],
+  "CNAPP policy": [
+    "CNAPPpolicy"
+  ],
+  "CNAPP rule": [
+    "CNAPPrule"
+  ],
+  "CNAPP profile": [
+    "CNAPPprofile"
+  ],
+  "CNAPP tenant": [
+    "CNAPPtenant"
+  ],
+  "CNAPP workspace": [
+    "CNAPPworkspace"
+  ],
+  "CNAPP cluster": [
+    "CNAPPcluster"
+  ],
+  "CNAPP node": [
+    "CNAPPnode"
+  ],
+  "CNAPP server": [
+    "CNAPPserver"
+  ],
+  "CNAPP client": [
+    "CNAPPclient"
+  ],
+  "CNAPP endpoint": [
+    "CNAPPendpoint"
+  ],
+  "CNAPP workload": [
+    "CNAPPworkload"
+  ],
+  "DSPM security": [
+    "DSPMsecurity"
+  ],
+  "DSPM platform": [
+    "DSPMplatform"
+  ],
+  "DSPM console": [
+    "DSPMconsole"
+  ],
+  "DSPM manager": [
+    "DSPMmanager"
+  ],
+  "DSPM agent": [
+    "DSPMagent"
+  ],
+  "DSPM sensor": [
+    "DSPMsensor"
+  ],
+  "DSPM collector": [
+    "DSPMcollector"
+  ],
+  "DSPM connector": [
+    "DSPMconnector"
+  ],
+  "DSPM gateway": [
+    "DSPMgateway"
+  ],
+  "DSPM policy": [
+    "DSPMpolicy"
+  ],
+  "DSPM rule": [
+    "DSPMrule"
+  ],
+  "DSPM profile": [
+    "DSPMprofile"
+  ],
+  "DSPM tenant": [
+    "DSPMtenant"
+  ],
+  "DSPM workspace": [
+    "DSPMworkspace"
+  ],
+  "DSPM cluster": [
+    "DSPMcluster"
+  ],
+  "DSPM node": [
+    "DSPMnode"
+  ],
+  "DSPM server": [
+    "DSPMserver"
+  ],
+  "DSPM client": [
+    "DSPMclient"
+  ],
+  "DSPM endpoint": [
+    "DSPMendpoint"
+  ],
+  "DSPM workload": [
+    "DSPMworkload"
+  ],
+  "CSPM security": [
+    "CSPMsecurity"
+  ],
+  "CSPM platform": [
+    "CSPMplatform"
+  ],
+  "CSPM console": [
+    "CSPMconsole"
+  ],
+  "CSPM manager": [
+    "CSPMmanager"
+  ],
+  "CSPM agent": [
+    "CSPMagent"
+  ],
+  "CSPM sensor": [
+    "CSPMsensor"
+  ],
+  "CSPM collector": [
+    "CSPMcollector"
+  ],
+  "CSPM connector": [
+    "CSPMconnector"
+  ],
+  "CSPM gateway": [
+    "CSPMgateway"
+  ],
+  "CSPM policy": [
+    "CSPMpolicy"
+  ],
+  "CSPM rule": [
+    "CSPMrule"
+  ],
+  "CSPM profile": [
+    "CSPMprofile"
+  ],
+  "CSPM tenant": [
+    "CSPMtenant"
+  ],
+  "CSPM workspace": [
+    "CSPMworkspace"
+  ],
+  "CSPM cluster": [
+    "CSPMcluster"
+  ],
+  "CSPM node": [
+    "CSPMnode"
+  ],
+  "CSPM server": [
+    "CSPMserver"
+  ],
+  "CSPM client": [
+    "CSPMclient"
+  ],
+  "CSPM endpoint": [
+    "CSPMendpoint"
+  ],
+  "CSPM workload": [
+    "CSPMworkload"
+  ],
+  "EDR security": [
+    "EDRsecurity"
+  ],
+  "EDR platform": [
+    "EDRplatform"
+  ],
+  "EDR console": [
+    "EDRconsole"
+  ],
+  "EDR manager": [
+    "EDRmanager"
+  ],
+  "EDR agent": [
+    "EDRagent"
+  ],
+  "EDR sensor": [
+    "EDRsensor"
+  ],
+  "EDR collector": [
+    "EDRcollector"
+  ],
+  "EDR connector": [
+    "EDRconnector"
+  ],
+  "EDR gateway": [
+    "EDRgateway"
+  ],
+  "EDR policy": [
+    "EDRpolicy"
+  ],
+  "EDR rule": [
+    "EDRrule"
+  ],
+  "EDR profile": [
+    "EDRprofile"
+  ],
+  "EDR tenant": [
+    "EDRtenant"
+  ],
+  "EDR workspace": [
+    "EDRworkspace"
+  ],
+  "EDR cluster": [
+    "EDRcluster"
+  ],
+  "EDR node": [
+    "EDRnode"
+  ],
+  "EDR server": [
+    "EDRserver"
+  ],
+  "EDR client": [
+    "EDRclient"
+  ],
+  "EDR endpoint": [
+    "EDRendpoint"
+  ],
+  "EDR workload": [
+    "EDRworkload"
+  ],
+  "NDR security": [
+    "NDRsecurity"
+  ],
+  "NDR platform": [
+    "NDRplatform"
+  ],
+  "NDR console": [
+    "NDRconsole"
+  ],
+  "NDR manager": [
+    "NDRmanager"
+  ],
+  "NDR agent": [
+    "NDRagent"
+  ],
+  "NDR sensor": [
+    "NDRsensor"
+  ],
+  "NDR collector": [
+    "NDRcollector"
+  ],
+  "NDR connector": [
+    "NDRconnector"
+  ],
+  "NDR gateway": [
+    "NDRgateway"
+  ],
+  "NDR policy": [
+    "NDRpolicy"
+  ],
+  "NDR rule": [
+    "NDRrule"
+  ],
+  "NDR profile": [
+    "NDRprofile"
+  ],
+  "NDR tenant": [
+    "NDRtenant"
+  ],
+  "NDR workspace": [
+    "NDRworkspace"
+  ],
+  "NDR cluster": [
+    "NDRcluster"
+  ],
+  "NDR node": [
+    "NDRnode"
+  ],
+  "NDR server": [
+    "NDRserver"
+  ],
+  "NDR client": [
+    "NDRclient"
+  ],
+  "NDR endpoint": [
+    "NDRendpoint"
+  ],
+  "NDR workload": [
+    "NDRworkload"
+  ],
+  "XDR security": [
+    "XDRsecurity"
+  ],
+  "XDR console": [
+    "XDRconsole"
+  ],
+  "XDR manager": [
+    "XDRmanager"
+  ],
+  "XDR agent": [
+    "XDRagent"
+  ],
+  "XDR sensor": [
+    "XDRsensor"
+  ],
+  "XDR collector": [
+    "XDRcollector"
+  ],
+  "XDR connector": [
+    "XDRconnector"
+  ],
+  "XDR gateway": [
+    "XDRgateway"
+  ],
+  "XDR policy": [
+    "XDRpolicy"
+  ],
+  "XDR rule": [
+    "XDRrule"
+  ],
+  "XDR profile": [
+    "XDRprofile"
+  ],
+  "XDR tenant": [
+    "XDRtenant"
+  ],
+  "XDR workspace": [
+    "XDRworkspace"
+  ],
+  "XDR cluster": [
+    "XDRcluster"
+  ],
+  "XDR node": [
+    "XDRnode"
+  ],
+  "XDR server": [
+    "XDRserver"
+  ],
+  "XDR client": [
+    "XDRclient"
+  ],
+  "XDR endpoint": [
+    "XDRendpoint"
+  ],
+  "XDR workload": [
+    "XDRworkload"
+  ],
+  "MDR security": [
+    "MDRsecurity"
+  ],
+  "MDR platform": [
+    "MDRplatform"
+  ],
+  "MDR console": [
+    "MDRconsole"
+  ],
+  "MDR manager": [
+    "MDRmanager"
+  ],
+  "MDR agent": [
+    "MDRagent"
+  ],
+  "MDR sensor": [
+    "MDRsensor"
+  ],
+  "MDR collector": [
+    "MDRcollector"
+  ],
+  "MDR connector": [
+    "MDRconnector"
+  ],
+  "MDR gateway": [
+    "MDRgateway"
+  ],
+  "MDR policy": [
+    "MDRpolicy"
+  ],
+  "MDR rule": [
+    "MDRrule"
+  ],
+  "MDR profile": [
+    "MDRprofile"
+  ],
+  "MDR tenant": [
+    "MDRtenant"
+  ],
+  "MDR workspace": [
+    "MDRworkspace"
+  ],
+  "MDR cluster": [
+    "MDRcluster"
+  ],
+  "MDR node": [
+    "MDRnode"
+  ],
+  "MDR server": [
+    "MDRserver"
+  ],
+  "MDR client": [
+    "MDRclient"
+  ],
+  "MDR endpoint": [
+    "MDRendpoint"
+  ],
+  "MDR workload": [
+    "MDRworkload"
+  ],
+  "WAF security": [
+    "WAFsecurity"
+  ],
+  "WAF platform": [
+    "WAFplatform"
+  ],
+  "WAF console": [
+    "WAFconsole"
+  ],
+  "WAF manager": [
+    "WAFmanager"
+  ],
+  "WAF agent": [
+    "WAFagent"
+  ],
+  "WAF sensor": [
+    "WAFsensor"
+  ],
+  "WAF collector": [
+    "WAFcollector"
+  ],
+  "WAF connector": [
+    "WAFconnector"
+  ],
+  "WAF gateway": [
+    "WAFgateway"
+  ],
+  "WAF policy": [
+    "WAFpolicy"
+  ],
+  "WAF rule": [
+    "WAFrule"
+  ],
+  "WAF profile": [
+    "WAFprofile"
+  ],
+  "WAF tenant": [
+    "WAFtenant"
+  ],
+  "WAF workspace": [
+    "WAFworkspace"
+  ],
+  "WAF cluster": [
+    "WAFcluster"
+  ],
+  "WAF node": [
+    "WAFnode"
+  ],
+  "WAF server": [
+    "WAFserver"
+  ],
+  "WAF client": [
+    "WAFclient"
+  ],
+  "WAF endpoint": [
+    "WAFendpoint"
+  ],
+  "WAF workload": [
+    "WAFworkload"
+  ],
+  "DevSecOps security": [
+    "DevSecOpssecurity"
+  ],
+  "DevSecOps platform": [
+    "DevSecOpsplatform"
+  ],
+  "DevSecOps console": [
+    "DevSecOpsconsole"
+  ],
+  "DevSecOps manager": [
+    "DevSecOpsmanager"
+  ],
+  "DevSecOps agent": [
+    "DevSecOpsagent"
+  ],
+  "DevSecOps sensor": [
+    "DevSecOpssensor"
+  ],
+  "DevSecOps collector": [
+    "DevSecOpscollector"
+  ],
+  "DevSecOps connector": [
+    "DevSecOpsconnector"
+  ],
+  "DevSecOps gateway": [
+    "DevSecOpsgateway"
+  ],
+  "DevSecOps policy": [
+    "DevSecOpspolicy"
+  ],
+  "DevSecOps rule": [
+    "DevSecOpsrule"
+  ],
+  "DevSecOps profile": [
+    "DevSecOpsprofile"
+  ],
+  "DevSecOps tenant": [
+    "DevSecOpstenant"
+  ],
+  "DevSecOps workspace": [
+    "DevSecOpsworkspace"
+  ],
+  "DevSecOps cluster": [
+    "DevSecOpscluster"
+  ],
+  "DevSecOps node": [
+    "DevSecOpsnode"
+  ],
+  "DevSecOps server": [
+    "DevSecOpsserver"
+  ],
+  "DevSecOps client": [
+    "DevSecOpsclient"
+  ],
+  "DevSecOps endpoint": [
+    "DevSecOpsendpoint"
+  ],
+  "DevSecOps workload": [
+    "DevSecOpsworkload"
   ]
 }
