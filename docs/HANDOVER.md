@@ -41,10 +41,9 @@ Be honest about these when reporting status.
   `Recorder.swift` sends the helper's stderr to `FileHandle.nullDevice`, so the
   user never sees it. They instead experience it as "I can't hear myself". This
   is the most valuable small fix outstanding.
-- **`docs/progress.html`** is a progress page from the build and is not
-  maintained. Either update it or retire it.
-- **A stray file named `10`** sits in the repository root, apparently from a
-  mistyped redirect. Confirm before removing.
+- **`docs/progress.html`** is a progress page from the build, is not
+  maintained, and is excluded from the public repository because it quotes real
+  transcript text. Either update it or retire it.
 - **Build artifacts are committed** — `app/Scribebot.app` and
   `capture/ScribebotCapture.app` binaries are tracked. Convenient for handing
   someone a working app, unusual for a source repository.
