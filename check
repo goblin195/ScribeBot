@@ -1,0 +1,54 @@
+#!/bin/bash
+# Every self-check in the project, in one command.
+#
+# An earlier version of this script could not fail: it read $? after a pipeline,
+# which is tail's status, not the check's. A check that exited 1 was reported
+# green. Exit status is now captured before any pipe touches it.
+set -u
+cd "$(dirname "$0")"
+fail=0
+run() {
+  printf "  %-24s " "$1"
+  local tmp rc
+  tmp=$(mktemp)
+  eval "$2" >"$tmp" 2>&1
+  rc=$?
+  local last
+  last=$(tail -1 "$tmp")
+  rm -f "$tmp"
+  if [ "$rc" -ne 0 ]; then
+    echo "FAILED (exit $rc): $last"; fail=1
+  elif echo "$last" | grep -qiE "error|traceback|assert|FAIL"; then
+    echo "FAILED: $last"; fail=1
+  else
+    echo "$last"
+  fi
+}
+echo "self-checks"
+run "export"           "python3 export.py --selftest"
+run "summarize"        "python3 summarize.py --selftest"
+run "meeting"          "python3 meeting.py --selftest"
+run "attribute"        "python3 attribute.py --selftest"
+run "glossary"         "python3 bench/glossary.py"
+run "negative control" "python3 bench/negative_control.py"
+run "app wiring"        "python3 bench/wiring.py"
+run "app environment"   "python3 bench/env_isolation.py"
+run "score metrics"    "python3 -c \"import sys;sys.path.insert(0,'bench');from score import wer,norm,kept;assert norm('ה-DLP.')=='ה DLP';assert wer('א ב ג','א ב ג')==0.0;print('score self-check passed')\""
+
+# The end-to-end test needs audio hardware and takes ~15s, so it is opt-in:
+#   ./check --e2e
+#
+# It runs the REAL capture helper against a real tap and a real microphone - but
+# it spawns that helper itself, so it passes whether or not the app does. The
+# app's own wiring is checked separately, above, by reading its source. Neither
+# is a substitute for driving the UI, and neither should be described as proving
+# the product works end to end.
+if [ "${1:-}" = "--e2e" ]; then
+  echo
+  echo "end-to-end (audio hardware)"
+  run "capture + transcribe" "python3 bench/e2e.py"
+fi
+
+echo
+if [ $fail -eq 0 ]; then echo "all checks passed"; else echo "SOME CHECKS FAILED"; fi
+exit $fail

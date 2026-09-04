@@ -1,0 +1,65 @@
+{
+ "audio": "meeting.wav",
+ "sample_rate": 16000,
+ "speakers": [
+  "Carmit",
+  "Daniel",
+  "Samantha"
+ ],
+ "turns": [
+  {
+   "speaker": "Carmit",
+   "start": 0.0,
+   "end": 3.111,
+   "text": "בוקר טוב, בואו נתחיל את הפגישה השבועית שלנו"
+  },
+  {
+   "speaker": "Daniel",
+   "start": 3.361,
+   "end": 7.01,
+   "text": "It started right after the deploy last night, around eleven."
+  },
+  {
+   "speaker": "Samantha",
+   "start": 7.26,
+   "end": 10.507,
+   "text": "Agreed. I will pull the logs and open a ticket this morning."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 10.757,
+   "end": 13.778,
+   "text": "מצוין, תעדכנו אותי עד סוף היום בבקשה"
+  },
+  {
+   "speaker": "Daniel",
+   "start": 14.028,
+   "end": 16.933,
+   "text": "Let us review the dashboard before the next standup."
+  },
+  {
+   "speaker": "Samantha",
+   "start": 17.183,
+   "end": 20.751,
+   "text": "Good morning. We are seeing errors from the DLP in production."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 21.001,
+   "end": 23.93,
+   "text": "מתי בדיוק זה התחיל, אתמול או היום בבוקר"
+  },
+  {
+   "speaker": "Daniel",
+   "start": 24.18,
+   "end": 27.608,
+   "text": "Agreed. I will pull the logs and open a ticket this morning."
+  },
+  {
+   "speaker": "Samantha",
+   "start": 27.858,
+   "end": 30.705,
+   "text": "Will do. I will send you both the link when it is ready."
+  }
+ ]
+}

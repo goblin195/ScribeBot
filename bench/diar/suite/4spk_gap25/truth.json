@@ -1,0 +1,84 @@
+{
+ "audio": "meeting.wav",
+ "sample_rate": 16000,
+ "speakers": [
+  "Carmit",
+  "Daniel",
+  "Samantha",
+  "Tessa"
+ ],
+ "turns": [
+  {
+   "speaker": "Carmit",
+   "start": 0.0,
+   "end": 3.111,
+   "text": "בוקר טוב, בואו נתחיל את הפגישה השבועית שלנו"
+  },
+  {
+   "speaker": "Daniel",
+   "start": 3.361,
+   "end": 7.01,
+   "text": "It started right after the deploy last night, around eleven."
+  },
+  {
+   "speaker": "Samantha",
+   "start": 7.26,
+   "end": 10.507,
+   "text": "Agreed. I will pull the logs and open a ticket this morning."
+  },
+  {
+   "speaker": "Tessa",
+   "start": 10.757,
+   "end": 14.116,
+   "text": "Will do. I will send you both the link when it is ready."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 14.366,
+   "end": 17.457,
+   "text": "אני חושב שכדאי לפתוח כרטיס ולעקוב אחרי זה"
+  },
+  {
+   "speaker": "Daniel",
+   "start": 17.707,
+   "end": 21.413,
+   "text": "Good morning. We are seeing errors from the DLP in production."
+  },
+  {
+   "speaker": "Samantha",
+   "start": 21.663,
+   "end": 25.097,
+   "text": "It started right after the deploy last night, around eleven."
+  },
+  {
+   "speaker": "Tessa",
+   "start": 25.347,
+   "end": 29.233,
+   "text": "Agreed. I will pull the logs and open a ticket this morning."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 29.483,
+   "end": 32.504,
+   "text": "מצוין, תעדכנו אותי עד סוף היום בבקשה"
+  },
+  {
+   "speaker": "Daniel",
+   "start": 32.754,
+   "end": 35.659,
+   "text": "Let us review the dashboard before the next standup."
+  },
+  {
+   "speaker": "Samantha",
+   "start": 35.909,
+   "end": 39.477,
+   "text": "Good morning. We are seeing errors from the DLP in production."
+  },
+  {
+   "speaker": "Tessa",
+   "start": 39.727,
+   "end": 43.748,
+   "text": "It started right after the deploy last night, around eleven."
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+cs01	מה מצב פריסת ה SSE אצלך	SSE
+cs02	צריך לעשות deploy לפרודקשן עד יום חמישי	deploy
+cs03	ה latency של ה API עלה משמעותית אתמול	latency,API
+cs04	תעשה refactor ל component הזה בבקשה	refactor,component
+cs05	יש לנו memory leak ב backend	memory,leak,backend
+cs06	ה pull request שלך מחכה ל review	pull,request,review
+cs07	בוא נדבר על ה roadmap של הרבעון הבא	roadmap
+cs08	ה cache לא מתעדכן אחרי ה migration	cache,migration
+cs09	תוסיף logging ל service הזה	logging,service
+cs10	ה dashboard מראה CPU גבוה על ה cluster	dashboard,CPU,cluster

@@ -1,0 +1,26 @@
+models/
+bench/data/
+bench/out/
+.build/
+*.wav
+*.m4a
+
+# Python / editor / OS noise
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
+
+# User content. Recordings, transcripts and summaries live in
+# ~/Library/Application Support/Scribebot/ and must never be committed;
+# these patterns are belt-and-braces for anything copied into the tree.
+*.txt
+!RECORDINGS.md
+recordings/
+audio/
+docs/progress.html
+
+# a mistyped "record 10" wrote CoreAudio audio to a file named 10
+/10
+*.caf

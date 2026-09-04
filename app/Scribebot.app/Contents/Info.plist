@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleExecutable</key><string>Scribebot</string>
+  <key>CFBundleIconFile</key>
+	<string>Scribebot</string>
+	<key>CFBundleIdentifier</key><string>dev.scribebot.app</string>
+  <key>CFBundleName</key><string>Scribebot</string>
+  <key>CFBundleDisplayName</key><string>Scribebot</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>0.1</string>
+  <key>CFBundleVersion</key><string>1</string>
+  <key>LSMinimumSystemVersion</key><string>14.0</string>
+  <key>LSUIElement</key><true/>
+  <key>NSHighResolutionCapable</key><true/>
+  <key>NSAudioCaptureUsageDescription</key>
+  <string>Scribebot records system audio so it can transcribe what the other people on a call say. Audio never leaves this Mac.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Scribebot records your microphone so your side of the conversation is transcribed too. Audio never leaves this Mac.</string>
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>Scribebot reads your calendar to name each recording after the meeting it happened in.</string>
+  <key>NSContactsUsageDescription</key>
+  <string>Scribebot reads contact names so the transcriber stops mangling the names of people you work with.</string>
+</dict></plist>

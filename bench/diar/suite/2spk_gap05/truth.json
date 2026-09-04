@@ -1,0 +1,58 @@
+{
+ "audio": "meeting.wav",
+ "sample_rate": 16000,
+ "speakers": [
+  "Carmit",
+  "Samantha"
+ ],
+ "turns": [
+  {
+   "speaker": "Carmit",
+   "start": 0.0,
+   "end": 3.111,
+   "text": "בוקר טוב, בואו נתחיל את הפגישה השבועית שלנו"
+  },
+  {
+   "speaker": "Samantha",
+   "start": 3.161,
+   "end": 6.595,
+   "text": "It started right after the deploy last night, around eleven."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 6.645,
+   "end": 10.178,
+   "text": "צריך לבדוק את הלוגים ב SIEM לפני שאנחנו מחליטים משהו"
+  },
+  {
+   "speaker": "Samantha",
+   "start": 10.228,
+   "end": 13.075,
+   "text": "Will do. I will send you both the link when it is ready."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 13.125,
+   "end": 16.216,
+   "text": "אני חושב שכדאי לפתוח כרטיס ולעקוב אחרי זה"
+  },
+  {
+   "speaker": "Samantha",
+   "start": 16.266,
+   "end": 19.834,
+   "text": "Good morning. We are seeing errors from the DLP in production."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 19.884,
+   "end": 22.813,
+   "text": "מתי בדיוק זה התחיל, אתמול או היום בבוקר"
+  },
+  {
+   "speaker": "Samantha",
+   "start": 22.863,
+   "end": 26.11,
+   "text": "Agreed. I will pull the logs and open a ticket this morning."
+  }
+ ]
+}

@@ -1,0 +1,65 @@
+{
+ "audio": "meeting.wav",
+ "sample_rate": 16000,
+ "speakers": [
+  "Carmit",
+  "Karen",
+  "Moira"
+ ],
+ "turns": [
+  {
+   "speaker": "Carmit",
+   "start": 0.0,
+   "end": 3.111,
+   "text": "בוקר טוב, בואו נתחיל את הפגישה השבועית שלנו"
+  },
+  {
+   "speaker": "Karen",
+   "start": 3.211,
+   "end": 6.713,
+   "text": "It started right after the deploy last night, around eleven."
+  },
+  {
+   "speaker": "Moira",
+   "start": 6.812,
+   "end": 10.37,
+   "text": "Agreed. I will pull the logs and open a ticket this morning."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 10.47,
+   "end": 13.491,
+   "text": "מצוין, תעדכנו אותי עד סוף היום בבקשה"
+  },
+  {
+   "speaker": "Karen",
+   "start": 13.591,
+   "end": 16.449,
+   "text": "Let us review the dashboard before the next standup."
+  },
+  {
+   "speaker": "Moira",
+   "start": 16.549,
+   "end": 20.145,
+   "text": "Good morning. We are seeing errors from the DLP in production."
+  },
+  {
+   "speaker": "Carmit",
+   "start": 20.245,
+   "end": 23.174,
+   "text": "מתי בדיוק זה התחיל, אתמול או היום בבוקר"
+  },
+  {
+   "speaker": "Karen",
+   "start": 23.274,
+   "end": 26.522,
+   "text": "Agreed. I will pull the logs and open a ticket this morning."
+  },
+  {
+   "speaker": "Moira",
+   "start": 26.622,
+   "end": 29.723,
+   "text": "Will do. I will send you both the link when it is ready."
+  }
+ ]
+}
