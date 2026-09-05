@@ -119,7 +119,7 @@ final class Summarizer: ObservableObject {
                     let err = out.err.trimmingCharacters(in: .whitespacesAndNewlines)
                     self.state = .failed(err.isEmpty ? "summarize.py exited with code \(out.code)."
                                                      : String(err.prefix(400)),
-                                         hint: "Run it in Terminal for the full output.")
+                                         hint: "The full output is in \(id).capture.log, beside the recording.")
                     return
                 }
                 let s = Summary(markdown: out.text)

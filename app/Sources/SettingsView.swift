@@ -226,7 +226,7 @@ struct AIProviderPicker: View {
 
             Picker("Engine", selection: $provider) {
                 ForEach(ai.providers) { p in
-                    Text(p.available ? p.label : "\(p.label) — not installed").tag(p.id)
+                    Text(p.state.isEmpty ? p.label : "\(p.label) — \(p.state)").tag(p.id)
                 }
             }
             .pickerStyle(.radioGroup)
@@ -239,12 +239,23 @@ struct AIProviderPicker: View {
                 if !p.available {
                     Text(p.detail).font(T.body(12)).foregroundStyle(P.warn)
                         .fixedSize(horizontal: false, vertical: true)
+                    // Installed but stopped is one click from working, so
+                    // offer the click rather than a sentence about it.
+                    if p.id == "ollama", p.installed, !p.running {
+                        Button("Start Ollama") { ai.startOllama() }
+                            .buttonStyle(FlatButton(filled: true))
+                    }
                 }
                 if p.id == "ollama" {
                     if p.models.isEmpty {
-                        Text("No models found. Pull one with `ollama pull gemma4` and press Refresh.")
-                            .font(T.mono(11)).foregroundStyle(P.ink3)
-                            .fixedSize(horizontal: false, vertical: true)
+                        // Only a hint once the server is actually up: telling
+                        // someone to pull a model while Ollama is stopped
+                        // answers a question they did not ask.
+                        if p.running {
+                            Text("No models yet. Pull one, for example: ollama pull gemma4")
+                                .font(T.mono(11)).foregroundStyle(P.ink3)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     } else {
                         Picker("Model", selection: $model) {
                             ForEach(p.models, id: \.self) { Text($0).tag($0) }
@@ -291,7 +302,15 @@ struct AIProviderPicker: View {
         .background(P.surface, in: RoundedRectangle(cornerRadius: 12))
         .onAppear {
             model = AISettings.model(for: provider)
-            if ai.providers.isEmpty { ai.refresh() }
+            ai.refresh()
+            ai.watchWhileVisible()
+        }
+        .onDisappear { ai.stopWatching() }
+        .onReceive(NotificationCenter.default.publisher(
+            for: NSApplication.didBecomeActiveNotification)) { _ in
+            // Starting Ollama happens in another app; coming back here is the
+            // moment to notice, without making the user press Refresh.
+            ai.refresh()
         }
         .onChange(of: ai.providers) { _, list in
             // Ollama's picker needs a selection that exists in the list, or it

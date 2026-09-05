@@ -51,7 +51,18 @@ def binary(provider: str) -> str | None:
         return toolpaths.find("claude", "SCRIBEBOT_CLAUDE")
     if provider == "codex":
         return toolpaths.find("codex", "SCRIBEBOT_CODEX")
+    if provider == "ollama":
+        return toolpaths.find("ollama", "SCRIBEBOT_OLLAMA")
     return None
+
+
+def ollama_running() -> bool:
+    """Is the server answering? Separate from whether Ollama is installed."""
+    try:
+        with urllib.request.urlopen(OLLAMA_TAGS, timeout=3) as r:
+            return r.status == 200
+    except Exception:
+        return False
 
 
 def ollama_models() -> list[str]:
@@ -72,17 +83,40 @@ def status() -> dict:
     for pid, (label, sends) in PROVIDERS.items():
         entry = {"id": pid, "label": label, "sendsDataOffDevice": sends}
         if pid == "ollama":
-            entry["models"] = ollama_models()
+            # Installed and running are different failures with different
+            # fixes, and reporting both as "not installed" sent a user off to
+            # download Ollama they already had. The binary is on disk whether
+            # or not the server is up, so ask each question separately.
+            path = binary("ollama")
+            running = ollama_running()
+            entry["path"] = path or ""
+            entry["installed"] = path is not None
+            entry["running"] = running
+            entry["models"] = ollama_models() if running else []
             entry["available"] = bool(entry["models"])
-            entry["path"] = ""
-            entry["detail"] = ("" if entry["models"]
-                               else "Ollama is not answering on localhost:11434.")
+            if not path:
+                entry["state"] = "not installed"
+                entry["detail"] = "Ollama is not installed on this Mac."
+            elif not running:
+                entry["state"] = "not running"
+                entry["detail"] = ("Ollama is installed but not running. "
+                                   "Start it and it will be picked up.")
+            elif not entry["models"]:
+                entry["state"] = "no models"
+                entry["detail"] = ("Ollama is running but has no models. "
+                                   "Pull one, for example: ollama pull gemma4")
+            else:
+                entry["state"] = ""
+                entry["detail"] = ""
         else:
             path = binary(pid)
             entry["available"] = path is not None
             entry["path"] = path or ""
+            entry["installed"] = path is not None
+            entry["running"] = path is not None
             entry["models"] = []
-            entry["detail"] = "" if path else f"The {pid} command was not found."
+            entry["state"] = "" if path else "not installed"
+            entry["detail"] = "" if path else f"{label} is not installed on this Mac."
         out.append(entry)
     return {"providers": out, "default": DEFAULT_PROVIDER,
             "defaultOllamaModel": DEFAULT_OLLAMA_MODEL}
@@ -205,7 +239,12 @@ def selftest() -> None:
     ids = [p["id"] for p in s["providers"]]
     assert ids == list(PROVIDERS), ids
     for p in s["providers"]:
-        assert {"id", "label", "available", "models", "detail", "path"} <= set(p)
+        assert {"id", "label", "available", "models", "detail", "path",
+                "installed", "running", "state"} <= set(p)
+        # "not installed" and "not running" must never be conflated: a user
+        # with Ollama installed but stopped was told to go and install it.
+        if p["id"] == "ollama" and p["installed"] and not p["running"]:
+            assert p["state"] == "not running", p
         # An unavailable provider must explain itself, or the picker greys out
         # a row with no reason beside it.
         assert p["available"] or p["detail"], p

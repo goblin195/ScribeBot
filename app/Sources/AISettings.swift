@@ -13,6 +13,13 @@ struct AIProvider: Identifiable, Decodable, Equatable {
     var models: [String]
     var detail: String
     var path: String
+    /// Installed and running are different problems with different fixes.
+    /// Reporting both as "not installed" sent a user off to download Ollama
+    /// they already had.
+    var installed: Bool
+    var running: Bool
+    /// "", "not installed", "not running", "no models" - for the row label.
+    var state: String
     /// True when choosing this sends the transcript off this Mac. The project
     /// promises it does not, so the picker has to say when that stops holding.
     var sendsDataOffDevice: Bool
@@ -38,7 +45,53 @@ final class AISettings: ObservableObject {
     /// change which model summarises their meetings.
     @Published private(set) var defaultOllamaModel = "gemma4:latest"
 
+    private var poll: Task<Void, Never>?
+
     private init() {}
+
+    /// Re-probe until something changes, so starting Ollama in another window
+    /// is noticed on its own. The user should never have to press Refresh to
+    /// make the app see what is already true.
+    func watchWhileVisible() {
+        poll?.cancel()
+        poll = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(3))
+                if Task.isCancelled { return }
+                guard let self else { return }
+                // Only worth re-asking while something is missing.
+                let settled = self.providers.allSatisfy { $0.available }
+                if settled && self.problem == nil { continue }
+                self.refresh()
+            }
+        }
+    }
+
+    func stopWatching() { poll?.cancel(); poll = nil }
+
+    /// Launch Ollama for the user. `open -a` is tried first because that is
+    /// the app most people installed; `ollama serve` covers a CLI-only setup.
+    func startOllama() {
+        let path = providers.first { $0.id == "ollama" }?.path ?? ""
+        Task.detached {
+            let open = Process()
+            open.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+            open.arguments = ["-ga", "Ollama"]
+            try? open.run()
+            open.waitUntilExit()
+            if open.terminationStatus != 0, !path.isEmpty {
+                let serve = Process()
+                serve.executableURL = URL(fileURLWithPath: path)
+                serve.arguments = ["serve"]
+                serve.standardOutput = FileHandle.nullDevice
+                serve.standardError = FileHandle.nullDevice
+                try? serve.run()
+            }
+            // The server needs a moment before /api/tags answers.
+            try? await Task.sleep(for: .seconds(2))
+            await MainActor.run { AISettings.shared.refresh() }
+        }
+    }
 
     // MARK: - Choice
 

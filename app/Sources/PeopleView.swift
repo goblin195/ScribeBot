@@ -112,18 +112,27 @@ private struct PersonRow: View {
 }
 
 private struct NotIndexed: View {
+    /// An installed copy has no checkout behind it, so the old text here -
+    /// "read from bench/meetings.json in the checkout that owns this app, run
+    /// the calendar scanner there" - was an instruction the reader could not
+    /// follow, printed above a path inside the app bundle. A user who installs
+    /// the DMG should never be shown either. This is an empty state, not an
+    /// error: People fills in from the meetings Scribebot records.
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Eyebrow(text: "calendar not indexed")
-            Text("No attendee index was found.")
+            Eyebrow(text: "nobody yet")
+            Text("People appear as you record meetings.")
                 .font(T.disp(15)).foregroundStyle(P.ink)
-            Text("People are read from bench/meetings.json in the checkout that owns this app. Run the calendar scanner there and reopen this window.")
+            Text("Scribebot lists the people in your calendar events for the calls "
+                 + "it records. Grant calendar access in Settings to name meetings "
+                 + "and their attendees.")
                 .font(T.body(12)).foregroundStyle(P.ink2).lineSpacing(3)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(Paths.root.appendingPathComponent("bench/meetings.json").path)
-                .font(T.mono(9.5)).foregroundStyle(P.ink3)
-                .textSelection(.enabled)
-                .fixedSize(horizontal: false, vertical: true)
+            Button("Open Calendar settings") {
+                NotificationCenter.default.post(name: .openSettings, object: nil,
+                                                userInfo: ["page": SettingsPage.calendar.rawValue])
+            }
+            .buttonStyle(FlatButton(filled: false))
             Spacer()
         }
         .padding(18).frame(maxWidth: .infinity, alignment: .leading)
