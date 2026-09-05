@@ -17,8 +17,6 @@ No bot in the participant list. No audio leaving your Mac.
 
 </div>
 
-![Scribebot recording, transcribing and attributing a meeting](docs/images/scribebot-app.png)
-
 ---
 
 ## What it is
