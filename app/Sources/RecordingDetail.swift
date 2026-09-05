@@ -27,6 +27,12 @@ func parseTranscript(_ raw: String) -> [Utterance] {
     }
 }
 
+/// Which half of a recording is on screen. The transcript is what the app
+/// produced; the summary is what a model made of it. They are read for
+/// different reasons, so they are two views of one recording rather than two
+/// panels competing for the same scroll.
+enum DetailTab: String { case transcription, summary }
+
 struct RecordingDetail: View {
     let rec: Recording
     var deletionAllowed = true
@@ -36,9 +42,18 @@ struct RecordingDetail: View {
     @ObservedObject var library: Library
     @ObservedObject var index: MeetingIndex
 
+    @State private var tab: DetailTab = .transcription
+    @State private var templateID = SummaryTemplates.defaultID
+    @StateObject private var summarizer = Summarizer()
+    @ObservedObject private var templates = SummaryTemplates.shared
+    @State private var editingInstructions = false
+    @State private var browsingTemplates = false
+    @State private var creatingTemplate = false
+
     private var sides: Sides { library.sides[rec.id] ?? .missing }
     private var meeting: CalMeeting? { index.meeting(at: rec.startedAt) }
     private var lines: [Utterance] { parseTranscript(library.transcript(rec)) }
+    private var template: SummaryTemplate { templates.template(templateID) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -47,10 +62,18 @@ struct RecordingDetail: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     if let m = meeting { attendees(m) }
-                    transcript
+                    switch tab {
+                    case .transcription: transcript
+                    case .summary: summaryPane
+                    }
                 }
             }
         }
+        .onAppear(perform: loadForRecording)
+        .onChange(of: rec.id) { loadForRecording() }
+        .sheet(isPresented: $editingInstructions) { instructionsSheet }
+        .sheet(isPresented: $browsingTemplates) { allTemplatesSheet }
+        .sheet(isPresented: $creatingTemplate) { NewTemplateSheet(templates: templates) }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(P.ground)
         .sheet(isPresented: $showingDelete) {
@@ -122,13 +145,162 @@ struct RecordingDetail: View {
                 .help(deletionAllowed ? "Choose which call files to delete" : "Wait for recording and transcription to finish")
                 Button("Reveal in Finder") { library.reveal(rec) }
                     .buttonStyle(FlatButton(filled: false))
-
+                Spacer(minLength: 12)
+                viewToggle
             }
             .padding(.top, 4)
         }
         .padding(.horizontal, 30).padding(.top, 30).padding(.bottom, 24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(P.sidebar)
+    }
+
+    // MARK: - Transcription / Summary toggle
+
+    private func loadForRecording() {
+        templateID = SummaryTemplates.selectedID(for: rec.id)
+        summarizer.loadCached(rec.id, template: templateID)
+    }
+
+    private func choose(_ t: SummaryTemplate) {
+        templateID = t.id
+        SummaryTemplates.select(t.id, for: rec.id)
+        tab = .summary
+        // Each template caches its own file, so switching back to one already
+        // generated is instant rather than another minute of model time.
+        summarizer.cancel()
+        summarizer.loadCached(rec.id, template: t.id)
+    }
+
+    private func generate() {
+        summarizer.run(id: rec.id, template: templateID,
+                       instructions: templates.instructions)
+    }
+
+    @ViewBuilder private var templateMenu: some View {
+        Button { editingInstructions = true } label: {
+            Label("Change how it's written…", systemImage: "pencil.circle")
+        }
+        Divider()
+        Section("Templates") {
+            ForEach(templates.all) { t in
+                Button { choose(t) } label: {
+                    if t.id == templateID { Label(t.name, systemImage: "checkmark") }
+                    else { Text(t.name) }
+                }
+            }
+        }
+        Divider()
+        Button { browsingTemplates = true } label: {
+            Label("All templates…", systemImage: "square.grid.2x2")
+        }
+        Button { creatingTemplate = true } label: {
+            Label("New template…", systemImage: "plus")
+        }
+    }
+
+    private var viewToggle: some View {
+        HStack(spacing: 3) {
+            Button { tab = .transcription } label: {
+                Label("Transcription", systemImage: "text.alignleft")
+            }
+            .buttonStyle(Segment(active: tab == .transcription))
+
+            // The label switches view, the chevron opens the template menu.
+            // A Menu with primaryAction: renders no chevron here, which left
+            // the whole template list unreachable.
+            HStack(spacing: 5) {
+                Button { tab = .summary } label: {
+                    Label("Summary", systemImage: "sparkles")
+                        .labelStyle(.titleAndIcon)
+                        .imageScale(.small)
+                }
+                .buttonStyle(.plain)
+                Menu {
+                    templateMenu
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 9, weight: .bold))
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .frame(width: 12)
+                .help("Summary template: \(template.name)")
+            }
+            .font(T.body(12.5, .semibold))
+            .foregroundStyle(tab == .summary ? P.surface : P.ink2)
+            .padding(.horizontal, 12).padding(.vertical, 6)
+            .background(tab == .summary ? P.ink : .clear, in: Capsule())
+            .fixedSize()
+        }
+        .padding(3)
+        .background(P.surface2, in: Capsule())
+        .overlay(Capsule().strokeBorder(P.rule, lineWidth: 1))
+    }
+
+    // MARK: - Summary
+
+    @ViewBuilder private var summaryPane: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 8) {
+                Text(template.name).font(T.body(15, .semibold)).foregroundStyle(P.ink2)
+                if case .ready(_, true) = summarizer.state {
+                    Eyebrow(text: "saved")
+                }
+                Spacer()
+                if case .running = summarizer.state {
+                    Button("Cancel") { summarizer.cancel() }
+                        .buttonStyle(FlatButton(filled: false))
+                } else {
+                    Button(hasSummary ? "Regenerate" : "Summarise", action: generate)
+                        .buttonStyle(FlatButton(filled: !hasSummary))
+                        .disabled(lines.isEmpty)
+                }
+            }
+            .padding(.horizontal, 30).padding(.top, 18)
+
+            switch summarizer.state {
+            case .running, .failed:
+                SummaryStatus(summarizer: summarizer)
+            case let .ready(s, _):
+                ForEach(s.sections) { section in SummarySection(section: section) }
+                if s.sections.isEmpty, !s.abstract.isEmpty {
+                    BidiText(text: s.abstract, font: T.body(15), color: P.ink)
+                        .padding(20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(P.surface, in: RoundedRectangle(cornerRadius: 14))
+                        .padding(.horizontal, 22)
+                }
+            case .idle:
+                VStack(alignment: .leading, spacing: 6) {
+                    Eyebrow(text: "no summary yet")
+                    Text(lines.isEmpty
+                         ? "There is no transcript to summarise yet."
+                         : "\(template.name) — \(template.sectionSummary). Runs on this Mac through Ollama; nothing is uploaded.")
+                        .font(T.body(12)).foregroundStyle(P.ink2).lineSpacing(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(22).frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+
+    private var hasSummary: Bool {
+        if case .ready = summarizer.state { return true }
+        return false
+    }
+
+    // MARK: - Sheets
+
+    private var instructionsSheet: some View {
+        InstructionsSheet(templates: templates) { editingInstructions = false }
+    }
+
+    private var allTemplatesSheet: some View {
+        AllTemplatesSheet(templates: templates, selected: templateID,
+                          onPick: { t in choose(t); browsingTemplates = false },
+                          onClose: { browsingTemplates = false })
     }
 
     // MARK: - Calendar

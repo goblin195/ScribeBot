@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "_comment": [
+    "Summary templates, read by BOTH summarize.py and the app",
+    "(app/Sources/SummaryTemplates.swift). One file so the two can never",
+    "disagree about what 'Standup' means - the section list used to live inline",
+    "in summarize.py AND again in Transcript.swift, so any change had to be made",
+    "twice or the app silently failed to parse its own output.",
+    "",
+    "Each section carries its heading in English and Hebrew. The summary is",
+    "written in the language of the transcript, so the heading has to follow it;",
+    "`guidance` is what the model is told the section should contain.",
+    "User-defined templates live in Application Support and merge on top."
+  ],
+  "templates": [
+    {
+      "id": "standard",
+      "name": "Standard",
+      "description": "A general meeting record: what it was about, what was decided, who owes what.",
+      "sections": [
+        { "en": "Summary", "he": "תקציר",
+          "guidance": "2-4 sentences describing what the meeting was about" },
+        { "en": "Decisions", "he": "החלטות",
+          "guidance": "decisions that were actually reached" },
+        { "en": "Tasks", "he": "משימות",
+          "guidance": "tasks, with the owner's name where it was said" }
+      ]
+    },
+    {
+      "id": "one-on-one",
+      "name": "1:1",
+      "description": "A manager and a report: how things are going, feedback both ways, what happens next.",
+      "sections": [
+        { "en": "Highlights", "he": "עיקרי הדברים",
+          "guidance": "what was discussed, in 2-4 sentences" },
+        { "en": "Feedback", "he": "משוב",
+          "guidance": "feedback given or received, in either direction" },
+        { "en": "Growth and goals", "he": "יעדים והתפתחות",
+          "guidance": "career, skills or goals raised" },
+        { "en": "Action items", "he": "משימות",
+          "guidance": "what each person committed to" }
+      ]
+    },
+    {
+      "id": "standup",
+      "name": "Standup",
+      "description": "Yesterday, today, blockers. Short by design.",
+      "sections": [
+        { "en": "Done", "he": "מה נעשה",
+          "guidance": "work reported as completed, grouped by person" },
+        { "en": "Today", "he": "מה מתוכנן",
+          "guidance": "what each person plans to work on" },
+        { "en": "Blockers", "he": "חסמים",
+          "guidance": "anything reported as blocked, and on whom" }
+      ]
+    },
+    {
+      "id": "interview",
+      "name": "Interview",
+      "description": "A candidate conversation, written so it can be compared against other candidates.",
+      "sections": [
+        { "en": "Candidate summary", "he": "סיכום המועמד",
+          "guidance": "background and experience as the candidate described it" },
+        { "en": "Strengths", "he": "חוזקות",
+          "guidance": "evidence of strength, with the example that showed it" },
+        { "en": "Concerns", "he": "נקודות לבדיקה",
+          "guidance": "gaps or doubts raised, without inventing any" },
+        { "en": "Recommendation", "he": "המלצה",
+          "guidance": "only the recommendation actually voiced in the conversation" }
+      ]
+    },
+    {
+      "id": "client-call",
+      "name": "Client call",
+      "description": "What the client asked for, what was promised, and what is due.",
+      "sections": [
+        { "en": "Context", "he": "רקע",
+          "guidance": "why the call happened and where things stand" },
+        { "en": "Client needs", "he": "צרכי הלקוח",
+          "guidance": "requirements and requests, in the client's own terms" },
+        { "en": "Commitments", "he": "התחייבויות",
+          "guidance": "what was promised, by whom, and by when if stated" },
+        { "en": "Next steps", "he": "הצעדים הבאים",
+          "guidance": "agreed next steps" }
+      ]
+    },
+    {
+      "id": "lecture",
+      "name": "Lecture",
+      "description": "A talk or class, kept as study notes rather than minutes.",
+      "sections": [
+        { "en": "Overview", "he": "סקירה",
+          "guidance": "the subject and the argument, in 2-4 sentences" },
+        { "en": "Key points", "he": "נקודות מרכזיות",
+          "guidance": "the main points, in the order they were made" },
+        { "en": "Terms and definitions", "he": "מונחים והגדרות",
+          "guidance": "terms introduced, each with the definition given" },
+        { "en": "Questions", "he": "שאלות",
+          "guidance": "questions asked, with the answer if one was given" }
+      ]
+    },
+    {
+      "id": "session",
+      "name": "Session",
+      "description": "A working or coaching session: themes, insights, what to carry forward.",
+      "sections": [
+        { "en": "Summary", "he": "תקציר",
+          "guidance": "what the session covered, in 2-4 sentences" },
+        { "en": "Themes", "he": "נושאים מרכזיים",
+          "guidance": "recurring themes across the session" },
+        { "en": "Insights", "he": "תובנות",
+          "guidance": "realisations or conclusions reached during the session" },
+        { "en": "Follow-ups", "he": "להמשך",
+          "guidance": "what was left to continue with" }
+      ]
+    },
+    {
+      "id": "consultation",
+      "name": "Consultation",
+      "description": "An advisory conversation: the situation, the read on it, the advice.",
+      "sections": [
+        { "en": "Situation", "he": "המצב",
+          "guidance": "the situation as it was presented" },
+        { "en": "Assessment", "he": "הערכה",
+          "guidance": "how it was assessed, and on what grounds" },
+        { "en": "Recommendations", "he": "המלצות",
+          "guidance": "the advice given" },
+        { "en": "Next steps", "he": "הצעדים הבאים",
+          "guidance": "agreed next steps" }
+      ]
+    },
+    {
+      "id": "investor-meeting",
+      "name": "Investor meeting",
+      "description": "An investor conversation: numbers discussed, doubts raised, what was asked for.",
+      "sections": [
+        { "en": "Summary", "he": "תקציר",
+          "guidance": "what the meeting covered, in 2-4 sentences" },
+        { "en": "Metrics discussed", "he": "מדדים שנדונו",
+          "guidance": "figures quoted, exactly as stated and never rounded or invented" },
+        { "en": "Concerns raised", "he": "סוגיות שעלו",
+          "guidance": "objections, risks or doubts the investor raised" },
+        { "en": "Asks and commitments", "he": "בקשות והתחייבויות",
+          "guidance": "what either side asked for or committed to" },
+        { "en": "Follow-ups", "he": "להמשך",
+          "guidance": "material to send and next steps" }
+      ]
+    }
+  ]
+}

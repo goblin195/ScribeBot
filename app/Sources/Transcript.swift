@@ -126,38 +126,69 @@ enum Transcript {
     }
 }
 
-/// The three sections summarize.py promises, kept apart so they can be styled
-/// apart. Anything before the first heading is treated as the abstract.
+/// A summary as summarize.py writes it: `## heading` sections in the order the
+/// chosen template asked for them, kept apart so they can be styled apart.
 struct Summary {
-    var abstract: String = ""
-    var decisions: [String] = []
-    var tasks: [String] = []
+    /// One `## heading` and the lines under it. Sections are whatever the
+    /// chosen template asked for, in the order it asked for them - this used
+    /// to be three fixed Hebrew headings, so a template with any other section
+    /// produced a summary the app could not read back.
+    struct Section: Identifiable {
+        let id: Int
+        let title: String
+        let items: [String]
+        /// A single long run reads as a paragraph; anything else is a list.
+        var isProse: Bool { items.count == 1 && items[0].count > 60 }
+    }
 
-    static let headings = ["## תקציר", "## החלטות", "## משימות"]
+    /// Anything before the first heading. Usually nothing: the models put
+    /// everything under a heading.
+    var preamble: String = ""
+    var sections: [Section] = []
+
+    /// The opening prose. Callers that predate templates - the live view's
+    /// summary band - expect the first section to be the abstract, which is
+    /// exactly what the standard template's "תקציר" is, so keep answering that.
+    var abstract: String {
+        preamble.isEmpty
+            ? (sections.first.map { $0.items.joined(separator: " ") } ?? "")
+            : preamble
+    }
 
     init(markdown: String) {
-        var section = 0
         var abstractLines: [String] = []
+        var titles: [String] = []
+        var bodies: [[String]] = []
         for raw in markdown.split(separator: "\n", omittingEmptySubsequences: false) {
             let line = raw.trimmingCharacters(in: .whitespaces)
             if line.hasPrefix("#") {
-                if line.contains("תקציר") { section = 0 }
-                else if line.contains("החלטות") { section = 1 }
-                else if line.contains("משימות") { section = 2 }
+                let title = line.drop { $0 == "#" }.trimmingCharacters(in: .whitespaces)
+                titles.append(Summary.unbullet(title))
+                bodies.append([])
                 continue
             }
             guard !line.isEmpty else { continue }
-            let body = Summary.unbullet(line)
-            switch section {
-            case 1: decisions.append(body)
-            case 2: tasks.append(body)
-            default: abstractLines.append(line)
-            }
+            if bodies.isEmpty { abstractLines.append(line) }
+            else { bodies[bodies.count - 1].append(Summary.unbullet(line)) }
         }
-        abstract = abstractLines.joined(separator: " ")
+        preamble = abstractLines.joined(separator: " ")
+        sections = zip(titles, bodies).enumerated().compactMap { i, pair in
+            pair.1.isEmpty ? nil : Section(id: i, title: pair.0, items: pair.1)
+        }
     }
 
-    var isEmpty: Bool { abstract.isEmpty && decisions.isEmpty && tasks.isEmpty }
+    /// Lookups the standard template's sections still answer to, so a caller
+    /// that only wants decisions does not have to know about templates.
+    private func section(_ needles: [String]) -> [String] {
+        sections.first { s in
+            let t = s.title.lowercased()
+            return needles.contains { t.contains($0) }
+        }?.items ?? []
+    }
+    var decisions: [String] { section(["החלטות", "decision"]) }
+    var tasks: [String] { section(["משימות", "task", "action item"]) }
+
+    var isEmpty: Bool { preamble.isEmpty && sections.isEmpty }
 
     /// Strip a leading list marker only — "- foo", "* foo", "1. foo", "2) foo".
     /// Deliberately conservative: a task that genuinely starts with a year

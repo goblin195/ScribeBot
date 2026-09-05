@@ -32,7 +32,10 @@ It is a complete meeting record, not a transcription toy:
   audio driver to install, and no participant to admit.
 - 🌍 **~100 languages**, detected automatically. See below.
 - 👥 **Knows who spoke** — exactly, for two-party calls, without guessing.
-- 📝 **Summaries, search and export** (Markdown, SRT, plain text).
+- 📝 **Summaries from templates** — Standard, 1:1, Standup, Interview, Client
+  call, Lecture, Session, Consultation, Investor meeting, or one you write.
+  Each recording toggles between Transcription and Summary.
+- 🔎 **Search and export** (Markdown, SRT, plain text).
 - ⚡ **~0.5 s decode per chunk**, with a live preview while people talk.
 - 🔒 **No network calls at runtime.** At all.
 

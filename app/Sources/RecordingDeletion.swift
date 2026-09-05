@@ -27,7 +27,18 @@ enum RecordingDeletion: String, CaseIterable, Identifiable {
         }
         var names: [String] = []
         if self != .transcript { names += [wav, id + "-you.wav"] }
-        if self != .audio { names += [id + ".txt", id + ".summary.md"] }
+        if self != .audio {
+            names += [id + ".txt", id + ".summary.md"]
+            // Each template caches its own summary, so deleting a transcript
+            // has to take all of them - otherwise a "deleted" call leaves its
+            // Standup and Interview summaries sitting in the folder.
+            let siblings = (try? FileManager.default
+                .contentsOfDirectory(atPath: directory.path)) ?? []
+            names += siblings.filter {
+                $0.hasPrefix(id + ".summary.") && $0.hasSuffix(".md")
+                    && $0 != id + ".summary.md"
+            }.sorted()
+        }
         // Metadata goes last so a partially completed operation stays visible.
         if self == .both { names.append(id + ".json") }
         return names.map { directory.appendingPathComponent($0) }

@@ -37,14 +37,27 @@ final class Summarizer: ObservableObject {
     // MARK: - Cache
 
     /// Sits next to the wav and the transcript, so deleting a recording takes
-    /// its summary with it.
-    static func cacheURL(_ id: String) -> URL {
-        Paths.recordings.appendingPathComponent("\(id).summary.md")
+    /// its summaries with it. One file per template: switching from Standard
+    /// to Standup and back should not mean waiting for the model twice, and a
+    /// Standup summary overwriting the Standard one would silently discard a
+    /// minute the user already spent.
+    static func cacheURL(_ id: String, template: String = SummaryTemplates.defaultID) -> URL {
+        let suffix = template == SummaryTemplates.defaultID ? "" : ".\(template)"
+        return Paths.recordings.appendingPathComponent("\(id).summary\(suffix).md")
+    }
+
+    /// Every summary file this recording could have left behind.
+    static func cacheURLs(_ id: String) -> [URL] {
+        let dir = Paths.recordings
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: dir.path)) ?? []
+        return names
+            .filter { $0.hasPrefix("\(id).summary") && $0.hasSuffix(".md") }
+            .map { dir.appendingPathComponent($0) }
     }
 
     /// Load a previous run, if the transcript hasn't changed under it.
-    func loadCached(_ id: String) {
-        let cache = Summarizer.cacheURL(id)
+    func loadCached(_ id: String, template: String = SummaryTemplates.defaultID) {
+        let cache = Summarizer.cacheURL(id, template: template)
         let txt = Paths.recordings.appendingPathComponent("\(id).txt")
         guard let md = try? String(contentsOf: cache, encoding: .utf8), !md.isEmpty,
               let cachedAt = mtime(cache) else { return }
@@ -66,7 +79,8 @@ final class Summarizer: ObservableObject {
         state = .idle
     }
 
-    func run(id: String) {
+    func run(id: String, template: String = SummaryTemplates.defaultID,
+             instructions: String = "") {
         guard state != .running else { return }
         let txt = Paths.recordings.appendingPathComponent("\(id).txt")
         guard let raw = try? String(contentsOf: txt, encoding: .utf8),
@@ -89,7 +103,8 @@ final class Summarizer: ObservableObject {
                 await self?.finish(.failed(down.0, hint: down.1))
                 return
             }
-            let out = await self?.spawn(script: script, transcript: txt.path)
+            let out = await self?.spawn(script: script, transcript: txt.path,
+                                        template: template, instructions: instructions)
             guard let out else { return }
             await MainActor.run { [weak self] in
                 guard let self, self.state == .running else { return }   // cancelled
@@ -107,7 +122,8 @@ final class Summarizer: ObservableObject {
                                          hint: "Try again, or a different model with --model.")
                     return
                 }
-                try? out.text.write(to: Summarizer.cacheURL(id), atomically: true, encoding: .utf8)
+                try? out.text.write(to: Summarizer.cacheURL(id, template: template),
+                                    atomically: true, encoding: .utf8)
                 self.state = .ready(s, fromCache: false)
             }
         }
@@ -123,13 +139,20 @@ final class Summarizer: ObservableObject {
     /// Blocking, but only on a detached task. stdout is drained on its own
     /// queue: a summary big enough to fill the 64K pipe buffer would otherwise
     /// deadlock against waitUntilExit().
-    private nonisolated func spawn(script: URL, transcript: String) async -> Output {
+    private nonisolated func spawn(script: URL, transcript: String,
+                                   template: String, instructions: String) async -> Output {
         await withCheckedContinuation { k in
             DispatchQueue.global(qos: .userInitiated).async {
                 let python = URL(fileURLWithPath: Paths.python)
                 let p = Process()
                 p.executableURL = python
-                p.arguments = ["-B", script.path, transcript]
+                var argv = ["-B", script.path, transcript, "--template", template]
+                // Only pass it when there is something to say; an empty
+                // --instructions would put a stray blank line in the prompt.
+                if !instructions.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    argv += ["--instructions", instructions]
+                }
+                p.arguments = argv
                 p.currentDirectoryURL = Paths.root
                 var env = ProcessInfo.processInfo.environment
                 env["PYTHONUNBUFFERED"] = "1"

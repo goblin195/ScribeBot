@@ -32,6 +32,31 @@ TERM_RULE = (
     "שאר הטקסט צריך להיות בעברית תקנית."
 )
 
+# The Hebrew rule says "write the rest in proper Hebrew", which is right for a
+# Hebrew meeting and wrong for every other one - an English transcript came back
+# with English headings over a Hebrew body. The rule follows the transcript now.
+TERM_RULE_EN = (
+    "Hard rule: every technical term that appears in Latin script in the source "
+    "(SIEM, DLP, API, deploy, Kubernetes) must stay in Latin script, spelled "
+    "exactly as it appears. Never transliterate it into another script. Write "
+    "everything else in the same language as the transcript."
+)
+
+CHUNK_PROMPT_EN = """{rule}
+
+This is one section of a meeting transcript. In 2-3 sentences, summarise the \
+main points, decisions and tasks mentioned in this section only. Do not invent \
+anything that is not in the text.
+
+Transcript section:
+{chunk}
+"""
+
+
+def term_rule(lang: str) -> str:
+    return TERM_RULE if lang == "he" else TERM_RULE_EN
+
+
 CHUNK_PROMPT = """{rule}
 
 זהו קטע מתוך תמלול של פגישה. סכם בקצרה (2-3 משפטים) את הנקודות המרכזיות, ההחלטות \
@@ -41,23 +66,69 @@ CHUNK_PROMPT = """{rule}
 {chunk}
 """
 
+TEMPLATES_FILE = Path(__file__).resolve().parent / "templates.json"
+# Where the app writes templates the user made. Read-only from here.
+USER_TEMPLATES_FILE = (Path.home() / "Library/Application Support/Scribebot"
+                       / "templates.user.json")
+DEFAULT_TEMPLATE = "standard"
+
+
+def load_templates() -> dict:
+    """Every template by id, built-ins first, user templates layered on top.
+
+    Both this file and the app read templates.json. The section list used to be
+    written out twice - here and in Transcript.swift, which parsed the output by
+    looking for three specific Hebrew headings - so adding a section in one
+    place silently produced a summary the other could not read.
+    """
+    out = {}
+    for path in (TEMPLATES_FILE, USER_TEMPLATES_FILE):
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as e:
+            # A broken user file must not take the built-ins down with it.
+            print(f"[warning: ignoring {path.name}: {e}]", file=sys.stderr)
+            continue
+        for t in data.get("templates", []):
+            if t.get("id") and t.get("sections"):
+                out[t["id"]] = t
+    return out
+
+
+def heading(section: dict, lang: str) -> str:
+    """A section's heading in the language the summary is being written in."""
+    return section.get(lang) or section.get("en") or ""
+
+
 FINAL_PROMPT = """{rule}
 
-להלן סיכומי קטעים מתוך תמלול של פגישה אחת. אחד אותם לסיכום פגישה מלא, בדיוק \
-בפורמט הבא (שלוש כותרות, בעברית):
+{intro}
 
-## תקציר
-(2-4 משפטים המתארים את מהות הפגישה)
+{sections}
 
-## החלטות
-(רשימת החלטות שהתקבלו בפגישה; אם לא הוזכרו החלטות, כתוב "לא צוינו החלטות")
+{closing}
 
-## משימות
-(רשימת משימות, עם שם האחראי אם הוזכר; אם לא הוזכרו משימות, כתוב "לא צוינו משימות")
-
-סיכומי הקטעים:
+{label}
 {summaries}
 """
+
+_HE = {
+    "intro": "להלן סיכומי קטעים מתוך תמלול של פגישה אחת. אחד אותם לסיכום פגישה "
+             "מלא, בדיוק בפורמט הבא:",
+    "closing": "אל תוסיף כותרות שאינן מופיעות למעלה, ואל תמציא מידע שלא נאמר.",
+    "label": "סיכומי הקטעים:",
+    "empty": 'אם לא הוזכר דבר, כתוב "לא צוין"',
+}
+_EN = {
+    "intro": "Below are summaries of sections of one meeting transcript. Merge "
+             "them into a single meeting summary, in exactly this format:",
+    "closing": "Do not add headings that are not listed above, and do not "
+               "invent anything that was not said.",
+    "label": "Section summaries:",
+    "empty": 'if nothing was mentioned, write "not stated"',
+}
 
 
 # qwen3:32b intermittently emits CJK tokens mid-Hebrew ("נקבע לה 更新 את הלקוח").
@@ -151,13 +222,28 @@ def chunk_text(text: str, chunk_words: int = CHUNK_WORDS,
     return chunks
 
 
-def build_chunk_prompt(chunk: str) -> str:
-    return CHUNK_PROMPT.format(rule=TERM_RULE, chunk=chunk)
+def build_chunk_prompt(chunk: str, lang: str = "he") -> str:
+    template = CHUNK_PROMPT if lang == "he" else CHUNK_PROMPT_EN
+    return template.format(rule=term_rule(lang), chunk=chunk)
 
 
-def build_final_prompt(summaries: list[str]) -> str:
-    joined = "\n\n".join(f"[קטע {i + 1}]\n{s}" for i, s in enumerate(summaries))
-    return FINAL_PROMPT.format(rule=TERM_RULE, summaries=joined)
+def build_final_prompt(summaries: list[str], template: dict | None = None,
+                       lang: str = "he", instructions: str = "") -> str:
+    if template is None:
+        template = load_templates().get(DEFAULT_TEMPLATE)
+    words = _HE if lang == "he" else _EN
+    body = "\n\n".join(
+        f"## {heading(s, lang)}\n({s.get('guidance', '')}; {words['empty']})"
+        for s in template["sections"])
+    joined = "\n\n".join(f"[{i + 1}]\n{s}" for i, s in enumerate(summaries))
+    closing = words["closing"]
+    if instructions.strip():
+        # The user's own words about style go last, where they are least
+        # likely to be crowded out by the section list above them.
+        closing += "\n\n" + instructions.strip()
+    return FINAL_PROMPT.format(rule=term_rule(lang), intro=words["intro"],
+                               sections=body, closing=closing,
+                               label=words["label"], summaries=joined)
 
 
 def call_ollama(prompt: str, model: str = DEFAULT_MODEL) -> str:
@@ -176,14 +262,34 @@ def call_ollama(prompt: str, model: str = DEFAULT_MODEL) -> str:
     return data["response"].strip()
 
 
-def summarize(text: str, model: str = DEFAULT_MODEL) -> str:
+_HEBREW_RANGE = re.compile(r"[֐-׿]")
+
+
+def transcript_language(text: str) -> str:
+    """"he" when the transcript is substantially Hebrew, else "en".
+
+    The summary has to be written in the language of the meeting, and its
+    headings with it. This only has to separate Hebrew from everything else -
+    Hebrew is the language with translated headings in templates.json.
+    """
+    hebrew = len(_HEBREW_RANGE.findall(text))
+    letters = sum(1 for c in text if c.isalpha())
+    return "he" if letters and hebrew / letters > 0.2 else "en"
+
+
+def summarize(text: str, model: str = DEFAULT_MODEL,
+              template: dict | None = None, lang: str | None = None,
+              instructions: str = "") -> str:
+    lang = lang or transcript_language(text)
+    if template is None:
+        template = load_templates().get(DEFAULT_TEMPLATE)
     chunks = chunk_text(text)
     if len(chunks) == 1:
         # small enough to skip straight to the final formatting pass
         partials = chunks
     else:
-        partials = [call_ollama(build_chunk_prompt(c), model) for c in chunks]
-    return call_ollama(build_final_prompt(partials), model)
+        partials = [call_ollama(build_chunk_prompt(c, lang), model) for c in chunks]
+    return call_ollama(build_final_prompt(partials, template, lang, instructions), model)
 
 
 def selftest() -> None:
@@ -211,6 +317,58 @@ def selftest() -> None:
     assert "## תקציר" in fp and "## החלטות" in fp and "## משימות" in fp
     assert "סיכום קטע אחד" in fp and "סיכום קטע שני" in fp
 
+    # --- templates -----------------------------------------------------
+    ts = load_templates()
+    assert DEFAULT_TEMPLATE in ts, "the default template must always exist"
+    for tid, t in ts.items():
+        assert t.get("name"), f"{tid} has no name"
+        assert t.get("sections"), f"{tid} has no sections"
+        for s in t["sections"]:
+            # Every section must be renderable in both languages, or a Hebrew
+            # meeting silently gets English headings in the middle of it.
+            assert s.get("en") and s.get("he"), f"{tid} section missing a heading"
+            assert heading(s, "he") == s["he"] and heading(s, "en") == s["en"]
+    # the nine the UI offers
+    for tid in ("standard", "one-on-one", "standup", "interview", "client-call",
+                "lecture", "session", "consultation", "investor-meeting"):
+        assert tid in ts, f"the app offers {tid} but templates.json does not"
+
+    # a template's own headings, in the language of the meeting
+    standup = ts["standup"]
+    he = build_final_prompt(["x"], standup, "he")
+    en = build_final_prompt(["x"], standup, "en")
+    assert "## חסמים" in he and "## Blockers" in en
+    assert "## Blockers" not in he and "## חסמים" not in en
+    # and no leakage from a different template
+    assert "## תקציר" not in he, "standup must not carry Standard's sections"
+
+    # the user's own styling note reaches the prompt, and only when given
+    assert "keep it to three bullets" in build_final_prompt(
+        ["x"], ts["standard"], "en", "keep it to three bullets")
+    assert "\n\n\n" not in build_final_prompt(["x"], ts["standard"], "en", "   ")
+
+    # an English meeting must not be told to write Hebrew
+    assert "בעברית" in build_final_prompt(["x"], ts["standard"], "he")
+    assert "בעברית" not in build_final_prompt(["x"], ts["standard"], "en")
+    assert "same language as the transcript" in build_chunk_prompt("x", "en")
+    assert "SIEM" in term_rule("he") and "SIEM" in term_rule("en")
+
+    assert transcript_language("שלום, מה מצב ה-SSE?") == "he"
+    assert transcript_language("Let's review the SSE rollout today.") == "en"
+    assert transcript_language("") == "en"
+
+    # An unreadable user file is ignored, not fatal.
+    import tempfile as _tf
+    with _tf.TemporaryDirectory() as d:
+        bad = Path(d) / "templates.user.json"
+        bad.write_text("{not json", encoding="utf-8")
+        global USER_TEMPLATES_FILE
+        keep, USER_TEMPLATES_FILE = USER_TEMPLATES_FILE, bad
+        try:
+            assert DEFAULT_TEMPLATE in load_templates()
+        finally:
+            USER_TEMPLATES_FILE = keep
+
     k, m = term_audit("we discussed the SLA and the DLP", "דיברנו על ה-SLA")
     assert k == ["SLA"] and m == ["DLP"], (k, m)
     assert near_misses(["SLA"], "דיברנו על ה-SLI החדש") == [("SLA", "SLI")]
@@ -229,12 +387,27 @@ def main() -> None:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("transcript", nargs="?", help="path to a transcript text file")
     ap.add_argument("--model", default=DEFAULT_MODEL, help=f"ollama model (default: {DEFAULT_MODEL})")
+    ap.add_argument("--template", default=DEFAULT_TEMPLATE, metavar="ID",
+                    help=f"summary template (default: {DEFAULT_TEMPLATE})")
+    ap.add_argument("--instructions", default="", metavar="TEXT",
+                    help="extra guidance on how the summary should be written")
+    ap.add_argument("--list-templates", action="store_true",
+                    help="print the available templates as JSON and exit")
     ap.add_argument("--selftest", action="store_true", help="run the offline self-check and exit")
     a = ap.parse_args()
 
     if a.selftest:
         selftest()
         return
+
+    templates = load_templates()
+    if a.list_templates:
+        print(json.dumps({"templates": list(templates.values())},
+                         ensure_ascii=False, indent=2))
+        return
+    if a.template not in templates:
+        sys.exit(f"no such template: {a.template}\n"
+                 f"available: {', '.join(sorted(templates))}")
     if not a.transcript:
         ap.error("transcript file required (or use --selftest)")
 
@@ -242,7 +415,8 @@ def main() -> None:
     if not path.exists():
         sys.exit(f"no such file: {path}")
 
-    out = summarize(path.read_text(encoding="utf-8"), model=a.model)
+    out = summarize(path.read_text(encoding="utf-8"), model=a.model,
+                    template=templates[a.template], instructions=a.instructions)
     out, dropped = strip_foreign_script(out)
     kept, missing = term_audit(path.read_text(encoding="utf-8"), out)
     misses = near_misses(missing, out)

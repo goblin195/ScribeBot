@@ -45,6 +45,9 @@ def main():
         *sorted((ROOT / 'app/Sources').glob('*.swift')))
     for name in ['scribebot.py', 'live.py', 'stream.py', 'toolpaths.py', 'languages.py', 'meeting.py', 'summarize.py', 'export.py', 'attribute.py']:
         copy(ROOT / name, RUNTIME / name)
+    # summarize.py and the app both read this; shipping one without it leaves
+    # the Summary menu empty and every template but the fallback missing.
+    copy(ROOT / 'templates.json', RUNTIME / 'templates.json')
     for name in ['glossary.py', 'aliases.json']:
         copy(ROOT / 'bench' / name, RUNTIME / 'bench' / name)
     # The calendar index and harvested vocabulary are intentionally not shipped.
