@@ -40,12 +40,32 @@ private final class PCMSink {
         return Float(peak) / 32767
     }
 
-    func close() {
+    /// `padTo` is the wall-clock length of the recording. The tap stops
+    /// producing IO the moment nothing is playing, so its stream can end early
+    /// - a 72.5 s Zoom call once left a 26.9 s file. The microphone's file is
+    /// always the true length, and when the two disagree every far-side line
+    /// sits at the wrong time and attribution hands it to the local speaker.
+    /// Pad the shortfall with silence so both files describe the same minute.
+    func close(padTo seconds: Double = 0) {
+        deliveredSeconds = Double(bytes) / (16_000 * 2)
+        let want = Int(seconds * 16_000) * 2
+        if want > bytes {
+            var left = want - bytes
+            while left > 0 {
+                let n = min(left, 32_000)
+                wav.write(Data(count: n))
+                left -= n
+            }
+            bytes = want
+        }
         try? wav.seek(toOffset: 0)
         wav.write(PCMSink.header(bytes))
         try? wav.close()
         try? toTranscriber?.close()
     }
+
+    /// How much of the file the tap actually delivered, before any padding.
+    private(set) var deliveredSeconds: Double = 0
 
     var seconds: Double { Double(bytes) / (16_000 * 2) }
 
@@ -121,7 +141,7 @@ final class Recorder: ObservableObject {
         p.arguments = ["stream"]
         let out = Pipe()
         p.standardOutput = out
-        p.standardError = FileHandle.nullDevice
+        p.standardError = Recorder.helperLog(wavName, tag: "tap")
         out.fileHandleForReading.readabilityHandler = { [weak self] h in
             let data = h.availableData
             guard !data.isEmpty else { return }
@@ -148,8 +168,12 @@ final class Recorder: ObservableObject {
         (tap?.standardOutput as? Pipe)?.fileHandleForReading.readabilityHandler = nil
         tap?.terminate(); tap = nil
         micProc?.terminate(); micProc = nil
-        sink?.close()
-        let seconds = sink?.seconds ?? elapsed
+        // Pad to wall clock, not to whatever the tap happened to deliver:
+        // `seconds` used to be derived from the byte count, so a stalled tap
+        // made the whole recording look short instead of making the gap visible.
+        sink?.close(padTo: elapsed)
+        let seconds = max(elapsed, sink?.seconds ?? elapsed)
+        let delivered = sink?.deliveredSeconds ?? seconds
         sink = nil
         transcriber?.terminate(); transcriber = nil
         level = 0
@@ -162,13 +186,23 @@ final class Recorder: ObservableObject {
             startedAt = nil
             return
         }
-        let title = calendarTitle(at: started, store: eventStore)
+        let calendarEnabled = UserDefaults.standard.object(forKey: "useCalendarTitles") as? Bool ?? true
+        let title = (calendarEnabled ? calendarTitle(at: started, store: eventStore) : nil)
             ?? started.formatted(date: .abbreviated, time: .shortened)
         let rec = Recording(id: wavName.replacingOccurrences(of: ".wav", with: ""),
                             title: title, startedAt: started,
                             duration: seconds, wav: wavName)
         library.save(rec, transcript: committed)
         startedAt = nil
+        // Say it out loud when the far side was only partly captured. Silence
+        // here is what made a Zoom call look merely "bad at Hebrew" when in
+        // fact two thirds of the other person had never reached the disk.
+        if seconds >= 5, delivered < seconds * 0.8 {
+            lastError = String(format:
+                "System audio was only captured for %.0fs of this %.0fs call — "
+                + "the other side is missing from the rest. "
+                + "See %@.capture.log.", delivered, seconds, rec.id)
+        }
         // The live transcript is a best-effort preview - its coverage swings
         // with decode timing. Re-transcribe the saved file in one pass now that
         // there is no real-time pressure, and replace the preview with it.
@@ -238,7 +272,24 @@ final class Recorder: ObservableObject {
         }
     }
 
-    /// Capture the local voice to its own file, alongside the tap stream.
+    /// stderr for one of the capture helpers, appended to a log beside the
+    /// recording. This used to be FileHandle.nullDevice, and that single line
+    /// is why three shipped bugs were invisible: the helper prints its input
+    /// device, its clock source, every sample rate, the Bluetooth low-quality
+    /// warning, each tap stall, and every hard failure - and all of it was
+    /// thrown away, so a broken recording and a good one looked identical.
+    nonisolated static func helperLog(_ wavName: String, tag: String) -> Any {
+        let id = wavName.replacingOccurrences(of: ".wav", with: "")
+        let url = Paths.recordings.appendingPathComponent("\(id).capture.log")
+        let fm = FileManager.default
+        if !fm.fileExists(atPath: url.path) { fm.createFile(atPath: url.path, contents: nil) }
+        guard let h = try? FileHandle(forWritingTo: url) else { return FileHandle.nullDevice }
+        h.seekToEndOfFile()
+        let stamp = ISO8601DateFormatter().string(from: Date())
+        h.write("\n===== \(tag) \(stamp) =====\n".data(using: .utf8)!)
+        return h
+    }
+
     /// Capture the local voice to its own file AND feed it to a second live
     /// transcriber. Feeding the live view only the system tap meant that while
     /// the user spoke, with nothing else playing, it saw silence - and filled
@@ -251,7 +302,7 @@ final class Recorder: ObservableObject {
             .appendingPathComponent(micName).path, "--stream"]
         let out = Pipe()
         p.standardOutput = out
-        p.standardError = FileHandle.nullDevice
+        p.standardError = Recorder.helperLog(wavName, tag: "mic")
         out.fileHandleForReading.readabilityHandler = { h in
             let d = h.availableData
             guard !d.isEmpty else { return }

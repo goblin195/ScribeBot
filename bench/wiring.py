@@ -46,6 +46,18 @@ CHECKS = [
                not re.search(r'executableURL\s*=\s*URL\(fileURLWithPath:\s*"/usr/bin/env"', s)),
     ("a failed transcription is reported, not swallowed",
      lambda s: "terminationStatus != 0" in s),
+    # The helper prints its input device, clock source, sample rates, the
+    # Bluetooth low-quality warning and every tap stall to stderr. Sending that
+    # to nullDevice is why three shipped bugs were invisible, and why a Zoom
+    # call that captured 26.9s of a 72.5s meeting looked identical to a good
+    # one on every green check.
+    ("the capture helpers' stderr is kept, not discarded",
+     lambda s: s.count("Recorder.helperLog(") >= 2),
+    # The tap only runs IO while something is playing, so its stream can end
+    # early. Without padding, the far side's words sit at the wrong timestamps
+    # and attribution hands every line to the local speaker.
+    ("the tap file is padded to wall clock, not to bytes delivered",
+     lambda s: "close(padTo:" in s),
 ]
 
 

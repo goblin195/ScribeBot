@@ -24,3 +24,11 @@ docs/progress.html
 # a mistyped "record 10" wrote CoreAudio audio to a file named 10
 /10
 *.caf
+
+# agent tool state
+.serena/
+
+# Per-recording capture diagnostics. These live beside the audio in
+# ~/Library/Application Support/Scribebot/, but they name the user's audio
+# devices, so keep them out of the tree if one is ever copied in.
+*.capture.log

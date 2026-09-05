@@ -47,6 +47,40 @@ stat -f "%Sm %N" -t "%H:%M:%S" <id>.wav <id>.txt
 If the `.txt` shares a second with the `.wav`, it was written at stop and
 finalization never ran. Finalization takes about a second per file.
 
+## "The other side is missing, and every line says You:"
+
+One defect produces both halves of this. Compare the two files:
+
+```sh
+cd ~/Library/Application\ Support/Scribebot/recordings
+afinfo <id>.wav | grep duration        # them
+afinfo <id>-you.wav | grep duration    # you
+```
+
+They should match. If the tap file is much shorter, the CoreAudio tap stalled
+during the call: a tap-bearing aggregate only runs IO while something is
+playing, and the stream carries no timeline, so a stall used to erase its own
+gap rather than record silence. Everything after the first stall then sat at
+the wrong timestamp, attribution handed it to the local speaker, and the
+surviving audio was spliced mid-word into something the decoder could not read
+- it answers with repeated filler rather than words.
+
+A real 72.5 s Zoom call came back as a 26.9 s tap file this way.
+
+The gap is now padded with silence and the two files always agree, so
+attribution survives a stall. The stall itself is still worth chasing - read
+the log written beside the recording:
+
+```sh
+grep -E "stalled|clock source|preflight|WARNING" <id>.capture.log
+```
+
+`tap stalled 8.3s` marks each one. `clock source` names the device the
+aggregate was clocked by; an output device that reconfigures mid-call - a
+Bluetooth headset switching profile, or a virtual device belonging to another
+conferencing app - is the leading suspect. Audio the tap never delivered is
+not recoverable for that call; `rebuild` cannot invent it.
+
 ## "I can't hear myself in the recording"
 
 Check the peak level of your side:

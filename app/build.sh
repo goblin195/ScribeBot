@@ -10,7 +10,11 @@ printf 'APPL????' > "$APP/Contents/PkgInfo"
 swiftc -target arm64-apple-macos14.0 -parse-as-library \
        -o "$APP/Contents/MacOS/Scribebot" Sources/*.swift
 mkdir -p "$APP/Contents/Resources"
-cp "$(dirname "$0")/icon/Scribebot.icns" "$APP/Contents/Resources/" 2>/dev/null || true
+# We already cd'd to this script's directory, so the path is relative to it.
+# Using $(dirname "$0") a second time looked for app/app/icon when the script
+# was run as ./app/build.sh, the copy failed, and `|| true` swallowed it - the
+# rebuilt app silently lost its icon. Let a missing icon fail the build.
+cp icon/Scribebot.icns "$APP/Contents/Resources/"
 
 codesign --force -s - -i dev.scribebot.app "$APP"
 codesign -dv "$APP" 2>&1 | grep -E 'Identifier|Signature'

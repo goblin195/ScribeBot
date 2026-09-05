@@ -36,11 +36,18 @@ Be honest about these when reporting status.
 
 ## Open items
 
-- **Surface the microphone quality warning in the UI.** `tap.swift` detects a
-  Bluetooth hands-free profile (≤16 kHz input) and prints a warning, but
-  `Recorder.swift` sends the helper's stderr to `FileHandle.nullDevice`, so the
-  user never sees it. They instead experience it as "I can't hear myself". This
-  is the most valuable small fix outstanding.
+- **Why the tap stalls is still unknown.** On a real Zoom call the process tap
+  delivered 26.9 s of a 72.5 s meeting. The gap is now padded with silence and
+  logged, so the two files stay aligned and attribution survives it, but
+  nothing yet prevents the stall - and audio the tap never delivered is gone.
+  It did not reproduce with the built-in speakers as clock source, through
+  eight seconds of total silence. The next occurrence will name itself in
+  `<id>.capture.log`; suspect an output device that reconfigures mid-call.
+- **The helper's stderr is now kept** in `<id>.capture.log` beside each
+  recording, and a call whose system audio covered less than 80% of the
+  elapsed time raises a message in the app. The Bluetooth low-quality warning
+  therefore reaches disk, but it is still not shown in the UI - only the
+  coverage shortfall is.
 - **`docs/progress.html`** is a progress page from the build, is not
   maintained, and is excluded from the public repository because it quotes real
   transcript text. Either update it or retire it.

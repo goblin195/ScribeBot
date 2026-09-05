@@ -180,7 +180,8 @@ code-switches into English.
 | Area | What's needed | Difficulty |
 |---|---|:---:|
 | Glossary terms | Hebrew transliterations of English tech terms | 🟢 easy |
-| Surface the mic warning | Bluetooth-headset warning exists but is swallowed by the UI | 🟢 easy |
+| Surface the mic warning | The Bluetooth-headset warning reaches `<id>.capture.log` but is still not shown in the UI | 🟢 easy |
+| Find why the tap stalls | A real call captured 26.9s of 72.5s; the gap is padded and logged, but not prevented | 🔴 involved |
 | Real diarization data | One labelled multi-speaker recording; the benchmark is synthetic | 🟡 medium |
 | Latency measurement | True end-to-end lag behind live speech is unmeasured | 🟡 medium |
 | Another language | The architecture is not Hebrew-specific — only the model and glossary are | 🔴 involved |

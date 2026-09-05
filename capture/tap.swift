@@ -710,6 +710,55 @@ func cmdStream(pids: [pid_t], mic: Bool = false) throws {
     var converter: AVAudioConverter?
     let stdout = FileHandle.standardOutput
 
+    // A tap-bearing aggregate only runs IO while something is playing, so the
+    // callback stalls whenever the far side goes quiet or the output device
+    // reconfigures. This is a raw byte stream with no timeline in it, so a
+    // stall used to leave no trace: the gap vanished and every later sample
+    // moved earlier. A real Zoom call came back as a 26.9 s file for a 72.5 s
+    // meeting - the far side unintelligible because non-adjacent audio had been
+    // spliced together mid-word, and every line attributed to the local speaker
+    // because the two files no longer shared a clock.
+    //
+    // The tap's own sample time is authoritative. Anchor to it and emit the
+    // silence each stall stands for.
+    var originSampleTime: Double?
+    var framesEmitted: Int64 = 0
+    var silenceEmitted: Int64 = 0
+
+    func emitSilence(_ frames: Int64) {
+        guard frames > 0 else { return }
+        var left = Int(frames)
+        while left > 0 {
+            let n = min(left, 16_000)
+            stdout.write(Data(count: n * 2))
+            left -= n
+        }
+        framesEmitted += frames
+        silenceEmitted += frames
+    }
+
+    /// Emit whatever silence separates this callback from the previous one.
+    func closeGap(_ ts: AudioTimeStamp, inputRate: Double) {
+        guard ts.mFlags.contains(.sampleTimeValid), inputRate > 0 else { return }
+        if originSampleTime == nil { originSampleTime = ts.mSampleTime }
+        guard let origin = originSampleTime else { return }
+        let expected = Int64((((ts.mSampleTime - origin) * outFmt.sampleRate)
+                              / inputRate).rounded())
+        // Sub-50 ms differences are ordinary buffer jitter, not a stall.
+        let gap = expected - framesEmitted
+        guard gap > Int64(0.05 * outFmt.sampleRate) else { return }
+        let seconds = Double(gap) / outFmt.sampleRate
+        // Worth saying out loud: a long stall means the far side of a call was
+        // not being captured at all for that stretch, which the user
+        // experiences as "it missed half of what was said".
+        if seconds >= 1 {
+            let msg = "\u{2192} tap stalled \(String(format: "%.1f", seconds))s"
+                + " - no system audio captured for that stretch\n"
+            FileHandle.standardError.write(msg.data(using: .utf8)!)
+        }
+        emitSilence(gap)
+    }
+
     let consume: (AVAudioPCMBuffer) -> Void = { buf in
         if converter == nil { converter = AVAudioConverter(from: buf.format, to: outFmt) }
         guard let converter else { return }
@@ -732,10 +781,16 @@ func cmdStream(pids: [pid_t], mic: Bool = false) throws {
             withUnsafeBytes(of: &s) { pcm.append(contentsOf: $0) }
         }
         stdout.write(pcm)
+        framesEmitted += Int64(outBuf.frameLength)
     }
 
-    try tap.start(targets: targets) { buf, _ in
-        if mic, let mx = mixer { mx.pushTap(buf) } else { consume(buf) }
+    try tap.start(targets: targets) { buf, ts in
+        if mic, let mx = mixer {
+            mx.pushTap(buf)
+        } else {
+            closeGap(ts, inputRate: buf.format.sampleRate)
+            consume(buf)
+        }
     }
     if mic, let tapFmt = tap.format {
         let mx = Mixer(format: tapFmt, onOutput: consume)
