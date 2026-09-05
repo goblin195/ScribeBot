@@ -16,6 +16,8 @@ struct MainWindowView: View {
     @ObservedObject var perms: Permissions
     @StateObject private var index = MeetingIndex.shared
 
+    @State private var showingSettings = false
+    @State private var settingsPage: SettingsPage = .general
     @State private var pane: Pane = .recordings
     @State private var query = (ProcessInfo.processInfo.environment["SCRIBEBOT_SEARCH"] ?? "")
     @State private var selectedRec: String?
@@ -30,6 +32,7 @@ struct MainWindowView: View {
     }
 
     var body: some View {
+        ZStack {
         HSplitView {
             sidebar.frame(minWidth: 240, idealWidth: 320, maxWidth: 320)
                 .background(InitialColumnWidths())
@@ -37,6 +40,18 @@ struct MainWindowView: View {
                 .frame(minWidth: 268, idealWidth: 440, maxWidth: 520)
             VStack(spacing: 0) { detail }
                 .frame(minWidth: 360, idealWidth: 630)
+        }
+        .opacity(showingSettings ? 0 : 1)
+        .allowsHitTesting(!showingSettings)
+        .accessibilityHidden(showingSettings)
+        if showingSettings {
+            SettingsView(perms: perms, onBack: { showingSettings = false }, page: settingsPage)
+                .id(settingsPage)
+        }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openSettings)) { notification in
+            settingsPage = SettingsPage(rawValue: notification.userInfo?["page"] as? String ?? "General") ?? .general
+            showingSettings = true
         }
         .background(P.ground)
         // Ideal, not just minimum: SwiftUI sizes a Window scene from the
@@ -53,10 +68,10 @@ struct MainWindowView: View {
     /// ⌘F and ⌘K both land in the search field; ⌘1/⌘2 switch panes.
     private var shortcuts: some View {
         ZStack {
-            Button("") { searchFocused = true }.keyboardShortcut("f", modifiers: .command)
-            Button("") { searchFocused = true }.keyboardShortcut("k", modifiers: .command)
-            Button("") { pane = .recordings }.keyboardShortcut("1", modifiers: .command)
-            Button("") { pane = .people }.keyboardShortcut("2", modifiers: .command)
+            Button("") { showingSettings = false; searchFocused = true }.keyboardShortcut("f", modifiers: .command)
+            Button("") { showingSettings = false; searchFocused = true }.keyboardShortcut("k", modifiers: .command)
+            Button("") { showingSettings = false; pane = .recordings }.keyboardShortcut("1", modifiers: .command)
+            Button("") { showingSettings = false; pane = .people }.keyboardShortcut("2", modifiers: .command)
         }
         .opacity(0).frame(width: 0, height: 0)
     }
@@ -92,10 +107,20 @@ struct MainWindowView: View {
 
             Spacer(minLength: 12)
             Divider().overlay(P.rule)
+            Button { showingSettings = true } label: {
+                Label("Settings", systemImage: "gearshape")
+                    .font(T.body(15, .medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 14).padding(.vertical, 14)
+                    .background(P.accentSoft, in: RoundedRectangle(cornerRadius: 9))
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain).foregroundStyle(P.ink)
+            .padding(.horizontal, 10).padding(.top, 12).padding(.bottom, 6)
             footer
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .background(P.surface2)
+        .background(P.sidebar)
     }
 
     private var footer: some View {
@@ -235,9 +260,9 @@ private struct NavRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 9) {
-                Image(systemName: pane.icon).font(.system(size: 17))
+                Image(systemName: pane.icon).font(.system(size: 16))
                     .foregroundStyle(active ? P.accent : P.ink2).frame(width: 22)
-                Text(title).font(T.body(16, active ? .semibold : .regular))
+                Text(title).font(T.body(15, active ? .semibold : .regular))
                     .foregroundStyle(active ? P.ink : P.ink2)
                 Spacer()
                 if let count {

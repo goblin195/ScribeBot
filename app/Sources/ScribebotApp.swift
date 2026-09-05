@@ -4,6 +4,7 @@ import SwiftUI
 extension Notification.Name {
     /// AppDelegate lives outside the scene graph, so the one view that is always
     /// instantiated (the status item label) opens the main window on its behalf.
+    static let openSettings = Notification.Name("scribebot.openSettings")
     static let openMainWindow = Notification.Name("scribebot.openMainWindow")
 }
 
@@ -31,6 +32,7 @@ final class AppState: ObservableObject {
     let perms = Permissions()
     let library: Library
     let recorder: Recorder
+    lazy var callMonitor = CallMonitor(recorder: recorder, perms: perms)
     private init() {
         let l = Library()
         library = l
@@ -54,7 +56,7 @@ final class Windows {
         w.isReleasedWhenClosed = false
         w.backgroundColor = NSColor(name: nil) { ap in
             ap.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
-                ? NSColor(hex: "1D1D1C") : NSColor(hex: "F2F1EF")
+                ? NSColor(hex: "1D1D1C") : NSColor(hex: "FFFFFF")
         }
         w.contentView = NSHostingView(rootView: content(id))
         w.center()
@@ -89,6 +91,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ n: Notification) {
         MainActor.assumeIsolated {
             NSApp.setActivationPolicy(.regular)
+            AppState.shared.callMonitor.start()
+            SettingsView.applyAppearance(UserDefaults.standard.string(forKey: "appearance") ?? "system")
             let env = ProcessInfo.processInfo.environment
             // ponytail: screenshot hook. The -AppleInterfaceStyle argument domain
             // is no longer honoured, and flipping the system theme to check ours
@@ -125,6 +129,7 @@ struct ScribebotApp: App {
     @ObservedObject private var state = AppState.shared
 
     var body: some Scene {
+
         MenuBarExtra {
             MenuBarView(recorder: state.recorder, perms: state.perms) {
                 Windows.shared.show($0)
@@ -140,6 +145,14 @@ struct ScribebotApp: App {
         }
         .defaultSize(width: 1180, height: 720)
         .windowToolbarStyle(.unifiedCompact)
+        .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Settings…") {
+                    NotificationCenter.default.post(name: .openMainWindow, object: nil)
+                    NotificationCenter.default.post(name: .openSettings, object: nil)
+                }.keyboardShortcut(",", modifiers: .command)
+            }
+        }
     }
 }
 

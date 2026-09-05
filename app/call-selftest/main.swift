@@ -1,0 +1,12 @@
+import Foundation
+var sessions = CallSessions()
+let start = Date()
+assert(sessions.update(active: ["zoom"], now: start, suppressed: false) == "zoom")
+assert(sessions.update(active: ["zoom"], now: start.addingTimeInterval(2), suppressed: false) == nil)
+assert(sessions.update(active: [], now: start.addingTimeInterval(10), suppressed: false) == nil)
+assert(sessions.update(active: ["zoom"], now: start.addingTimeInterval(20), suppressed: false) == nil)
+assert(sessions.update(active: [], now: start.addingTimeInterval(51), suppressed: false) == nil)
+assert(sessions.update(active: ["zoom"], now: start.addingTimeInterval(52), suppressed: false) == "zoom")
+assert(sessions.update(active: ["teams"], now: start.addingTimeInterval(53), suppressed: true) == nil)
+assert(sessions.update(active: ["teams"], now: start.addingTimeInterval(54), suppressed: false) == nil)
+print("call session checks passed")

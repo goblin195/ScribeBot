@@ -128,7 +128,7 @@ struct RecordingDetail: View {
         }
         .padding(.horizontal, 30).padding(.top, 30).padding(.bottom, 24)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(P.surface)
+        .background(P.sidebar)
     }
 
     // MARK: - Calendar
