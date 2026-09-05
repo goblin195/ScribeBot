@@ -19,6 +19,15 @@ func baseDirection(_ s: String) -> LayoutDirection {
     return .leftToRight
 }
 
+/// Base direction for a whole block, from whichever script has more letters in
+/// it. `baseDirection` above is the right rule for one transcript line and the
+/// wrong one for a summary: the block has to read one way, headings and bullet
+/// markers included, and one English term at the top of a Hebrew section must
+/// not flip it.
+func dominantDirection(_ text: String) -> LayoutDirection {
+    Summary.isHebrew(text) ? .rightToLeft : .leftToRight
+}
+
 /// A transcript line laid out in its own base direction.
 struct BidiText: View {
     let text: String

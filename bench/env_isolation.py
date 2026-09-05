@@ -28,6 +28,10 @@ def _speechlike_wav(path: Path, seconds: float = 2.0, sr: int = 16_000) -> None:
 
 def main() -> int:
     python = sys.executable  # the app resolves an absolute python the same way
+    # Deliberately NOT forwarding SCRIBEBOT_SUPPORT. A Finder-launched app does
+    # not have it either, and a developer who deletes models/ and exports it in
+    # their shell would get a green check while the real app dies looking in
+    # ~/Library/Application Support. This environment is the whole test.
     with tempfile.TemporaryDirectory() as d:
         wav = Path(d) / "probe.wav"
         _speechlike_wav(wav)

@@ -51,7 +51,12 @@ def main():
     for name in ['glossary.py', 'aliases.json']:
         copy(ROOT / 'bench' / name, RUNTIME / 'bench' / name)
     # The calendar index and harvested vocabulary are intentionally not shipped.
-    copy(ROOT / 'models/ivrit-large-v3-turbo.bin', RUNTIME / 'models/ivrit-large-v3-turbo.bin')
+    # Neither is a model. 0.1 shipped models/ivrit-large-v3-turbo.bin here and
+    # 1.4 GB of a 1.5 GB DMG was that one file. First-run setup downloads it
+    # instead, into the support directory - it cannot be put back into the
+    # bundle later because writing under Contents/Resources breaks the code
+    # signature verified below, and the next launch is refused.
+    assert not (RUNTIME / 'models').exists(), 'No model belongs in the bundle.'
     copy(BUILD / 'whisper-build/bin/whisper-cli', RUNTIME / 'bin/whisper-cli')
     shutil.copytree(INPUTS / 'python', RUNTIME / 'python', symlinks=True)
     helper = RUNTIME / 'capture/ScribebotCapture.app'

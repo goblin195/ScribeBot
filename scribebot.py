@@ -90,6 +90,12 @@ def transcribe_segments(wav: Path, lang: str | None = None) -> list[dict]:
     """
     js = wav.with_suffix(".wav.json")
     model, flag = languages.resolve(lang)
+    # No model is now the state of a fresh install, not a broken checkout: the
+    # DMG ships none and first-run setup downloads them. Returning [] here would
+    # export an empty SRT that looks like a recording with nothing in it.
+    if not model.exists():
+        sys.exit(f"model missing: {model}\nfinish Scribebot's setup, or place the "
+                 f"model at that path.")
     r = subprocess.run(
         [WHISPER, "-m", str(model), "-f", str(wav), "-l", flag,
          "-sow", "-oj", "-np"],
@@ -120,11 +126,7 @@ def transcribe_segments(wav: Path, lang: str | None = None) -> list[dict]:
 
 
 def transcribe(wav: Path, lang: str | None = None) -> str:
-    model, flag = languages.resolve(lang)
-    if not model.exists():
-        sys.exit(f"model missing: {model}\n"
-                 f"download it, or pick a language whose model you have "
-                 f"(--lang he uses {languages.HEBREW.name}).")
+    model, flag = languages.require(lang)
     r = subprocess.run(
         [WHISPER, "-m", str(model), "-f", str(wav), "-l", flag, "-nt", "-np"],
         capture_output=True, text=True)

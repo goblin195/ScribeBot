@@ -70,4 +70,24 @@ check(s.tasks.count == 1 && s.tasks[0].contains("אורנה"), "tasks")
 check(Summary.unbullet("2026 היה קשה") == "2026 היה קשה", "year is not a bullet")
 check(Summary(markdown: "").isEmpty, "empty summary")
 
+// what the Copy button puts on the pasteboard: every section, in order
+let md = s.markdown
+check(md.hasPrefix("## תקציר"), "markdown opens on the first heading: \(md.prefix(24))")
+check(md.contains("\n## החלטות\n"), "later headings kept")
+check(md.contains("- לדחות את ה-deploy ליום חמישי"), "list items are bulleted")
+check(md.contains("- אורנה"), "the last section is copied too, not just the visible one")
+check(Summary(markdown: md).sections.count == s.sections.count, "markdown round-trips")
+check(Summary(markdown: "פתיח לפני הכותרת\n\n## תקציר\nכן.").markdown
+        .hasPrefix("פתיח לפני הכותרת\n\n## תקציר"), "preamble is copied before the headings")
+
+// which way the summary reads. Per-line rules are wrong here: the second one
+// opens with an English term and is still a Hebrew summary.
+check(s.isHebrew, "Hebrew summary reads RTL")
+check(Summary(markdown: "## תקציר\nSIEM-ה נפרס ביום חמישי.").isHebrew,
+      "Hebrew carrying English terms still reads RTL")
+check(!Summary(markdown: "## Summary\nWe agreed to ship on Thursday.").isHebrew,
+      "an English summary stays LTR")
+check(!Summary(markdown: "## Summary\nThe deploy is on Thursday. Owner: אורנה")
+        .isHebrew, "English carrying a Hebrew name stays LTR")
+
 print("transcript self-check passed")

@@ -16,7 +16,7 @@ Reference: Machacek, Dabre & Bojar, "Turning Whisper into Real-Time Transcriptio
 System" (2023) - the confirmed/unconfirmed discipline, not the code.
 """
 from __future__ import annotations
-import array, json, re, subprocess, tempfile, wave
+import array, json, re, subprocess, sys, tempfile, wave
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -59,14 +59,20 @@ def decode(pcm: bytes, offset: float, prompt: str = "") -> list[Word]:
         # language on `auto` means the general model here; naming the language
         # (SCRIBEBOT_LANG=he) puts the fine-tune in the preview too. Either
         # way the transcript saved at the end is re-decoded properly.
-        model, flag = languages.resolve()
+        model, flag = languages.require()
         cmd = [WHISPER, "-m", str(model), "-f", str(wav), "-l", flag,
                "-ml", "1", "-sow", "-oj", "-np"]
         if prompt:
             cmd += ["--prompt", " ".join(prompt.split()[-40:])]
-        subprocess.run(cmd, capture_output=True, text=True)
+        r = subprocess.run(cmd, capture_output=True, text=True)
         js = wav.with_suffix(".wav.json")
-        if not js.exists():
+        # A failed decode is not silence. Say so on stderr - live.py's stderr
+        # now reaches <id>.capture.log - rather than returning "no words" and
+        # leaving the live view blank with no explanation anywhere.
+        if r.returncode != 0 or not js.exists():
+            detail = (r.stderr or r.stdout or "").strip().splitlines()[-1:]
+            print(f"decode failed (exit {r.returncode}): "
+                  f"{detail[0] if detail else 'no output'}", file=sys.stderr)
             return []
         try:
             data = json.loads(js.read_text())

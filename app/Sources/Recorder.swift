@@ -337,7 +337,11 @@ final class Recorder: ObservableObject {
         let stdin = Pipe(), stdout = Pipe()
         p.standardInput = stdin
         p.standardOutput = stdout
-        p.standardError = FileHandle.nullDevice
+        // live.py's stderr used to go to nullDevice. With no model on disk -
+        // the state of every fresh install until the first-run download
+        // finishes - the decoder failed on every chunk and the live view
+        // stayed blank for a whole meeting with the reason thrown away.
+        p.standardError = Recorder.helperLog(wavName, tag: "live" + (label.isEmpty ? "" : " " + label))
         stdout.fileHandleForReading.readabilityHandler = { [weak self] h in
             let d = h.availableData
             guard !d.isEmpty else { return }

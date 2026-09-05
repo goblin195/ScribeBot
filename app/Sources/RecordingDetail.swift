@@ -49,6 +49,8 @@ struct RecordingDetail: View {
     @State private var editingInstructions = false
     @State private var browsingTemplates = false
     @State private var creatingTemplate = false
+    @State private var copied = false
+    @State private var copyReset: Task<Void, Never>?
 
     private var sides: Sides { library.sides[rec.id] ?? .missing }
     private var meeting: CalMeeting? { index.meeting(at: rec.startedAt) }
@@ -160,6 +162,7 @@ struct RecordingDetail: View {
     private func loadForRecording() {
         templateID = SummaryTemplates.selectedID(for: rec.id)
         summarizer.loadCached(rec.id, template: templateID)
+        copyReset?.cancel(); copied = false
     }
 
     private func choose(_ t: SummaryTemplate) {
@@ -248,6 +251,12 @@ struct RecordingDetail: View {
                     Eyebrow(text: "saved")
                 }
                 Spacer()
+                if case let .ready(s, _) = summarizer.state, !s.isEmpty {
+                    // The label is the whole confirmation: a summary is read
+                    // in place, and a banner here would push it down the page.
+                    Button(copied ? "Copied" : "Copy") { copy(s) }
+                        .buttonStyle(FlatButton(filled: false))
+                }
                 if case .running = summarizer.state {
                     Button("Cancel") { summarizer.cancel() }
                         .buttonStyle(FlatButton(filled: false))
@@ -263,14 +272,7 @@ struct RecordingDetail: View {
             case .running, .failed:
                 SummaryStatus(summarizer: summarizer)
             case let .ready(s, _):
-                ForEach(s.sections) { section in SummarySection(section: section) }
-                if s.sections.isEmpty, !s.abstract.isEmpty {
-                    BidiText(text: s.abstract, font: T.body(15), color: P.ink)
-                        .padding(20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(P.surface, in: RoundedRectangle(cornerRadius: 14))
-                        .padding(.horizontal, 22)
-                }
+                if !s.isEmpty { SummaryDocument(summary: s) }
             case .idle:
                 VStack(alignment: .leading, spacing: 6) {
                     Eyebrow(text: "no summary yet")
@@ -284,6 +286,17 @@ struct RecordingDetail: View {
             }
         }
         .padding(.vertical, 8)
+    }
+
+    private func copy(_ s: Summary) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(s.markdown, forType: .string)
+        copied = true
+        copyReset?.cancel()
+        copyReset = Task {
+            try? await Task.sleep(for: .seconds(1.8))
+            if !Task.isCancelled { copied = false }
+        }
     }
 
     private var hasSummary: Bool {

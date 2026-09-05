@@ -21,7 +21,7 @@ enum WindowID: String {
         switch self {
         case .transcript: return NSSize(width: 620, height: 520)
         case .library: return NSSize(width: 820, height: 520)
-        case .onboarding: return NSSize(width: 620, height: 640)
+        case .onboarding: return NSSize(width: 680, height: 700)
         }
     }
 }
@@ -32,6 +32,13 @@ final class AppState: ObservableObject {
     let perms = Permissions()
     let library: Library
     let recorder: Recorder
+    /// Models land beside the recordings, never inside the bundle: adding a
+    /// file under Contents/Resources breaks the signature macOS just checked.
+    /// The checkout's own models/ is searched too, so a development build does
+    /// not offer to re-download what it already has.
+    let models = ModelDownloads(
+        directory: ModelCatalog.directory(under: Paths.support),
+        alsoSearch: [Paths.root.appendingPathComponent("models")])
     lazy var callMonitor = CallMonitor(recorder: recorder, perms: perms)
     private init() {
         let l = Library()
@@ -72,8 +79,7 @@ final class Windows {
         case .transcript: TranscriptView(recorder: s.recorder)
         case .library: MeetingsView(library: s.library)
         case .onboarding:
-            OnboardingView(perms: s.perms) {
-                UserDefaults.standard.set(true, forKey: "didOnboard")
+            OnboardingView(perms: s.perms, models: s.models) {
                 Windows.shared.close(.onboarding)
             }
         }

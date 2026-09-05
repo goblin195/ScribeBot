@@ -21,39 +21,142 @@ struct Segment: ButtonStyle {
     }
 }
 
-/// One `## heading` of a summary. A single long run is a paragraph, anything
-/// else is a list: a template's sections are not all the same shape - "Summary"
-/// is prose and "Blockers" is a list.
-struct SummarySection: View {
-    let section: Summary.Section
-
+/// The whole summary as one card. A single long run under a heading is a
+/// paragraph, anything else is a list: a template's sections are not all the
+/// same shape - "Summary" is prose and "Blockers" is a list.
+///
+/// This used to be a card per `## heading`, each heading and each bullet its
+/// own SwiftUI `Text`. SwiftUI text selection is per-`Text`: a drag could only
+/// ever select the one box it started in and ⌘A selected nothing at all, which
+/// is what the user hit. One text view is the only way to get a single
+/// selection across the whole summary - and it is also the only way to get
+/// real RTL, where the heading, the bullet marker and the wrapped continuation
+/// lines all sit on the right edge rather than being individually re-aligned.
+struct SummaryDocument: View {
+    let summary: Summary
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(section.title)
-                .font(T.body(12, .semibold))
-                .foregroundStyle(P.accent)
-                .textCase(.uppercase)
-                .kerning(0.6)
+        // No colorScheme rebuild here on purpose: NSColor(P.ink) is a dynamic
+        // NSCustomDynamicColor that resolves at draw time, so the theme
+        // follows on its own. An earlier version rebuilt the string on a
+        // colorScheme change, which did nothing anyway - two identically built
+        // attributed strings compare equal, so updateNSView returned early -
+        // and that equality is load-bearing: it is what stops an unrelated
+        // redraw from throwing away the user's selection.
+        SelectableText(content: Self.attributed(
+            summary, rtl: dominantDirection(summary.markdown) == .rightToLeft))
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(P.surface, in: RoundedRectangle(cornerRadius: 14))
+            .padding(.horizontal, 22)
+    }
+
+    private static let hangingIndent: CGFloat = 15
+
+    static func attributed(_ s: Summary, rtl: Bool) -> NSAttributedString {
+        let out = NSMutableAttributedString()
+
+        func paragraph(before: CGFloat, lineSpacing: CGFloat,
+                       hanging: CGFloat = 0) -> NSParagraphStyle {
+            let p = NSMutableParagraphStyle()
+            // Set the alignment explicitly rather than leaving it .natural:
+            // .natural follows the app's UI language, not this text's script,
+            // so a Hebrew summary in an English UI came out left-aligned.
+            p.baseWritingDirection = rtl ? .rightToLeft : .leftToRight
+            p.alignment = rtl ? .right : .left
+            p.paragraphSpacingBefore = out.length == 0 ? 0 : before
+            p.lineSpacing = lineSpacing
+            p.headIndent = hanging
+            if hanging > 0 {
+                p.tabStops = [NSTextTab(textAlignment: .natural, location: hanging)]
+            }
+            return p
+        }
+
+        func add(_ text: String, size: CGFloat, weight: NSFont.Weight = .regular,
+                 color: NSColor, kern: CGFloat = 0, style: NSParagraphStyle) {
+            if out.length > 0 { out.append(NSAttributedString(string: "\n")) }
+            out.append(NSAttributedString(string: text, attributes: [
+                .font: NSFont.systemFont(ofSize: size, weight: weight),
+                .foregroundColor: color,
+                .kern: kern,
+                .paragraphStyle: style,
+            ]))
+        }
+
+        let ink = NSColor(P.ink), accent = NSColor(P.accent), marker = NSColor(P.ink3)
+        if !s.preamble.isEmpty {
+            add(s.preamble, size: 15, color: ink,
+                style: paragraph(before: 0, lineSpacing: 6))
+        }
+        for section in s.sections {
+            // Hebrew has no case, so uppercasing only affects English headings -
+            // which is exactly the treatment the cards used to give them.
+            add(section.title.uppercased(), size: 12, weight: .semibold,
+                color: accent, kern: 0.6, style: paragraph(before: 22, lineSpacing: 0))
             if section.isProse {
-                BidiText(text: section.items[0], font: T.body(15), color: P.ink)
-                    .lineSpacing(6)
-                    .fixedSize(horizontal: false, vertical: true)
+                add(section.items[0], size: 15, color: ink,
+                    style: paragraph(before: 10, lineSpacing: 6))
             } else {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(Array(section.items.enumerated()), id: \.offset) { _, item in
-                        HStack(alignment: .top, spacing: 9) {
-                            Circle().fill(P.ink3).frame(width: 4, height: 4).padding(.top, 8)
-                            BidiText(text: item, font: T.body(14.5), color: P.ink)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
+                for (i, item) in section.items.enumerated() {
+                    let start = out.length
+                    add("•\t" + item, size: 14.5, color: ink,
+                        style: paragraph(before: i == 0 ? 10 : 8,
+                                         lineSpacing: 3, hanging: hangingIndent))
+                    // The marker is furniture, the item is content; the cards
+                    // made the same distinction with a dimmer dot. `add`
+                    // separates blocks with a newline, so skip it.
+                    out.addAttribute(.foregroundColor, value: marker,
+                                     range: NSRange(location: start == 0 ? 0 : start + 1,
+                                                    length: 1))
                 }
             }
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(P.surface, in: RoundedRectangle(cornerRadius: 14))
-        .padding(.horizontal, 22)
+        return out
+    }
+}
+
+/// TextKit's "as tall as it needs to be". Spelled out because a bare
+/// `.greatestFiniteMagnitude` is ambiguous between CGFloat and Double here.
+private let unbounded: CGFloat = .greatestFiniteMagnitude
+
+/// A read-only text view sized to its content, because SwiftUI has no
+/// multi-paragraph selectable text of its own (see SummaryDocument).
+private struct SelectableText: NSViewRepresentable {
+    let content: NSAttributedString
+
+    func makeNSView(context: Context) -> NSTextView {
+        let v = NSTextView(frame: NSRect.zero)
+        // The height below is measured through NSLayoutManager, so pin the
+        // view to TextKit 1 here rather than letting the first measurement
+        // trip the fallback in the middle of a layout pass.
+        _ = v.layoutManager
+        v.textContainer?.lineFragmentPadding = 0
+        v.textContainer?.widthTracksTextView = false
+        v.isEditable = false
+        v.isSelectable = true
+        v.drawsBackground = false
+        v.textContainerInset = NSSize(width: 0, height: 0)
+        v.isHorizontallyResizable = false
+        v.isVerticallyResizable = true
+        return v
+    }
+
+    func updateNSView(_ v: NSTextView, context: Context) {
+        guard v.textStorage?.isEqual(to: content) != true else { return }
+        v.textStorage?.setAttributedString(content)
+    }
+
+    /// Inside a ScrollView nothing else will give the text view a height - the
+    /// scroll view offers it infinite space and it collapses - so measure the
+    /// wrapped text at the width SwiftUI is proposing.
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView v: NSTextView,
+                      context: Context) -> CGSize? {
+        guard let container = v.textContainer, let layout = v.layoutManager else { return nil }
+        let width = proposal.width ?? 0
+        guard width > 0, width < .infinity else { return nil }
+        container.size = NSSize(width: width, height: unbounded)
+        layout.ensureLayout(for: container)
+        return CGSize(width: width, height: ceil(layout.usedRect(for: container).height))
     }
 }
 

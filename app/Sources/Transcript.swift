@@ -177,6 +177,41 @@ struct Summary {
         }
     }
 
+    /// The whole summary as Markdown, in section order. Rebuilt from the
+    /// parsed sections rather than kept as the model's raw output, so what the
+    /// copy button puts on the pasteboard is exactly what the view renders -
+    /// bullets already normalised, `**bold**` run-ins already gone.
+    var markdown: String {
+        var blocks: [String] = []
+        if !preamble.isEmpty { blocks.append(preamble) }
+        for s in sections {
+            blocks.append("## \(s.title)")
+            blocks.append(s.isProse
+                ? s.items[0]
+                : s.items.map { "- \($0)" }.joined(separator: "\n"))
+        }
+        return blocks.joined(separator: "\n\n")
+    }
+
+    /// Which script the summary is written in, by letter count. This is a
+    /// different question from `baseDirection` in RTL.swift, which reads the
+    /// first strong character of ONE line: a Hebrew section that happens to
+    /// open with an English product name is still a Hebrew section, and
+    /// deciding per line put its heading and bullets on the wrong edge.
+    static func isHebrew(_ text: String) -> Bool {
+        var hebrew = 0, latin = 0
+        for u in text.unicodeScalars {
+            switch u.value {
+            case 0x0590...0x05FF: hebrew += 1
+            case 0x0041...0x005A, 0x0061...0x007A: latin += 1
+            default: continue
+            }
+        }
+        return hebrew > latin
+    }
+
+    var isHebrew: Bool { Summary.isHebrew(markdown) }
+
     /// Lookups the standard template's sections still answer to, so a caller
     /// that only wants decisions does not have to know about templates.
     private func section(_ needles: [String]) -> [String] {

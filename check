@@ -34,6 +34,7 @@ run "attribute"        "python3 attribute.py --selftest"
 run "glossary"         "python3 bench/glossary.py"
 run "negative control" "python3 bench/negative_control.py"
 run "app wiring"        "python3 bench/wiring.py"
+run "model download"    "python3 bench/model_download.py"
 run "app environment"   "python3 bench/env_isolation.py"
 run "score metrics"    "python3 -c \"import sys;sys.path.insert(0,'bench');from score import wer,norm,kept;assert norm('ה-DLP.')=='ה DLP';assert wer('א ב ג','א ב ג')==0.0;print('score self-check passed')\""
 
