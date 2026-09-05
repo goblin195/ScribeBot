@@ -94,11 +94,23 @@ your microphone to two separate files and transcribes them apart. Who spoke is
 then a fact about which file the words came from, not something a clustering
 algorithm has to guess. For two-party calls it is exact and free.
 
+## Screenshots
+
 <div align="center">
 
-![Transcript with speaker attribution and restored technical terms](docs/images/scribebot-transcript.png)
+| Recordings | Transcript | Search |
+|:---:|:---:|:---:|
+| <img src="docs/images/01-recordings.png" width="270"/> | <img src="docs/images/02-transcript.png" width="270"/> | <img src="docs/images/03-search.png" width="270"/> |
+
+| English | Español | Settings |
+|:---:|:---:|:---:|
+| <img src="docs/images/04-english.png" width="270"/> | <img src="docs/images/05-spanish.png" width="270"/> | <img src="docs/images/06-settings.png" width="270"/> |
 
 </div>
+
+> Every meeting shown above is synthetic demo data, generated for these
+> screenshots. No real recording, transcript or contact appears anywhere in
+> this repository.
 
 ## Download for Mac
 
