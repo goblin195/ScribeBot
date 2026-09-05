@@ -18,10 +18,10 @@ Nothing leaves the machine: this only talks to a local Ollama server.
 """
 import re
 import argparse, json, sys, urllib.error, urllib.request
+import providers
 from pathlib import Path
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-DEFAULT_MODEL = "gemma4:latest"
+DEFAULT_MODEL = providers.DEFAULT_OLLAMA_MODEL
 CHUNK_WORDS = 1500     # comfortably inside qwen3's context, keeps chunk count sane
 OVERLAP_WORDS = 150    # enough that a sentence isn't split across chunk halves
 
@@ -246,23 +246,21 @@ def build_final_prompt(summaries: list[str], template: dict | None = None,
                                label=words["label"], summaries=joined)
 
 
-def call_ollama(prompt: str, model: str = DEFAULT_MODEL) -> str:
-    payload = json.dumps({"model": model, "prompt": prompt, "stream": False}).encode()
-    req = urllib.request.Request(OLLAMA_URL, data=payload,
-                                  headers={"Content-Type": "application/json"})
+def call_ollama(prompt: str, model: str = DEFAULT_MODEL,
+                provider: str = providers.DEFAULT_PROVIDER) -> str:
+    """One prompt through whichever engine was chosen.
+
+    Kept under the old name because it is the only model call in the project
+    and every caller already says `call_ollama`; `providers` decides what that
+    actually means now.
+    """
     try:
-        with urllib.request.urlopen(req, timeout=600) as r:
-            data = json.loads(r.read())
-    except urllib.error.URLError as e:
-        sys.exit(f"cannot reach Ollama at {OLLAMA_URL} ({e.reason}).\n"
-                  f"is it running? try: ollama serve  (or: ollama list)")
-    if "error" in data:
-        sys.exit(f"ollama error: {data['error']}\n"
-                  f"is the model pulled? try: ollama pull {model}")
-    return data["response"].strip()
+        return providers.run(prompt, provider, model)
+    except RuntimeError as e:
+        sys.exit(str(e))
 
 
-_HEBREW_RANGE = re.compile(r"[֐-׿]")
+_HEBREW_RANGE = re.compile(r"[\u0590-\u05FF]")
 
 
 def transcript_language(text: str) -> str:
@@ -279,7 +277,8 @@ def transcript_language(text: str) -> str:
 
 def summarize(text: str, model: str = DEFAULT_MODEL,
               template: dict | None = None, lang: str | None = None,
-              instructions: str = "") -> str:
+              instructions: str = "",
+              provider: str = providers.DEFAULT_PROVIDER) -> str:
     lang = lang or transcript_language(text)
     if template is None:
         template = load_templates().get(DEFAULT_TEMPLATE)
@@ -288,8 +287,10 @@ def summarize(text: str, model: str = DEFAULT_MODEL,
         # small enough to skip straight to the final formatting pass
         partials = chunks
     else:
-        partials = [call_ollama(build_chunk_prompt(c, lang), model) for c in chunks]
-    return call_ollama(build_final_prompt(partials, template, lang, instructions), model)
+        partials = [call_ollama(build_chunk_prompt(c, lang), model, provider)
+                    for c in chunks]
+    return call_ollama(build_final_prompt(partials, template, lang, instructions),
+                       model, provider)
 
 
 def selftest() -> None:
@@ -386,9 +387,16 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("transcript", nargs="?", help="path to a transcript text file")
-    ap.add_argument("--model", default=DEFAULT_MODEL, help=f"ollama model (default: {DEFAULT_MODEL})")
+    ap.add_argument("--model", default=None,
+                    help="model name; defaults to the provider's own "
+                         f"(ollama: {DEFAULT_MODEL})")
     ap.add_argument("--template", default=DEFAULT_TEMPLATE, metavar="ID",
                     help=f"summary template (default: {DEFAULT_TEMPLATE})")
+    ap.add_argument("--provider", default=providers.DEFAULT_PROVIDER,
+                    choices=sorted(providers.PROVIDERS),
+                    help=f"summary engine (default: {providers.DEFAULT_PROVIDER})")
+    ap.add_argument("--list-providers", action="store_true",
+                    help="print installed providers and Ollama models as JSON")
     ap.add_argument("--instructions", default="", metavar="TEXT",
                     help="extra guidance on how the summary should be written")
     ap.add_argument("--list-templates", action="store_true",
@@ -398,6 +406,10 @@ def main() -> None:
 
     if a.selftest:
         selftest()
+        return
+
+    if a.list_providers:
+        print(json.dumps(providers.status(), indent=2))
         return
 
     templates = load_templates()
@@ -415,8 +427,11 @@ def main() -> None:
     if not path.exists():
         sys.exit(f"no such file: {path}")
 
-    out = summarize(path.read_text(encoding="utf-8"), model=a.model,
-                    template=templates[a.template], instructions=a.instructions)
+    out = summarize(path.read_text(encoding="utf-8"),
+                    template=templates[a.template], instructions=a.instructions,
+                    provider=a.provider,
+                    model=a.model if a.model is not None
+                          else providers.default_model(a.provider))
     out, dropped = strip_foreign_script(out)
     kept, missing = term_audit(path.read_text(encoding="utf-8"), out)
     misses = near_misses(missing, out)

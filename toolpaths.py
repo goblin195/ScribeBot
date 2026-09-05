@@ -11,7 +11,25 @@ import os, shutil
 from pathlib import Path
 
 # Where package managers put binaries that a GUI process will never see.
-_EXTRA = ("/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin")
+# ~/.local/bin is here because the Claude CLI installs there, and it is exactly
+# the kind of path that works in a terminal and does not exist for a
+# Finder-launched app.
+_EXTRA = ("/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin",
+          str(Path.home() / ".local/bin"), "/usr/bin")
+
+
+def find(name: str, env_var: str) -> str | None:
+    """Absolute path to `name`, or None. For tools that are optional.
+
+    resolve() exits when a tool is missing, which is right for the decoder:
+    without it there is no product. A summary provider the user never installed
+    is a different thing - the app should offer the ones that are there and say
+    why the rest are unavailable.
+    """
+    override = os.environ.get(env_var)
+    if override:
+        return override if Path(override).is_file() else None
+    return shutil.which(name) or shutil.which(name, path=os.pathsep.join(_EXTRA))
 
 
 def resolve(name: str, env_var: str) -> str:

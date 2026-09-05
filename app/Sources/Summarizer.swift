@@ -81,6 +81,8 @@ final class Summarizer: ObservableObject {
 
     func run(id: String, template: String = SummaryTemplates.defaultID,
              instructions: String = "") {
+        let provider = AISettings.providerID
+        let model = AISettings.model(for: provider)
         guard state != .running else { return }
         let txt = Paths.recordings.appendingPathComponent("\(id).txt")
         guard let raw = try? String(contentsOf: txt, encoding: .utf8),
@@ -99,12 +101,16 @@ final class Summarizer: ObservableObject {
         startClock()
 
         Task.detached(priority: .userInitiated) { [weak self] in
-            if let down = await Summarizer.ollamaUnreachable() {
+            // Only Ollama has a server to be down. Probing it when the user
+            // picked Claude or Codex would refuse to summarise for a reason
+            // that has nothing to do with the engine they chose.
+            if provider == "ollama", let down = await Summarizer.ollamaUnreachable() {
                 await self?.finish(.failed(down.0, hint: down.1))
                 return
             }
             let out = await self?.spawn(script: script, transcript: txt.path,
-                                        template: template, instructions: instructions)
+                                        template: template, instructions: instructions,
+                                        provider: provider, model: model)
             guard let out else { return }
             await MainActor.run { [weak self] in
                 guard let self, self.state == .running else { return }   // cancelled
@@ -140,13 +146,18 @@ final class Summarizer: ObservableObject {
     /// queue: a summary big enough to fill the 64K pipe buffer would otherwise
     /// deadlock against waitUntilExit().
     private nonisolated func spawn(script: URL, transcript: String,
-                                   template: String, instructions: String) async -> Output {
+                                   template: String, instructions: String,
+                                   provider: String, model: String) async -> Output {
         await withCheckedContinuation { k in
             DispatchQueue.global(qos: .userInitiated).async {
                 let python = URL(fileURLWithPath: Paths.python)
                 let p = Process()
                 p.executableURL = python
-                var argv = ["-B", script.path, transcript, "--template", template]
+                var argv = ["-B", script.path, transcript, "--template", template,
+                            "--provider", provider]
+                // Empty means "the provider's own default", which is the only
+                // correct value for Claude and Codex.
+                if !model.isEmpty { argv += ["--model", model] }
                 // Only pass it when there is something to say; an empty
                 // --instructions would put a stray blank line in the prompt.
                 if !instructions.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

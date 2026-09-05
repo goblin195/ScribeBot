@@ -29,6 +29,7 @@ struct SettingsView: View {
     @AppStorage("callPrompts") private var callPrompts = true
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("useCalendarTitles") private var useCalendarTitles = true
+    @StateObject private var ai = AISettings.shared
 
     var body: some View {
         HStack(spacing: 0) {
@@ -114,11 +115,8 @@ struct SettingsView: View {
         case .billing:
             note("Free and open source", "This version of Scribebot has no subscription, trial, payment details, or usage charges. There is no billing account to manage.")
         case .ai:
-            note("Transcription", "Hebrew transcription runs locally using ivrit-ai large-v3-turbo. The glossary restores English technical terms inside Hebrew speech.")
-            section("Summaries", "Summaries use a separate local Ollama installation with the gemma4:latest model. Scribebot does not upload the transcript to a cloud service.") {
-                Link("Open Ollama", destination: URL(string: "https://ollama.com")!)
-                    .buttonStyle(FlatButton(filled: false))
-            }
+            note("Transcription", "Transcription runs entirely on this Mac. Hebrew uses the ivrit-ai large-v3-turbo fine-tune and the glossary restores technical terms; every other language uses large-v3-turbo. Nothing is uploaded.")
+            AIProviderPicker(ai: ai)
         case .integrations:
             section("Calendar", "Connect through macOS to use meeting titles.") { permissionControl(.calendar) }
             note("Meeting apps", "System audio capture works independently of the meeting app. No meeting bot or account connection is required.")
@@ -191,5 +189,123 @@ struct SettingsView: View {
         }
         .padding(20).frame(maxWidth: .infinity, alignment: .leading)
         .background(P.surface, in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+/// Which engine writes summaries. The list comes from providers.py rather than
+/// from constants here, so it can only offer what is installed - and the
+/// warning about leaving the Mac is attached to the choice that causes it,
+/// not buried in a document nobody opens.
+struct AIProviderPicker: View {
+    @ObservedObject var ai: AISettings
+    @State private var provider = AISettings.providerID
+    @State private var model = ""
+
+    private var chosen: AIProvider? { ai.providers.first { $0.id == provider } }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 8) {
+                Text("Summaries").font(T.body(16, .semibold))
+                Spacer()
+                if ai.probing { ProgressView().controlSize(.small) }
+                Button("Refresh") { ai.refresh() }
+                    .buttonStyle(FlatButton(filled: false))
+                    .disabled(ai.probing)
+            }
+            Text("Transcription always runs on this Mac. Summaries can run here too, "
+                 + "or through a tool you have already installed and signed in to.")
+                .font(T.body(13)).foregroundStyle(P.ink2)
+                .lineSpacing(3).fixedSize(horizontal: false, vertical: true)
+
+            if let problem = ai.problem {
+                Label(problem, systemImage: "exclamationmark.triangle")
+                    .font(T.body(12)).foregroundStyle(P.bad)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Picker("Engine", selection: $provider) {
+                ForEach(ai.providers) { p in
+                    Text(p.available ? p.label : "\(p.label) — not installed").tag(p.id)
+                }
+            }
+            .pickerStyle(.radioGroup)
+            .onChange(of: provider) { _, new in
+                AISettings.providerID = new
+                model = AISettings.model(for: new)
+            }
+
+            if let p = chosen {
+                if !p.available {
+                    Text(p.detail).font(T.body(12)).foregroundStyle(P.warn)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if p.id == "ollama" {
+                    if p.models.isEmpty {
+                        Text("No models found. Pull one with `ollama pull gemma4` and press Refresh.")
+                            .font(T.mono(11)).foregroundStyle(P.ink3)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Picker("Model", selection: $model) {
+                            ForEach(p.models, id: \.self) { Text($0).tag($0) }
+                        }
+                        .frame(maxWidth: 320)
+                        .onChange(of: model) { _, new in
+                            AISettings.setModel(new, for: p.id)
+                        }
+                    }
+                } else {
+                    // Claude and Codex each carry their own configured model.
+                    // Leaving this empty uses it; naming an Ollama model here
+                    // is what made the first Claude run fail outright.
+                    VStack(alignment: .leading, spacing: 5) {
+                        TextField("Model (optional — leave empty for \(p.label)'s own default)",
+                                  text: $model)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(maxWidth: 380)
+                            .onSubmit { AISettings.setModel(model, for: p.id) }
+                        if !p.path.isEmpty {
+                            Text(p.path).font(T.mono(10)).foregroundStyle(P.ink3)
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
+
+                if p.sendsDataOffDevice {
+                    Label("Summaries with \(p.label) send the transcript to its vendor. "
+                          + "Audio and transcription always stay on this Mac; this one "
+                          + "step does not.",
+                          systemImage: "arrow.up.forward.app")
+                        .font(T.body(12)).foregroundStyle(P.warn)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Label("Nothing leaves this Mac.", systemImage: "lock")
+                        .font(T.body(12)).foregroundStyle(P.ink3)
+                }
+            }
+
+            Link("Open Ollama", destination: URL(string: "https://ollama.com")!)
+                .buttonStyle(FlatButton(filled: false))
+        }
+        .padding(20).frame(maxWidth: .infinity, alignment: .leading)
+        .background(P.surface, in: RoundedRectangle(cornerRadius: 12))
+        .onAppear {
+            model = AISettings.model(for: provider)
+            if ai.providers.isEmpty { ai.refresh() }
+        }
+        .onChange(of: ai.providers) { _, list in
+            // Ollama's picker needs a selection that exists in the list, or it
+            // renders blank and saves nothing.
+            guard provider == "ollama" else { return }
+            let installed = list.first(where: { $0.id == "ollama" })?.models ?? []
+            guard !installed.isEmpty, !installed.contains(model) else { return }
+            // Prefer the stored choice, then the documented default, and only
+            // then whatever happens to be first.
+            let stored = AISettings.model(for: "ollama")
+            model = installed.contains(stored) ? stored
+                  : installed.contains(ai.defaultOllamaModel) ? ai.defaultOllamaModel
+                  : installed[0]
+            AISettings.setModel(model, for: "ollama")
+        }
     }
 }

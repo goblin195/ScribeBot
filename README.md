@@ -12,7 +12,7 @@ No bot in the participant list. No audio leaving your Mac.
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Swift](https://img.shields.io/badge/Swift-SwiftUI-F05138?logo=swift&logoColor=white)](https://developer.apple.com/swift/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e)](LICENSE)
-[![On-device](https://img.shields.io/badge/inference-100%25%20on--device-8b5cf6)](#-privacy)
+[![On-device](https://img.shields.io/badge/transcription-100%25%20on--device-8b5cf6)](#-privacy)
 [![Languages](https://img.shields.io/badge/languages-~100-0ea5e9)](#every-language-your-team-actually-speaks)
 
 </div>
@@ -37,7 +37,9 @@ It is a complete meeting record, not a transcription toy:
   Each recording toggles between Transcription and Summary.
 - 🔎 **Search and export** (Markdown, SRT, plain text).
 - ⚡ **~0.5 s decode per chunk**, with a live preview while people talk.
-- 🔒 **No network calls at runtime.** At all.
+- 🔒 **Recording and transcription never leave this Mac.** Summaries too, by
+  default; Claude Code and Codex are opt-in alternatives you already have
+  installed. See [Privacy](#-privacy).
 
 ## Every language your team actually speaks
 
@@ -118,8 +120,9 @@ algorithm has to guess. For two-party calls it is exact and free.
 Get the **[Scribebot 0.1 DMG](https://github.com/goblin195/ScribeBot/releases/tag/v0.1)**
 for Apple Silicon and macOS 14.2+. Drag it into Applications. Python,
 whisper.cpp and the model are included. The release is ad-hoc signed, not
-Apple-notarized; see the release notes for first-launch instructions. Optional
-summaries need a local [Ollama](https://ollama.com) install.
+Apple-notarized; see the release notes for first-launch instructions.
+Summaries need a local [Ollama](https://ollama.com) install, or the Claude Code
+or Codex CLI you already use.
 
 ## Build from source
 
@@ -276,9 +279,19 @@ docs/                 architecture, handover, benchmarks, troubleshooting
 ## 🔒 Privacy
 
 Audio, transcripts and summaries are written to
-`~/Library/Application Support/Scribebot/` and stay there. **Nothing in this
-project makes a network request at runtime.** There is no telemetry, no
-account, and no cloud component to opt out of.
+`~/Library/Application Support/Scribebot/` and stay there. There is no
+telemetry, no account, and no cloud component.
+
+**Recording and transcription never leave this Mac.** Not in any configuration:
+capture, the decoder and the glossary are all local, and none of them opens a
+socket.
+
+**Summaries are the one place you can change that, and only deliberately.** The
+default engine is Ollama on `localhost`, which uploads nothing. Settings → AI
+also offers Claude Code and Codex, driven through the CLIs you have already
+installed and signed in to — no API key is asked for or stored. Choosing one
+sends *the transcript text* to that vendor for the summary step, and the picker
+says so next to the choice. Audio is never sent, by anything.
 
 Recording a conversation may require the consent of the other participants
 where you live. That is your responsibility, not the software's.
