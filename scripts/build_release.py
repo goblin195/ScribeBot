@@ -43,7 +43,7 @@ def main():
     run('swiftc', '-target', 'arm64-apple-macos14.2', '-parse-as-library',
         '-module-cache-path', BUILD / 'swift-module-cache', '-o', binary,
         *sorted((ROOT / 'app/Sources').glob('*.swift')))
-    for name in ['scribebot.py', 'live.py', 'stream.py', 'toolpaths.py', 'meeting.py', 'summarize.py', 'export.py', 'attribute.py']:
+    for name in ['scribebot.py', 'live.py', 'stream.py', 'toolpaths.py', 'languages.py', 'meeting.py', 'summarize.py', 'export.py', 'attribute.py']:
         copy(ROOT / name, RUNTIME / name)
     for name in ['glossary.py', 'aliases.json']:
         copy(ROOT / 'bench' / name, RUNTIME / 'bench' / name)

@@ -4,8 +4,8 @@
 
 ### Meeting transcription for Mac that never joins your call.
 
-No bot in the participant list. No audio leaving your machine.
-Built for Hebrew speech carrying English technical terms.
+Records any meeting, in any language, entirely on your own machine.
+No bot in the participant list. No audio leaving your Mac.
 
 [![macOS 14.2+](https://img.shields.io/badge/macOS-14.2%2B-black?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-black?logo=apple&logoColor=white)](https://support.apple.com/en-us/HT211814)
@@ -13,26 +13,71 @@ Built for Hebrew speech carrying English technical terms.
 [![Swift](https://img.shields.io/badge/Swift-SwiftUI-F05138?logo=swift&logoColor=white)](https://developer.apple.com/swift/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e)](LICENSE)
 [![On-device](https://img.shields.io/badge/inference-100%25%20on--device-8b5cf6)](#-privacy)
+[![Languages](https://img.shields.io/badge/languages-~100-0ea5e9)](#every-language-your-team-actually-speaks)
 
 </div>
 
+![Scribebot recording, transcribing and attributing a meeting](docs/images/scribebot-app.png)
+
 ---
 
-## The problem it exists to solve
+## What it is
 
-Real engineering meetings in Israel are conducted in Hebrew with English
-technical terms dropped in mid-sentence. Every general-purpose Hebrew speech
-model mangles exactly the words that carry the meaning:
+Scribebot sits in your menu bar and records the meetings you are already in —
+Zoom, Teams, Meet, WhatsApp, a browser tab, anything that makes sound. When the
+call ends you have the audio, a transcript that knows who said what, and a
+summary. All of it produced on your own Mac.
 
-```text
-Actually said     מה מצב פריסת ה SSE אצלך
-Generic Hebrew ASR    מה מצב פריסת ה אס אס אי אצלך     ← the term is gone
-Scribebot         מה מצב פריסת ה SSE אצלך             ← restored
+It is a complete meeting record, not a transcription toy:
+
+- 🎧 **Captures any app's audio** through CoreAudio process taps. No virtual
+  audio driver to install, and no participant to admit.
+- 🌍 **~100 languages**, detected automatically. See below.
+- 👥 **Knows who spoke** — exactly, for two-party calls, without guessing.
+- 📝 **Summaries, search and export** (Markdown, SRT, plain text).
+- ⚡ **~0.5 s decode per chunk**, with a live preview while people talk.
+- 🔒 **No network calls at runtime.** At all.
+
+## Every language your team actually speaks
+
+Language is detected per recording — you do not have to tell it anything. The
+decoder is Whisper `large-v3-turbo`, so the list is the familiar one: English,
+Spanish, French, German, Portuguese, Italian, Dutch, Russian, Arabic, Hebrew,
+Hindi, Chinese, Japanese, Korean, Turkish, Polish, Ukrainian and around eighty
+more.
+
+```sh
+./scribebot.py file meeting.wav              # detect the language
+./scribebot.py file meeting.wav --lang es    # or name it
+export SCRIBEBOT_LANG=de                     # or set a default
 ```
 
-Lose `SSE`, `DLP`, `Kubernetes`, `latency`, and a transcript of a technical
-meeting becomes unsearchable and nearly useless. Scribebot treats those terms as
-the payload, not as noise.
+Hebrew additionally gets a **dedicated fine-tune** ([ivrit-ai][ivrit]), because
+that is the language this project was built and measured against. When
+detection comes back Hebrew, the batch pass automatically re-runs on the
+specialised model; every other language keeps the general one. You get the
+better decoder without choosing it.
+
+[ivrit]: https://huggingface.co/ivrit-ai
+
+### The hard case: meetings that code-switch
+
+The reason this project exists is the meeting that is *mostly* one language and
+carries technical vocabulary in another — which is most engineering meetings
+outside the English-speaking world. Speech models transliterate exactly the
+words that carry the meaning:
+
+```text
+Actually said         מה מצב פריסת ה SSE אצלך
+Generic model         מה מצב פריסת ה אס אס אי אצלך     ← the term is gone
+Scribebot             מה מצב פריסת ה SSE אצלך         ← restored
+```
+
+Lose `SSE`, `DLP`, `Kubernetes`, `latency`, and a technical transcript becomes
+unsearchable. A glossary of **1,243 terms** restores them after decoding. It
+ships tuned for Hebrew ↔ English, and the mechanism is not Hebrew-specific:
+any language pairing that borrows English technical vocabulary works the same
+way, and adding your own is [the easiest contribution here](#-contributing).
 
 ## What makes it different
 
@@ -42,33 +87,26 @@ the payload, not as noise.
 | Audio leaves your machine | **Never** | Yes | Often |
 | Needs a virtual audio driver | **No** | — | Usually |
 | Knows who said what | **Exactly** | Varies | Guessed |
-| English terms inside Hebrew | **Restored** | Mangled | Mangled |
+| Borrowed technical terms | **Restored** | Mangled | Mangled |
 
 **Speaker attribution without diarization.** Scribebot captures the call and
 your microphone to two separate files and transcribes them apart. Who spoke is
-then a fact about which file the words came from — not something a clustering
+then a fact about which file the words came from, not something a clustering
 algorithm has to guess. For two-party calls it is exact and free.
 
-## Features
+<div align="center">
 
-- 🎧 **Per-application system audio** via CoreAudio process taps — Zoom, Teams,
-  Meet, WhatsApp. No driver to install, no participant to admit.
-- 🧠 **On-device transcription** with whisper.cpp on Metal and the
-  [ivrit-ai](https://huggingface.co/ivrit-ai) Hebrew `large-v3-turbo` model.
-- 🔤 **Technical term restoration** — the piece that makes the transcripts
-  usable, and the easiest place to contribute.
-- 👥 **Exact speaker attribution** for two-party calls.
-- ⚡ **~0.5 s decode per chunk**, with a live preview while you talk.
-- 📝 **Summaries and export**, plus a native SwiftUI menu-bar app.
-- 🔒 **No network calls at runtime.** At all.
+![Transcript with speaker attribution and restored technical terms](docs/images/scribebot-transcript.png)
+
+</div>
 
 ## Download for Mac
 
-Get the complete **[Scribebot 0.1 DMG](https://github.com/goblin195/ScribeBot/releases/tag/v0.1)**
-for Apple Silicon and macOS 14.2+. Drag the app into Applications. Python,
-whisper.cpp, and the Hebrew model are included. This release is ad-hoc signed,
-not Apple-notarized; see the release notes for first-launch instructions.
-Optional summaries require a separate local Ollama installation.
+Get the **[Scribebot 0.1 DMG](https://github.com/goblin195/ScribeBot/releases/tag/v0.1)**
+for Apple Silicon and macOS 14.2+. Drag it into Applications. Python,
+whisper.cpp and the model are included. The release is ad-hoc signed, not
+Apple-notarized; see the release notes for first-launch instructions. Optional
+summaries need a local [Ollama](https://ollama.com) install.
 
 ## Build from source
 
@@ -76,13 +114,16 @@ Optional summaries require a separate local Ollama installation.
 brew install whisper-cpp                # the decoder
 git clone https://github.com/goblin195/ScribeBot.git && cd ScribeBot
 
-# the Hebrew model (~1.6 GB) -> models/ivrit-large-v3-turbo.bin
-# converted from ivrit-ai/whisper-large-v3-turbo
+# models/ -> place one or both (~1.6 GB each, gitignored)
+#   vanilla-large-v3-turbo.bin   general, ~100 languages
+#   ivrit-large-v3-turbo.bin     Hebrew fine-tune
 
 ./capture/build.sh                      # audio capture helper
 ./app/build.sh                          # menu bar app -> app/Scribebot.app
 open app/Scribebot.app
 ```
+
+Either model is enough to run; if one is missing the other is used.
 
 On first launch macOS asks for two **separate** permissions:
 
@@ -98,10 +139,11 @@ On first launch macOS asks for two **separate** permissions:
 ### Command line
 
 ```sh
-./scribebot.py record 60          # capture 60s of system audio, transcribe
-./scribebot.py record 60 --pid 42 # capture a single application
-./scribebot.py file meeting.wav   # transcribe an existing file
-./scribebot.py rebuild            # repair any transcript saved incomplete
+./scribebot.py record 60             # capture 60s of system audio, transcribe
+./scribebot.py record 60 --pid 42    # capture a single application
+./scribebot.py file meeting.wav      # transcribe an existing file
+./scribebot.py file a.wav --lang fr  # force a language instead of detecting
+./scribebot.py rebuild               # repair any transcript saved incomplete
 ```
 
 `rebuild` rewrites `.txt` files only — it never touches audio.
@@ -117,9 +159,9 @@ On first launch macOS asks for two **separate** permissions:
           └─────────────┬─────────────────────┘
                         ▼
               whisper.cpp on Metal
-           ivrit-ai large-v3-turbo (Hebrew)
+        language detected → model selected
                         │
-              glossary — restore English terms
+              glossary — restore borrowed terms
                         ▼
                     <id>.txt
 ```
@@ -128,7 +170,7 @@ Full detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Benchmarks
 
-Measured against Tape 0.9.3 on the same audio:
+Measured against Tape 0.9.3 on the same Hebrew-with-English audio:
 
 | Metric | Scribebot | Tape 0.9.3 |
 |---|:---:|:---:|
@@ -140,9 +182,10 @@ Measured against Tape 0.9.3 on the same audio:
 **Read this before quoting those numbers.** The two decoders tie at 46.8% term
 preservation — running *Tape's own transcripts* through Scribebot's glossary
 scores marginally better than Scribebot's own output. The advantage is a
-post-processing stage Tape does not ship, **not** better Hebrew recognition. And
+post-processing stage Tape does not ship, **not** better recognition. And
 ⚠️ every diarization figure comes from synthetic text-to-speech; no real
-multi-speaker recording has ever been scored.
+multi-speaker recording has ever been scored. Only Hebrew has been benchmarked
+at all — the other languages are Whisper's, unmeasured here.
 
 [docs/BENCHMARKS.md](docs/BENCHMARKS.md) keeps the full caveats, including two
 claims this project got wrong and retracted.
@@ -153,9 +196,10 @@ Contributions are genuinely welcome, and one of them is unusually easy to make.
 
 ### ⭐ Start here: teach it a term
 
-The glossary is where accuracy actually lives, it needs no Swift, no audio
-knowledge, and no model. If you have ever watched a Hebrew transcript turn
-`Kubernetes` into `קוברנטיס`, you can fix it in `bench/aliases.json`:
+The glossary is where accuracy actually lives, and it needs no Swift, no audio
+knowledge and no model. If you have watched a transcript turn `Kubernetes` into
+`קוברנטיס` — or into whatever your language does to it — you can fix it in
+`bench/aliases.json`:
 
 ```json
 {
@@ -167,24 +211,24 @@ knowledge, and no model. If you have ever watched a Hebrew transcript turn
 Then:
 
 ```sh
-./check     # the negative control will reject an alias that damages Hebrew
+./check     # the negative control rejects an alias that damages real text
 ```
 
-Open a PR with the term and one real sentence it appears in. **This is the
-highest-value contribution to the project**, and it scales to any domain —
-security, medicine, finance, law — and to any language pairing that
-code-switches into English.
+Open a PR with the term and one real sentence it appeared in. **This is the
+highest-value contribution to the project**, it scales to any domain —
+security, medicine, finance, law — and to any language that borrows English
+technical vocabulary.
 
 ### Other good places to start
 
 | Area | What's needed | Difficulty |
 |---|---|:---:|
-| Glossary terms | Hebrew transliterations of English tech terms | 🟢 easy |
+| Glossary terms | Transliterations of borrowed technical terms, any language | 🟢 easy |
 | Surface the mic warning | The Bluetooth-headset warning reaches `<id>.capture.log` but is still not shown in the UI | 🟢 easy |
-| Find why the tap stalls | A real call captured 26.9s of 72.5s; the gap is padded and logged, but not prevented | 🔴 involved |
+| Benchmark another language | Only Hebrew has ever been scored | 🟡 medium |
 | Real diarization data | One labelled multi-speaker recording; the benchmark is synthetic | 🟡 medium |
 | Latency measurement | True end-to-end lag behind live speech is unmeasured | 🟡 medium |
-| Another language | The architecture is not Hebrew-specific — only the model and glossary are | 🔴 involved |
+| Find why the tap stalls | A real call captured 26.9s of 72.5s; the gap is padded and logged, but not prevented | 🔴 involved |
 
 [docs/HANDOVER.md](docs/HANDOVER.md) is an honest account of what works, what is
 unproven, and what to do next. Read it before picking something up.
@@ -207,6 +251,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
 ```
 scribebot.py          transcribe / record / rebuild
+languages.py          language detection and model selection
 stream.py, live.py    live preview (LocalAgreement-2)
 toolpaths.py          absolute binary resolution
 capture/tap.swift     CoreAudio process taps + microphone
@@ -217,19 +262,19 @@ docs/                 architecture, handover, benchmarks, troubleshooting
 
 ## 🔒 Privacy
 
-Audio, transcripts, and summaries are written to
+Audio, transcripts and summaries are written to
 `~/Library/Application Support/Scribebot/` and stay there. **Nothing in this
-project makes a network request at runtime.** There is no telemetry, no account,
-and no cloud component to opt out of.
+project makes a network request at runtime.** There is no telemetry, no
+account, and no cloud component to opt out of.
 
-Recording a conversation may require the consent of the other participants where
-you live. That is your responsibility, not the software's.
+Recording a conversation may require the consent of the other participants
+where you live. That is your responsibility, not the software's.
 
 ## Documentation
 
 | Document | What it covers |
 |---|---|
-| [ARCHITECTURE](docs/ARCHITECTURE.md) | How capture, transcription, and the app fit together |
+| [ARCHITECTURE](docs/ARCHITECTURE.md) | How capture, transcription and the app fit together |
 | [HANDOVER](docs/HANDOVER.md) | Current state, what is unproven, what to do next |
 | [BENCHMARKS](docs/BENCHMARKS.md) | Results, and how much to trust each number |
 | [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) | Symptoms and their real causes |
@@ -238,7 +283,7 @@ you live. That is your responsibility, not the software's.
 
 ## Acknowledgements
 
-- [ivrit-ai](https://huggingface.co/ivrit-ai) — the Hebrew models this depends on
+- [ivrit-ai](https://huggingface.co/ivrit-ai) — the Hebrew fine-tune
 - [whisper.cpp](https://github.com/ggerganov/whisper.cpp) — on-device inference
 - Macháček, Dabre & Bojar, *Turning Whisper into Real-Time Transcription System*
   (2023) — the confirmed/unconfirmed streaming discipline

@@ -12,10 +12,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 CAPTURE = ROOT / "capture/ScribebotCapture.app/Contents/MacOS/ScribebotCapture"
-MODEL = ROOT / "models/ivrit-large-v3-turbo.bin"
 sys.path.insert(0, str(ROOT / "bench"))
 from glossary import Restorer
 from toolpaths import WHISPER
+import languages
 
 
 def load_glossary():
@@ -79,7 +79,7 @@ def is_silent(wav: Path, threshold: float = 0.004) -> bool:
     return max((abs(v) for v in a[::13]), default=0) / 32768.0 < threshold
 
 
-def transcribe_segments(wav: Path) -> list[dict]:
+def transcribe_segments(wav: Path, lang: str | None = None) -> list[dict]:
     """Transcribe with real per-segment timestamps.
 
     Export used to fabricate timings by splitting the recording duration across
@@ -89,10 +89,20 @@ def transcribe_segments(wav: Path) -> list[dict]:
     decoder can give real boundaries, so it does.
     """
     js = wav.with_suffix(".wav.json")
+    model, flag = languages.resolve(lang)
     r = subprocess.run(
-        [WHISPER, "-m", str(MODEL), "-f", str(wav), "-l", "he",
+        [WHISPER, "-m", str(model), "-f", str(wav), "-l", flag,
          "-sow", "-oj", "-np"],
         capture_output=True, text=True)
+    # On `auto`, Hebrew earns a second pass on its fine-tune. Every other
+    # language keeps the first result.
+    better = languages.upgrade(languages.detected_language(r.stderr), lang)
+    if better is not None:
+        js.unlink(missing_ok=True)
+        r = subprocess.run(
+            [WHISPER, "-m", str(better), "-f", str(wav), "-l", "he",
+             "-sow", "-oj", "-np"],
+            capture_output=True, text=True)
     if r.returncode != 0 or not js.exists():
         return []
     try:
@@ -109,21 +119,34 @@ def transcribe_segments(wav: Path) -> list[dict]:
     return out
 
 
-def transcribe(wav: Path) -> str:
-    if not MODEL.exists():
-        sys.exit(f"model missing: {MODEL}")
+def transcribe(wav: Path, lang: str | None = None) -> str:
+    model, flag = languages.resolve(lang)
+    if not model.exists():
+        sys.exit(f"model missing: {model}\n"
+                 f"download it, or pick a language whose model you have "
+                 f"(--lang he uses {languages.HEBREW.name}).")
     r = subprocess.run(
-        [WHISPER, "-m", str(MODEL), "-f", str(wav), "-l", "he", "-nt", "-np"],
+        [WHISPER, "-m", str(model), "-f", str(wav), "-l", flag, "-nt", "-np"],
         capture_output=True, text=True)
     if r.returncode != 0:
         sys.exit(f"transcription failed:\n{r.stderr.strip()[:400]}")
+    # On `auto`, Hebrew earns a second pass on its fine-tune - it is a better
+    # decoder for Hebrew carrying English technical terms, which is the case
+    # the glossary exists for. Every other language keeps the first result.
+    better = languages.upgrade(languages.detected_language(r.stderr), lang)
+    if better is not None:
+        r2 = subprocess.run(
+            [WHISPER, "-m", str(better), "-f", str(wav), "-l", "he", "-nt", "-np"],
+            capture_output=True, text=True)
+        if r2.returncode == 0:
+            return " ".join(r2.stdout.split())
     return " ".join(r.stdout.split())
 
 
 LIBRARY = Path.home() / "Library/Application Support/Scribebot/recordings"
 
 
-def rebuild(restorer, dry: bool = False) -> None:
+def rebuild(restorer, dry: bool = False, lang: str | None = None) -> None:
     """Re-transcribe saved recordings from their audio.
 
     The app writes a live preview first and replaces it with an accurate pass
@@ -144,7 +167,7 @@ def rebuild(restorer, dry: bool = False) -> None:
         for label, f in (("Them", wav), ("You", you)):
             if not f.exists() or is_silent(f):
                 continue
-            raw = transcribe(f)
+            raw = transcribe(f, lang)
             if not raw:
                 continue
             lines.append(f"{label}: {restorer.restore(raw)}")
@@ -178,12 +201,14 @@ def main() -> None:
     for p in (rec, fil):
         p.add_argument("--raw", action="store_true",
                        help="skip English-term restoration")
+    for p in (rec, fil, rb):
+        languages.add_argument(p)
     a = ap.parse_args()
 
     restorer, n_terms = load_glossary()
 
     if a.cmd == "rebuild":
-        rebuild(restorer, dry=a.dry_run)
+        rebuild(restorer, dry=a.dry_run, lang=a.lang)
         return
 
     if a.cmd == "record":
@@ -225,7 +250,7 @@ def main() -> None:
         return
 
     t0 = time.time()
-    raw = transcribe(wav)
+    raw = transcribe(wav, a.lang)
     elapsed = time.time() - t0
 
     out = raw if a.raw else restorer.restore(raw)

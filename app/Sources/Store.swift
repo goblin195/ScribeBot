@@ -70,8 +70,16 @@ enum Paths {
     }()
 
     static let support: URL = {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Scribebot")
+        // SCRIBEBOT_SUPPORT points the whole library somewhere else. It exists
+        // so demo and screenshot runs never write into the real one: that
+        // directory is irreplaceable meeting audio, ten files of it have
+        // already been lost, and "add a fake recording and delete it after" is
+        // the shape of how that happened.
+        let env = ProcessInfo.processInfo.environment["SCRIBEBOT_SUPPORT"] ?? ""
+        let base = env.isEmpty
+            ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("Scribebot")
+            : URL(fileURLWithPath: (env as NSString).expandingTildeInPath)
         try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
         return base
     }()

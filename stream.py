@@ -21,8 +21,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-MODEL = ROOT / "models/ivrit-large-v3-turbo.bin"
 from toolpaths import WHISPER
+import languages
 SR = 16_000
 # Whisper loops on near-silence, emitting runs like "פסססססססס".
 _RUN = re.compile(r"(.)\1{4,}")
@@ -54,7 +54,13 @@ def decode(pcm: bytes, offset: float, prompt: str = "") -> list[Word]:
         with wave.open(str(wav), "wb") as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
             w.writeframes(pcm)
-        cmd = [WHISPER, "-m", str(MODEL), "-f", str(wav), "-l", "he",
+        # The live preview cannot afford the batch path's second pass, so it
+        # runs whatever the configured language resolves to. Leaving the
+        # language on `auto` means the general model here; naming the language
+        # (SCRIBEBOT_LANG=he) puts the fine-tune in the preview too. Either
+        # way the transcript saved at the end is re-decoded properly.
+        model, flag = languages.resolve()
+        cmd = [WHISPER, "-m", str(model), "-f", str(wav), "-l", flag,
                "-ml", "1", "-sow", "-oj", "-np"]
         if prompt:
             cmd += ["--prompt", " ".join(prompt.split()[-40:])]
