@@ -4,21 +4,6 @@
 import SwiftUI
 import EventKit
 
-struct Recording: Codable, Identifiable, Equatable {
-    var id: String
-    var title: String
-    var startedAt: Date
-    var duration: TimeInterval
-    var wav: String          // filename, resolved against Paths.recordings
-
-    var durationText: String {
-        let s = Int(duration.rounded())
-        return s >= 3600
-            ? String(format: "%d:%02d:%02d", s / 3600, (s / 60) % 60, s % 60)
-            : String(format: "%d:%02d", s / 60, s % 60)
-    }
-}
-
 enum Paths {
     /// The checkout that owns the capture helper and the python pipeline.
     /// Walk up from the bundle so the app works from app/ or anywhere else.
@@ -141,12 +126,10 @@ final class Library: ObservableObject {
         let files = (try? fm.contentsOfDirectory(at: Paths.recordings,
                                                  includingPropertiesForKeys: nil)) ?? []
         let names = Set(files.map(\.lastPathComponent))
-        let dec = JSONDecoder()
-        dec.dateDecodingStrategy = .iso8601
         cache = [:]
         let found = files
             .filter { $0.pathExtension == "json" }
-            .compactMap { try? dec.decode(Recording.self, from: Data(contentsOf: $0)) }
+            .compactMap { try? RecordingFiles.load($0.deletingPathExtension().lastPathComponent, directory: Paths.recordings) }
         items = (found + items.filter { demoTranscripts[$0.id] != nil })
             .sorted { $0.startedAt > $1.startedAt }
         for r in found {
@@ -214,24 +197,11 @@ final class Library: ObservableObject {
         return (full, m)
     }
 
-    /// Write a transcript to disk without needing the main actor, so a decode
-    /// that finishes as the app is quitting is not lost.
-    static func writeTranscript(_ r: Recording, lines: [String]) {
-        try? lines.joined(separator: "\n")
-            .write(to: Paths.recordings.appendingPathComponent("\(r.id).txt"),
-                   atomically: true, encoding: .utf8)
-    }
-
-    func save(_ r: Recording, transcript: [String]) {
-        let enc = JSONEncoder()
-        enc.dateEncodingStrategy = .iso8601
-        enc.outputFormatting = .prettyPrinted
-        try? enc.encode(r).write(to: Paths.recordings.appendingPathComponent("\(r.id).json"))
-        if !transcript.isEmpty {
-            try? transcript.joined(separator: "\n")
-                .write(to: Paths.recordings.appendingPathComponent("\(r.id).txt"),
-                       atomically: true, encoding: .utf8)
+    func save(_ r: Recording, transcript: [String]? = nil) throws {
+        if let transcript {
+            try RecordingFiles.writeTranscript(r, lines: transcript, directory: Paths.recordings)
         }
+        try RecordingFiles.save(r, directory: Paths.recordings)
         reload()
     }
 
@@ -250,10 +220,37 @@ final class Library: ObservableObject {
         guard demoTranscripts[r.id] == nil else {
             throw NSError(domain: "Scribebot", code: 3, userInfo: [NSLocalizedDescriptionKey: "Demo calls cannot be deleted."])
         }
-        defer { reload() }
+        let lease = try RecordingLease(directory: Paths.recordings)
+        defer { withExtendedLifetime(lease) {}; reload() }
         try selection.perform(id: r.id, wav: r.wav, directory: Paths.recordings) { url in
             try FileManager.default.trashItem(at: url, resultingItemURL: nil)
         }
+        if selection == .transcript {
+            var cleared = r
+            cleared.speakerTranscript = nil; cleared.speakerFailure = nil
+            try RecordingFiles.save(cleared, directory: Paths.recordings)
+        }
+    }
+
+    func renameSpeaker(_ recording: Recording, speaker: String, name: String) throws {
+        let lease = try RecordingLease(directory: Paths.recordings)
+        defer { withExtendedLifetime(lease) {} }
+        let rec = try RecordingFiles.load(recording.id, directory: Paths.recordings)
+        guard var transcript = rec.speakerTranscript, transcript.names[speaker] != nil else {
+            throw RecordingFailure(message: "This speaker is no longer in the transcript.")
+        }
+        guard self.transcript(rec) == transcript.lines.joined(separator: "\n") else {
+            throw RecordingFailure(message: "The transcript changed since speaker analysis. Separate speakers again before naming them.")
+        }
+        let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !clean.isEmpty, clean.count <= 80, !clean.contains("\n"), !clean.contains("\r") else {
+            throw RecordingFailure(message: "Use a speaker name of 1–80 characters on one line.")
+        }
+        transcript.names[speaker] = clean
+        transcript.revision = UUID().uuidString
+        _ = try RecordingFiles.commit(rec, lines: transcript.lines, errors: [],
+            directory: Paths.recordings, speakers: transcript)
+        reload()
     }
 
     func reveal(_ r: Recording) {

@@ -28,7 +28,7 @@ enum RecordingDeletion: String, CaseIterable, Identifiable {
         var names: [String] = []
         if self != .transcript { names += [wav, id + "-you.wav"] }
         if self != .audio {
-            names += [id + ".txt", id + ".summary.md"]
+            names += [id + ".txt", id + ".partial.txt", id + ".summary.md"]
             // Each template caches its own summary, so deleting a transcript
             // has to take all of them - otherwise a "deleted" call leaves its
             // Standup and Interview summaries sitting in the folder.

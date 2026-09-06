@@ -45,7 +45,7 @@ CHECKS = [
      lambda s: "Paths.python" in s and
                not re.search(r'executableURL\s*=\s*URL\(fileURLWithPath:\s*"/usr/bin/env"', s)),
     ("a failed transcription is reported, not swallowed",
-     lambda s: "terminationStatus != 0" in s),
+     lambda s: "errors.append" in s and "RecordingFiles.commit" in s),
     # The helper prints its input device, clock source, sample rates, the
     # Bluetooth low-quality warning and every tap stall to stderr. Sending that
     # to nullDevice is why three shipped bugs were invisible, and why a Zoom
@@ -65,12 +65,15 @@ def _writes_before_main_hop(src: str) -> bool:
     i = src.find("private func finalize")
     if i < 0: return False
     body = src[i:i + 6000]
-    w = body.find("writeTranscript")
+    w = body.find("RecordingFiles.commit")
     # Anchor on the UI update itself, not on any main-queue hop - error
     # reporting also hops, and comparing against the first one made this check
     # fail on correct code.
-    m = body.find("self.library.save")
-    return w >= 0 and m >= 0 and w < m
+    m = body.find("self.library.reload")
+    persistence = (ROOT / "app/Sources/RecordingState.swift").read_text()
+    commit = persistence[persistence.index("static func commit"):]
+    return (w >= 0 and m >= 0 and w < m and
+            commit.index("writeTranscript") < commit.index("try save(result"))
 
 
 def main() -> int:

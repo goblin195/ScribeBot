@@ -11,6 +11,9 @@ struct Utterance: Identifiable {
     let id: Int
     let side: Side?
     let text: String
+    var speakerID: String? = nil
+    var speakerName: String? = nil
+    var start: Double? = nil
 }
 
 /// Transcript lines are written as "Them: …" / "You: …" by Recorder.finalize;
@@ -41,6 +44,14 @@ struct RecordingDetail: View {
     @State private var deleteError: String?
     @ObservedObject var library: Library
     @ObservedObject var index: MeetingIndex
+    var jobActive = false
+    var retryAllowed = false
+    var retry: (() -> Void)? = nil
+    var identifySpeakers: ((Int) -> Void)? = nil
+    @State private var remoteCount = 0
+    @State private var editingSpeaker: String? = nil
+    @State private var speakerName = ""
+    @State private var speakerError: String? = nil
 
     @State private var tab: DetailTab = .transcription
     @State private var templateID = SummaryTemplates.defaultID
@@ -54,13 +65,28 @@ struct RecordingDetail: View {
 
     private var sides: Sides { library.sides[rec.id] ?? .missing }
     private var meeting: CalMeeting? { index.meeting(at: rec.startedAt) }
-    private var lines: [Utterance] { parseTranscript(library.transcript(rec)) }
+    private var speakerDocument: SpeakerTranscript? {
+        guard let document = rec.speakerTranscript,
+              library.transcript(rec) == document.lines.joined(separator: "\n") else { return nil }
+        return document
+    }
+    private var lines: [Utterance] {
+        if let transcript = speakerDocument {
+            return transcript.segments.enumerated().map { index, segment in
+                Utterance(id: index, side: segment.source == "microphone" ? .you : .them,
+                    text: segment.text, speakerID: segment.speaker,
+                    speakerName: transcript.names[segment.speaker], start: segment.start)
+            }
+        }
+        return parseTranscript(library.transcript(rec))
+    }
     private var template: SummaryTemplate { templates.template(templateID) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             masthead
             Divider().overlay(P.rule)
+            if rec.status?.needsRecovery == true { recoveryStatus }
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     if let m = meeting { attendees(m) }
@@ -73,9 +99,36 @@ struct RecordingDetail: View {
         }
         .onAppear(perform: loadForRecording)
         .onChange(of: rec.id) { loadForRecording() }
+        .onChange(of: rec.speakerTranscript?.revision) {
+            summarizer.cancel(); summarizer.loadCached(rec.id, template: templateID)
+        }
+        .onChange(of: rec.status) {
+            if jobActive || rec.status == .complete {
+                summarizer.cancel()
+                summarizer.loadCached(rec.id, template: templateID)
+            }
+        }
         .sheet(isPresented: $editingInstructions) { instructionsSheet }
         .sheet(isPresented: $browsingTemplates) { allTemplatesSheet }
         .sheet(isPresented: $creatingTemplate) { NewTemplateSheet(templates: templates) }
+        .sheet(isPresented: Binding(get: { editingSpeaker != nil }, set: { if !$0 { editingSpeaker = nil } })) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Name this speaker").font(T.disp(22))
+                TextField("Speaker name", text: $speakerName)
+                Text("Applies to this voice in this recording. Names are not inferred from calendar invitations.")
+                    .font(T.body(12)).foregroundStyle(P.ink2)
+                if let speakerError { Text(speakerError).foregroundStyle(P.bad) }
+                HStack {
+                    Button("Cancel") { editingSpeaker = nil }.keyboardShortcut(.cancelAction)
+                    Spacer()
+                    Button("Save") {
+                        guard let speaker = editingSpeaker else { return }
+                        do { try library.renameSpeaker(rec, speaker: speaker, name: speakerName); editingSpeaker = nil }
+                        catch { speakerError = error.localizedDescription }
+                    }.disabled(!retryAllowed)
+                }
+            }.padding(24).frame(width: 420)
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(P.ground)
         .sheet(isPresented: $showingDelete) {
@@ -117,6 +170,33 @@ struct RecordingDetail: View {
     }
 
     // MARK: - Masthead
+
+    private var recoveryStatus: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(jobActive ? (rec.status == .recording ? "Recording…" : "Finishing transcription…")
+                     : rec.status == .partial ? "Partial transcription" : "Transcription needs attention")
+                    .font(T.body(13, .semibold))
+                Spacer()
+                if !jobActive, let retry {
+                    Button("Retry transcription", action: retry)
+                        .buttonStyle(FlatButton(filled: false))
+                        .disabled(!retryAllowed || sides == .missing)
+                }
+            }
+            if !jobActive {
+                Text(rec.failure ?? "Recording or transcription was interrupted. Retry uses a temporary audio copy and preserves the original files.")
+                    .font(T.body(12)).foregroundStyle(P.ink2)
+                    .fixedSize(horizontal: false, vertical: true)
+                if FileManager.default.fileExists(atPath: Paths.recordings.appendingPathComponent(rec.id + ".partial.txt").path),
+                   rec.failure?.contains("previous transcript") == true {
+                    Button("Reveal partial transcript") {
+                        NSWorkspace.shared.activateFileViewerSelecting([Paths.recordings.appendingPathComponent(rec.id + ".partial.txt")])
+                    }.buttonStyle(FlatButton(filled: false))
+                }
+            }
+        }.padding(.horizontal, 30).padding(.vertical, 14).background(P.surface2)
+    }
 
     private var masthead: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -160,6 +240,7 @@ struct RecordingDetail: View {
     // MARK: - Transcription / Summary toggle
 
     private func loadForRecording() {
+        remoteCount = rec.speakerTranscript?.remoteSpeakerCount ?? 0
         templateID = SummaryTemplates.selectedID(for: rec.id)
         summarizer.loadCached(rec.id, template: templateID)
         copyReset?.cancel(); copied = false
@@ -263,7 +344,7 @@ struct RecordingDetail: View {
                 } else {
                     Button(hasSummary ? "Regenerate" : "Summarise", action: generate)
                         .buttonStyle(FlatButton(filled: !hasSummary))
-                        .disabled(lines.isEmpty)
+                        .disabled(lines.isEmpty || jobActive || rec.status?.needsRecovery == true)
                 }
             }
             .padding(.horizontal, 30).padding(.top, 18)
@@ -350,6 +431,32 @@ struct RecordingDetail: View {
     // MARK: - Transcript
 
     @ViewBuilder private var transcript: some View {
+        if let identifySpeakers {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Speakers").font(T.body(14, .semibold))
+                    Spacer()
+                    Button(jobActive ? "Processing…" : speakerDocument == nil ? "Separate speakers" : "Analyze again") {
+                        identifySpeakers(remoteCount)
+                    }.buttonStyle(FlatButton(filled: false))
+                        .disabled(!retryAllowed || sides != .both)
+                }
+                Stepper(remoteCount == 0 ? "Remote speakers: Auto" : "Remote speakers: \(remoteCount)",
+                        value: $remoteCount, in: 0...100).disabled(jobActive)
+                Text("Count only people speaking through Zoom, excluding you. Analyzing again resets speaker names. Live preview stays labeled by audio source.")
+                    .font(T.body(12)).foregroundStyle(P.ink2)
+                if let failure = rec.speakerFailure {
+                    Text(failure).font(T.body(12)).foregroundStyle(P.bad)
+                }
+                if let result = speakerDocument {
+                    Text("\(result.names.keys.filter { $0 != "remote-unknown" }.count) labeled voices · tap a name to edit")
+                        .font(T.body(12, .semibold))
+                    ForEach(result.warnings, id: \.self) { warning in
+                        Text(warning).font(T.body(11)).foregroundStyle(P.ink2)
+                    }
+                }
+            }.padding(.horizontal, 30).padding(.vertical, 16)
+        }
         if lines.isEmpty {
             VStack(alignment: .leading, spacing: 6) {
                 Eyebrow(text: "no transcript")
@@ -365,7 +472,11 @@ struct RecordingDetail: View {
             VStack(alignment: .leading, spacing: 14) {
                 Text("Transcript").font(T.body(15, .semibold)).foregroundStyle(P.ink2)
                     .padding(.horizontal, 30).padding(.top, 18)
-                ForEach(lines) { u in UtteranceRow(u: u) }
+                ForEach(lines) { u in
+                    UtteranceRow(u: u, rename: u.speakerID == nil || u.speakerID == "remote-unknown" || !retryAllowed ? nil : {
+                        editingSpeaker = u.speakerID; speakerName = u.speakerName ?? ""; speakerError = nil
+                    })
+                }
             }
             .padding(.vertical, 8)
         }
@@ -374,6 +485,7 @@ struct RecordingDetail: View {
 
 private struct UtteranceRow: View {
     let u: Utterance
+    var rename: (() -> Void)? = nil
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
@@ -381,8 +493,16 @@ private struct UtteranceRow: View {
                     .font(.system(size: 11, weight: .semibold))
                     .frame(width: 28, height: 28)
                     .background((u.side?.color ?? P.ink3).opacity(0.12), in: Circle())
-                Text(u.side?.rawValue ?? "Speaker")
-                    .font(T.body(12, .semibold))
+                if let rename {
+                    Button(u.speakerName ?? u.side?.rawValue ?? "Speaker", action: rename)
+                        .buttonStyle(.plain).font(T.body(12, .semibold))
+                } else {
+                    Text(u.speakerName ?? u.side?.rawValue ?? "Speaker").font(T.body(12, .semibold))
+                }
+                if let start = u.start {
+                    Spacer()
+                    Text(String(format: "%02d:%02d", Int(start) / 60, Int(start) % 60)).font(T.mono(11))
+                }
             }
             .foregroundStyle(u.side?.color ?? P.ink2)
             BidiText(text: u.text, font: T.body(16), color: P.ink)

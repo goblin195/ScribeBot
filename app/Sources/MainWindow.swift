@@ -161,7 +161,11 @@ struct MainWindowView: View {
         switch pane {
         case .recordings:
             if let r = library.items.first(where: { $0.id == selectedRec }) {
-                RecordingDetail(rec: r, deletionAllowed: !recorder.isRecording && !recorder.isFinalizing, library: library, index: index)
+                RecordingDetail(rec: r, deletionAllowed: !recorder.isRecording && !recorder.isFinalizing,
+                                library: library, index: index, jobActive: recorder.activeID == r.id,
+                                retryAllowed: !recorder.isRecording && !recorder.isFinalizing,
+                                retry: { recorder.retry(r) },
+                                identifySpeakers: { recorder.identifySpeakers(r, remoteSpeakers: $0) })
                     .id(r.id)
             } else {
                 Blank(line: hits.isEmpty && !query.isEmpty

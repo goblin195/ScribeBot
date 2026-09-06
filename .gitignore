@@ -32,3 +32,12 @@ docs/progress.html
 # ~/Library/Application Support/Scribebot/, but they name the user's audio
 # devices, so keep them out of the tree if one is ever copied in.
 *.capture.log
+
+# Calendar-derived data. bench/meetings.json holds 439 real meetings and 850
+# attendee names; vocab.json and vocab_clean.json are harvested from the same
+# source. All three were committed and public before anyone noticed, and the
+# history had to be rewritten to remove them. They stay on the machine that
+# generated them and never in the repository again.
+bench/meetings.json
+bench/vocab.json
+bench/vocab_clean.json

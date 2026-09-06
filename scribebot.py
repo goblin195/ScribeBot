@@ -8,6 +8,7 @@ Nothing leaves the machine. No bot joins the call.
     ./scribebot.py record 60 --pid 123 capture one app only
 """
 import argparse, json, subprocess, sys, time
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -79,7 +80,7 @@ def is_silent(wav: Path, threshold: float = 0.004) -> bool:
     return max((abs(v) for v in a[::13]), default=0) / 32768.0 < threshold
 
 
-def transcribe_segments(wav: Path, lang: str | None = None) -> list[dict]:
+def transcribe_segments(wav: Path, lang: str | None = None, *, words: bool = False) -> list[dict]:
     """Transcribe with real per-segment timestamps.
 
     Export used to fabricate timings by splitting the recording duration across
@@ -88,7 +89,14 @@ def transcribe_segments(wav: Path, lang: str | None = None) -> list[dict]:
     meeting rendered as a 19-minute subtitle, printed to the millisecond. The
     decoder can give real boundaries, so it does.
     """
-    js = wav.with_suffix(".wav.json")
+    # whisper's sidecars must never be written next to irreplaceable audio.
+    with tempfile.TemporaryDirectory(prefix="scribebot-segments-") as temp:
+        return _decode_segments(wav, lang, Path(temp) / "segments", words=words)
+
+
+def _decode_segments(wav: Path, lang: str | None, output: Path, *, words: bool) -> list[dict]:
+    js = output.with_suffix(".json")
+    options = ["-of", str(output)] + (["-ml", "1"] if words else [])
     model, flag = languages.resolve(lang)
     # No model is now the state of a fresh install, not a broken checkout: the
     # DMG ships none and first-run setup downloads them. Returning [] here would
@@ -98,7 +106,7 @@ def transcribe_segments(wav: Path, lang: str | None = None) -> list[dict]:
                  f"model at that path.")
     r = subprocess.run(
         [WHISPER, "-m", str(model), "-f", str(wav), "-l", flag,
-         "-sow", "-oj", "-np"],
+         "-sow", "-oj", "-np", *options],
         capture_output=True, text=True)
     # On `auto`, Hebrew earns a second pass on its fine-tune. Every other
     # language keeps the first result.
@@ -107,10 +115,10 @@ def transcribe_segments(wav: Path, lang: str | None = None) -> list[dict]:
         js.unlink(missing_ok=True)
         r = subprocess.run(
             [WHISPER, "-m", str(better), "-f", str(wav), "-l", "he",
-             "-sow", "-oj", "-np"],
+             "-sow", "-oj", "-np", *options],
             capture_output=True, text=True)
     if r.returncode != 0 or not js.exists():
-        return []
+        raise RuntimeError(f"Segment transcription failed (exit {r.returncode}): {r.stderr[-600:]}")
     try:
         data = json.loads(js.read_text())
     finally:
@@ -198,6 +206,8 @@ def main() -> None:
 
     fil = sub.add_parser("file", help="transcribe an existing audio file")
     fil.add_argument("path")
+    fil.add_argument("--recover", action="store_true",
+                     help="decode a temporary repaired copy of interrupted PCM audio; never modify the original")
     fil.add_argument("--segments", action="store_true",
                      help="emit JSON segments with real timestamps, for export")
     for p in (rec, fil):
@@ -206,6 +216,8 @@ def main() -> None:
     for p in (rec, fil, rb):
         languages.add_argument(p)
     a = ap.parse_args()
+    if getattr(a, "recover", False) and getattr(a, "segments", False):
+        ap.error("--recover and --segments cannot be combined")
 
     restorer, n_terms = load_glossary()
 
@@ -238,8 +250,22 @@ def main() -> None:
         print(f"# {ctx.start:%Y-%m-%d %H:%M} · {len(ctx.speakers)} invited",
               file=sys.stderr)
 
+    if getattr(a, "recover", False):
+        from recovery import recovered_audio
+        # Keep the temporary copy alive through decoding and clean it on exit.
+        try:
+            with recovered_audio(wav) as recovered:
+                if is_silent(recovered):
+                    print("[no speech in this recording]", file=sys.stderr)
+                    return
+                raw = transcribe(recovered, a.lang)
+                print(raw if a.raw else restorer.restore(raw))
+        except (OSError, ValueError) as e:
+            sys.exit(f"recovery failed: {e}")
+        return
+
     if getattr(a, "segments", False):
-        segs = transcribe_segments(wav)
+        segs = transcribe_segments(wav, a.lang)
         if not a.raw:
             for seg in segs:
                 seg["text"] = restorer.restore(seg["text"])

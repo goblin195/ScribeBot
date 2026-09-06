@@ -194,10 +194,55 @@ final class MicCapture {
 
 // MARK: - Tap + aggregate device
 
+func captureMonoFormat(aggregateRate: Double) throws -> AVAudioFormat {
+    guard aggregateRate.isFinite, aggregateRate >= 8_000, aggregateRate <= 384_000,
+          let format = AVAudioFormat(commonFormat: .pcmFormatFloat32,
+                                    sampleRate: aggregateRate, channels: 1,
+                                    interleaved: false) else {
+        throw Err("invalid aggregate input sample rate: \(aggregateRate)")
+    }
+    return format
+}
+
+func checkCaptureRates() throws {
+    // Synthetic duration/pitch regression; this does not exercise hardware.
+    // The old 48 kHz label on 16 kHz frames produced one third the duration.
+    for rate in [16_000.0, 24_000.0, 44_100.0, 48_000.0] {
+        let input = try captureMonoFormat(aggregateRate: rate)
+        let output = try captureMonoFormat(aggregateRate: 16_000)
+        let frames = AVAudioFrameCount(rate * 3)
+        let source = AVAudioPCMBuffer(pcmFormat: input, frameCapacity: frames)!
+        source.frameLength = frames
+        for i in 0..<Int(frames) {
+            source.floatChannelData![0][i] = Float(sin(2 * .pi * 440 * Double(i) / rate)) * 0.25
+        }
+        let result = AVAudioPCMBuffer(pcmFormat: output, frameCapacity: 49_024)!
+        let converter = AVAudioConverter(from: input, to: output)!
+        var supplied = false
+        var error: NSError?
+        converter.convert(to: result, error: &error) { _, status in
+            if supplied { status.pointee = .endOfStream; return nil }
+            supplied = true; status.pointee = .haveData; return source
+        }
+        guard error == nil, abs(Int(result.frameLength) - 48_000) < 128 else {
+            throw Err("sample rate regression: \(rate) Hz produced \(result.frameLength) frames")
+        }
+        let samples = result.floatChannelData![0]
+        let crossings = (1..<Int(result.frameLength)).filter { samples[$0 - 1] < 0 && samples[$0] >= 0 }.count
+        guard abs(crossings - 1320) < 5 else { throw Err("pitch changed at \(rate) Hz") }
+    }
+    do {
+        _ = try captureMonoFormat(aggregateRate: 0)
+        throw Err("zero sample rate accepted")
+    } catch let error as Err where error.msg.hasPrefix("invalid aggregate") {}
+    print("capture rate self-check passed (synthetic duration and pitch, no hardware)")
+}
+
 final class SystemAudioTap {
     private var tapID = AudioObjectID(kAudioObjectUnknown)
     private var aggID = AudioObjectID(kAudioObjectUnknown)
     private var procID: AudioDeviceIOProcID?
+    private var rateListener: AudioObjectPropertyListenerBlock?
     private let ioQueue = DispatchQueue(label: "dev.scribebot.tap.io", qos: .userInitiated)
     private(set) var format: AVAudioFormat?
     private(set) var micUIDUsed: String?
@@ -251,10 +296,8 @@ final class SystemAudioTap {
         let cfg: [String: Any] = [
             kAudioAggregateDeviceNameKey as String: "scribebot-agg",
             kAudioAggregateDeviceUIDKey as String: aggUID,
-            // Clock source. With the mic present it drives the aggregate,
-            // because the tap only produces IO cycles while something is
-            // playing - so a stretch where only the local person speaks would
-            // otherwise be dropped entirely.
+            // The output device clocks this aggregate. Its rate can differ
+            // from the process tap's advertised format with Bluetooth HFP.
             kAudioAggregateDeviceMainSubDeviceKey as String: clockUID,
             kAudioAggregateDeviceIsPrivateKey as String: true,
             kAudioAggregateDeviceIsStackedKey as String: false,
@@ -272,15 +315,31 @@ final class SystemAudioTap {
         }
 
         FileHandle.standardError.write("→ agg created, installing IOProc...\n".data(using:.utf8)!)
-        // The aggregate now carries more than one input stream - the tap, and
-        // the microphone when it was added. Reading only the first buffer would
-        // silently drop whichever came second, so every buffer is downmixed to
-        // mono and summed here.
-        let monoFmt = AVAudioFormat(commonFormat: .pcmFormatFloat32,
-                                    sampleRate: fmt.sampleRate,
-                                    channels: 1, interleaved: false)
-        guard let monoFmt else { throw Err("cannot build mono mix format") }
+        // IOProc receives frames on the aggregate's clock, not the tap's
+        // advertised rate. CMF Bluetooth HFP delivered 16 kHz while the tap
+        // reported 48 kHz: using the latter compressed a 135 s call to 45 s.
+        guard let inputRate: Float64 = getData(aggID,
+                addr(kAudioDevicePropertyNominalSampleRate), Float64(0)) else {
+            throw Err("cannot read aggregate input sample rate")
+        }
+        let monoFmt = try captureMonoFormat(aggregateRate: inputRate)
+        FileHandle.standardError.write(Data("→ tap format: \(fmt.sampleRate) Hz; aggregate input: \(inputRate) Hz\n".utf8))
         self.format = monoFmt
+
+        // A route change must not silently continue with the old converter.
+        // Recorder surfaces this nonzero exit and preserves both saved tracks.
+        var rateAddress = addr(kAudioDevicePropertyNominalSampleRate)
+        let aggregate = aggID
+        let listener: AudioObjectPropertyListenerBlock = { _, _ in
+            let current: Float64? = getData(aggregate,
+                addr(kAudioDevicePropertyNominalSampleRate), Float64(0))
+            guard current != inputRate else { return }
+            FileHandle.standardError.write(Data("ERROR: audio device sample rate changed; restart recording with the selected audio device.\n".utf8))
+            DispatchQueue.main.async { exit(1) }
+        }
+        st = AudioObjectAddPropertyListenerBlock(aggID, &rateAddress, ioQueue, listener)
+        guard st == noErr else { throw Err("cannot monitor aggregate sample rate: \(st)") }
+        rateListener = listener
 
         st = AudioDeviceCreateIOProcIDWithBlock(&procID, aggID, ioQueue) {
             _, inInputData, inInputTime, _, _ in
@@ -321,6 +380,11 @@ final class SystemAudioTap {
     }
 
     func stop() {
+        if let rateListener {
+            var a = addr(kAudioDevicePropertyNominalSampleRate)
+            AudioObjectRemovePropertyListenerBlock(aggID, &a, ioQueue, rateListener)
+            self.rateListener = nil
+        }
         if let procID {
             AudioDeviceStop(aggID, procID)
             AudioDeviceDestroyIOProcID(aggID, procID)
@@ -474,13 +538,27 @@ func cmdMicRecord(seconds: Double, out: String, stream: Bool = false) throws {
     var file: AVAudioFile?
     var conv: AVAudioConverter?
     let mic = MicCapture(sampleRate: 16_000)
+    guard mic != nil else { throw Err("cannot initialize microphone capture") }
+    var failed = false
+    func fail(_ message: String) {
+        guard !failed else { return }
+        failed = true
+        FileHandle.standardError.write("ERROR: microphone \(message)\n".data(using: .utf8)!)
+        DispatchQueue.main.async {
+            mic?.stop()
+            file = nil
+            exit(1)
+        }
+    }
     try mic?.start { buf in
+        guard !failed else { return }
         if conv == nil {
             conv = AVAudioConverter(from: buf.format, to: outFmt)
-            file = try? AVAudioFile(forWriting: URL(fileURLWithPath: out),
-                                    settings: fileSettings)
+            do {
+                file = try AVAudioFile(forWriting: URL(fileURLWithPath: out), settings: fileSettings)
+            } catch { fail("cannot create audio file: \(error.localizedDescription)"); return }
         }
-        guard let conv, let file else { return }
+        guard let conv, let file else { fail("cannot initialize audio conversion"); return }
         let ratio = outFmt.sampleRate / buf.format.sampleRate
         let cap = AVAudioFrameCount(Double(buf.frameLength) * ratio) + 1024
         guard let o = AVAudioPCMBuffer(pcmFormat: outFmt, frameCapacity: cap) else { return }
@@ -490,8 +568,10 @@ func cmdMicRecord(seconds: Double, out: String, stream: Bool = false) throws {
             if supplied { st.pointee = .noDataNow; return nil }
             supplied = true; st.pointee = .haveData; return buf
         }
-        guard err == nil, o.frameLength > 0 else { return }
-        try? file.write(from: o)
+        if let err { fail("conversion failed: \(err.localizedDescription)"); return }
+        guard o.frameLength > 0 else { return }
+        do { try file.write(from: o) }
+        catch { fail("cannot save audio: \(error.localizedDescription)"); return }
         if stream, let ch = o.floatChannelData?[0] {
             var pcm = Data(capacity: Int(o.frameLength) * 2)
             for i in 0..<Int(o.frameLength) {
@@ -807,8 +887,24 @@ func cmdStream(pids: [pid_t], mic: Bool = false) throws {
     RunLoop.main.run()   // until killed
 }
 
+// Capture children must close their files if the owning app crashes. stdin
+// holds the app's library lease until this helper exits. CLI use has no owner
+// environment variable and retains its existing standalone lifetime.
+private var ownerWatch: DispatchSourceTimer?
+if let rawOwner = ProcessInfo.processInfo.environment["SCRIBEBOT_OWNER_PID"],
+   let owner = Int32(rawOwner) {
+    let watch = DispatchSource.makeTimerSource(queue: .main)
+    watch.schedule(deadline: .now() + 1, repeating: 1)
+    watch.setEventHandler {
+        if getppid() != owner { kill(getpid(), SIGTERM) }
+    }
+    ownerWatch = watch
+    watch.resume()
+}
+
 do {
     switch args.count > 1 ? args[1] : "list" {
+    case "selftest-rate": try checkCaptureRates()
     case "list": cmdList()
     case "record":
         let mic  = args.contains("--mic")
