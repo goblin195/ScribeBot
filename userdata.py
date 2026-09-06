@@ -37,6 +37,15 @@ def index_dir() -> Path:
     return support_dir() / "index"
 
 
+def processing_dir() -> Path:
+    """Private scratch space for audio and transcript derivatives."""
+    directory = support_dir() / "processing"
+    if directory.resolve() == ROOT or ROOT in directory.resolve().parents:
+        raise ValueError("Personal-data processing cannot use the checkout")
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    return directory
+
+
 MEETINGS_NAME = "meetings.json"
 VOCAB_NAME = "vocab.json"
 VOCAB_CLEAN_NAME = "vocab_clean.json"

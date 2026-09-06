@@ -9,7 +9,11 @@ enum SavedTranscription {
         guard values.isRegularFile == true, values.isSymbolicLink != true else {
             throw RecordingFailure(message: "Audio must be a regular file, not a link.")
         }
-        let temporary = FileManager.default.temporaryDirectory
+        let processing = audio.deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("processing")
+        try FileManager.default.createDirectory(at: processing, withIntermediateDirectories: true,
+                                               attributes: [.posixPermissions: 0o700])
+        let temporary = processing
             .appendingPathComponent("scribebot-transcribe-" + UUID().uuidString)
         try FileManager.default.createDirectory(at: temporary, withIntermediateDirectories: false,
                                                attributes: [.posixPermissions: 0o700])

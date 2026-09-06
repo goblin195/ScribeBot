@@ -74,4 +74,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import os
+    from unittest.mock import patch
+    with tempfile.TemporaryDirectory() as support, patch.dict(os.environ, SCRIBEBOT_SUPPORT=support):
+        main()

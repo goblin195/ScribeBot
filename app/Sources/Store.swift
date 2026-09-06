@@ -253,6 +253,21 @@ final class Library: ObservableObject {
         reload()
     }
 
+    func correctTurn(_ recording: Recording, edit: (inout SpeakerTranscript) throws -> Void) throws {
+        let lease = try RecordingLease(directory: Paths.recordings)
+        defer { withExtendedLifetime(lease) {} }
+        let current = try RecordingFiles.load(recording.id, directory: Paths.recordings)
+        guard var document = current.speakerTranscript,
+              document.revision == recording.speakerTranscript?.revision,
+              transcript(current) == document.lines.joined(separator: "\n") else {
+            throw RecordingFailure(message: "The transcript changed. Reload it before correcting a turn.")
+        }
+        try edit(&document)
+        _ = try RecordingFiles.commit(current, lines: document.lines, errors: [],
+            directory: Paths.recordings, speakers: document)
+        reload()
+    }
+
     func reveal(_ r: Recording) {
         NSWorkspace.shared.activateFileViewerSelecting(
             [Paths.recordings.appendingPathComponent(r.wav)])

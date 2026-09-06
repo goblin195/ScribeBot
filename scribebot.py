@@ -90,7 +90,8 @@ def transcribe_segments(wav: Path, lang: str | None = None, *, words: bool = Fal
     decoder can give real boundaries, so it does.
     """
     # whisper's sidecars must never be written next to irreplaceable audio.
-    with tempfile.TemporaryDirectory(prefix="scribebot-segments-") as temp:
+    from userdata import processing_dir
+    with tempfile.TemporaryDirectory(prefix="segments-", dir=processing_dir()) as temp:
         return _decode_segments(wav, lang, Path(temp) / "segments", words=words)
 
 

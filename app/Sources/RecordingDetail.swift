@@ -448,9 +448,21 @@ struct RecordingDetail: View {
                 if let failure = rec.speakerFailure {
                     Text(failure).font(T.body(12)).foregroundStyle(P.bad)
                 }
+                if let speakerError { Text(speakerError).font(T.body(12)).foregroundStyle(P.bad) }
                 if let result = speakerDocument {
-                    Text("\(result.names.keys.filter { $0 != "remote-unknown" }.count) labeled voices · tap a name to edit")
+                    Text("\(Set(result.segments.map(\.speaker)).filter { $0 != "remote-unknown" }.count) labeled voices · tap a name to edit")
                         .font(T.body(12, .semibold))
+                    Text("Use the menu beside a turn to correct its speaker or join it with the previous turn.")
+                        .font(T.body(12)).foregroundStyle(P.ink2)
+                    if result.engine?.hasPrefix("speech-windows-v2/") != true {
+                        Text("This transcript uses the older timing analysis. Analyze again to update it; saved names and turn corrections will reset.")
+                            .font(T.body(12)).foregroundStyle(P.warn)
+                    }
+                    if result.correctionUndo != nil {
+                        Button("Undo last turn correction") {
+                            applyTurnCorrection { $0.undoCorrection() }
+                        }.disabled(!retryAllowed)
+                    }
                     ForEach(result.warnings, id: \.self) { warning in
                         Text(warning).font(T.body(11)).foregroundStyle(P.ink2)
                     }
@@ -469,17 +481,42 @@ struct RecordingDetail: View {
             .padding(22)
             .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text("Transcript").font(T.body(15, .semibold)).foregroundStyle(P.ink2)
-                    .padding(.horizontal, 30).padding(.top, 18)
+                    .padding(.horizontal, 30).padding(.vertical, 18)
                 ForEach(lines) { u in
                     UtteranceRow(u: u, rename: u.speakerID == nil || u.speakerID == "remote-unknown" || !retryAllowed ? nil : {
                         editingSpeaker = u.speakerID; speakerName = u.speakerName ?? ""; speakerError = nil
                     })
+                    .overlay(alignment: .topTrailing) {
+                        if let doc = speakerDocument, retryAllowed, doc.segments.indices.contains(u.id) {
+                            let segment = doc.segments[u.id]
+                            Menu {
+                                Button("Join with previous turn") {
+                                    applyTurnCorrection { try $0.joinWithPrevious(segment.id) }
+                                }.disabled(u.id == 0 || doc.segments[max(0, u.id - 1)].source != segment.source)
+                                Section("Assign this turn to") {
+                                    ForEach(Array(Set(doc.segments.filter { $0.source == segment.source }.map(\.speaker))).sorted(), id: \.self) { speaker in
+                                        Button(doc.names[speaker] ?? speaker) {
+                                            applyTurnCorrection { try $0.assign(segment.id, to: speaker) }
+                                        }
+                                    }
+                                }
+                            } label: { Image(systemName: "ellipsis.circle") }
+                            .menuStyle(.borderlessButton).menuIndicator(.hidden)
+                            .frame(width: 20).padding(.trailing, 30).padding(.top, 10)
+                            .help("Correct this turn")
+                        }
+                    }
                 }
             }
             .padding(.vertical, 8)
         }
+    }
+
+    private func applyTurnCorrection(_ edit: (inout SpeakerTranscript) throws -> Void) {
+        do { try library.correctTurn(rec, edit: edit); speakerError = nil }
+        catch { speakerError = error.localizedDescription }
     }
 }
 
@@ -487,11 +524,11 @@ private struct UtteranceRow: View {
     let u: Utterance
     var rename: (() -> Void)? = nil
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
                 Image(systemName: u.side == .you ? "person.fill" : "waveform")
                     .font(.system(size: 11, weight: .semibold))
-                    .frame(width: 28, height: 28)
+                    .frame(width: 20, height: 20)
                     .background((u.side?.color ?? P.ink3).opacity(0.12), in: Circle())
                 if let rename {
                     Button(u.speakerName ?? u.side?.rawValue ?? "Speaker", action: rename)
@@ -501,19 +538,18 @@ private struct UtteranceRow: View {
                 }
                 if let start = u.start {
                     Spacer()
-                    Text(String(format: "%02d:%02d", Int(start) / 60, Int(start) % 60)).font(T.mono(11))
+                    Text(String(format: "%02d:%02d", Int(start) / 60, Int(start) % 60)).font(T.mono(11)).padding(.trailing, 28)
                 }
             }
             .foregroundStyle(u.side?.color ?? P.ink2)
             BidiText(text: u.text, font: T.body(16), color: P.ink)
-                .lineSpacing(7)
+                .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(20)
+        .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(P.surface, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(alignment: .bottom) { Divider().overlay(P.rule) }
         .padding(.horizontal, 30)
-        .padding(.bottom, 2)
     }
 }
 

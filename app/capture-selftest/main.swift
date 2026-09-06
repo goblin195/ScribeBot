@@ -199,6 +199,29 @@ final class Bytes: @unchecked Sendable {
         let preservedText = try String(contentsOf: Paths.recordings.appendingPathComponent("old.txt"), encoding: .utf8)
         precondition(preservedText.contains("Amir"))
 
+        var correction = speakerData
+        correction.segments.insert(SpeakerSegment(id: "fragment", source: "system", speaker: "remote-unknown",
+            start: 2, end: 2.5, text: "synthetic continuation", rawText: "synthetic continuation"), at: 1)
+        correction.names["remote-unknown"] = "Uncertain speaker"
+        let beforeCorrection = correction.segments
+        try correction.joinWithPrevious("fragment")
+        precondition(correction.segments.count == 2)
+        precondition(correction.segments[0].speaker == "remote-1")
+        precondition(correction.segments[0].end == 2.5)
+        precondition(correction.segments[0].text == "hello synthetic continuation")
+        precondition(correction.segments[1] == beforeCorrection[2])
+        correction.undoCorrection()
+        precondition(correction.segments == beforeCorrection)
+        try correction.assign("fragment", to: "remote-1")
+        precondition(correction.segments[1].speaker == "remote-1")
+        do {
+            try correction.joinWithPrevious("local")
+            preconditionFailure("Must not combine microphone and system audio")
+        } catch {}
+        let savedCorrection = try RecordingFiles.commit(old, lines: correction.lines, errors: [],
+            directory: Paths.recordings, speakers: correction)
+        precondition(savedCorrection.speakerTranscript?.correctionUndo == beforeCorrection)
+
         // Missing preview script must not prevent either audio capture path.
         try FileManager.default.moveItem(at: Paths.livePy, to: Paths.root.appendingPathComponent("live.off"))
         recorder.start()

@@ -11,6 +11,7 @@ import stat
 import struct
 import tempfile
 import wave
+from userdata import processing_dir
 
 
 @contextmanager
@@ -59,7 +60,7 @@ def recovered_audio(source: Path):
                 count -= count % 2  # a crash may leave one incomplete PCM sample
                 if not count:
                     raise ValueError("No saved audio samples to recover")
-                with tempfile.TemporaryDirectory(prefix="scribebot-recover-") as temp:
+                with tempfile.TemporaryDirectory(prefix="recover-", dir=processing_dir()) as temp:
                     out = Path(temp) / "audio.wav"
                     src.seek(payload)
                     with wave.open(str(out), "wb") as dst:

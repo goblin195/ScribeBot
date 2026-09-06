@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 import uuid
 import wave
+import tempfile
 
 ROOT = Path(__file__).resolve().parent
 
@@ -76,10 +77,11 @@ def assemble(words, turns, source, restore=lambda value: value):
         raw = word["text"].strip()
         if not raw:
             continue
-        if not math.isfinite(start) or not math.isfinite(end) or start < 0 or end < start:
+        if not math.isfinite(start) or not math.isfinite(end) or start < 0 or end <= start:
             raise ValueError("Invalid recognition timestamps")
         speaker = "local" if source == "microphone" else speaker_at(start, end, turns)
-        if out and out[-1]["speaker"] == speaker and 0 <= start - out[-1]["end"] <= 0.8:
+        if (out and out[-1]["speaker"] == speaker and 0 <= start - out[-1]["end"] <= 0.8
+                and end - out[-1]["start"] <= 15):
             out[-1]["rawText"] += " " + raw
             out[-1]["end"] = end
         else:
@@ -90,19 +92,69 @@ def assemble(words, turns, source, restore=lambda value: value):
     return out
 
 
+def speech_windows(turns, duration, maximum=20):
+    """Union detected speech; preserve real gaps and bound decoder context.
+
+    Overlapping voices are decoded once, never duplicated into both labels.
+    Padding protects quiet starts/ends. The source timeline remains unchanged.
+    """
+    merged = []
+    for start, end, _ in sorted(turns):
+        start, end = max(0, start - 0.2), min(duration, end + 0.2)
+        if end <= start:
+            continue
+        if merged and start <= merged[-1][1] + 0.3:
+            merged[-1][1] = max(end, merged[-1][1])
+        else:
+            merged.append([start, end])
+    windows = []
+    for start, end in merged:
+        while end - start > maximum:
+            windows.append((start, start + maximum))
+            start += maximum
+        if end > start:
+            windows.append((start, end))
+    return windows
+
+
+def decode_speech(audio, turns):
+    from scribebot import transcribe_segments
+    from userdata import processing_dir
+    result = []
+    with wave.open(str(audio)) as source:
+        rate = source.getframerate()
+        windows = speech_windows(turns, source.getnframes() / rate)
+        with tempfile.TemporaryDirectory(prefix="speech-", dir=processing_dir()) as temp:
+            clip = Path(temp) / "speech.wav"
+            for start, end in windows:
+                first, last = int(start * rate), int(end * rate)
+                source.setpos(first)
+                with wave.open(str(clip), "wb") as out:
+                    out.setparams(source.getparams())
+                    out.writeframes(source.readframes(last - first))
+                # Normal ASR segments, not -ml 1 fragments. The latter assigns
+                # zero duration to many words and is not forced alignment.
+                for item in transcribe_segments(clip):
+                    a, b = max(0, item['start']), min(end - start, item['end'])
+                    if b <= a:
+                        raise RuntimeError("Decoder returned invalid speech timing; keeping the previous transcript.")
+                    result.append(dict(start=start + a, end=start + b, text=item['text']))
+    return result
+
+
 def analyze(system, microphone, count=0):
     from recovery import recovered_audio
-    from scribebot import is_silent, load_glossary, transcribe_segments
+    from scribebot import is_silent, load_glossary
     restorer, _ = load_glossary()
     segments = []
     for source, path in [("system", system), ("microphone", microphone)]:
         with recovered_audio(path) as copy:
             if is_silent(copy):
                 continue
-            turns = diarize(copy, count) if source == "system" else []
-            # Word-sized ASR spans avoid attributing a long paragraph to just
-            # its majority speaker. Timestamps are estimates, not forced alignment.
-            words = transcribe_segments(copy, words=True)
+            turns = diarize(copy, count if source == "system" else 1)
+            if not turns:
+                continue
+            words = decode_speech(copy, turns)
             if not words:
                 raise RuntimeError(f"No timestamped text returned for the non-silent {source} track; keeping the previous transcript.")
             segments.extend(assemble(words, turns, source, restorer.restore))
@@ -114,7 +166,7 @@ def analyze(system, microphone, count=0):
     if not count:
         warnings.append("Speaker count is automatic; set the number of remote speakers if voices are split or merged.")
     return dict(version=1, revision=str(uuid.uuid4()), segments=segments, names=names,
-                engine="sherpa-onnx/pyannote-3.0/wespeaker-resnet34; threshold=0.5; minimum-voice=2s",
+                engine="speech-windows-v2/sherpa-onnx/pyannote-3.0/wespeaker-resnet34; threshold=0.5",
                 remoteSpeakerCount=count, warnings=warnings)
 
 

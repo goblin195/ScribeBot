@@ -52,7 +52,7 @@ and gh. Prepare these inputs under .build:
 
 Run `python3 scripts/build_release.py`. The script refuses to overwrite an
 existing staging directory or DMG. Outputs are .build/dmg-root/Scribebot.app,
-.build/Scribebot-0.1-macOS-arm64.dmg, and .build/SHA256SUMS.
+.build/Scribebot-0.1.1-macOS-arm64.dmg, and .build/SHA256SUMS.
 
 Verify the bundled interpreter and decoder with a minimal Finder-style PATH,
 and verify the DMG with hdiutil. GPU decoding requires actual Metal access;

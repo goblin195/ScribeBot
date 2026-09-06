@@ -4,11 +4,13 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import os
+import tempfile
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from speaker_transcript import assemble, speaker_at
+from speaker_transcript import assemble, speaker_at, speech_windows
 import scribebot
 
 
@@ -24,6 +26,17 @@ def main():
     local = assemble(words, turns, "microphone", lambda s: s.replace("עברית", "English"))
     assert all(s["speaker"] == "local" for s in local)
     assert local[0]["rawText"].startswith("עברית") and local[0]["text"].startswith("English")
+    assert speech_windows([(1, 2, 'a'), (1.5, 3, 'b'), (10, 11, 'a')], 12) == [(0.8, 3.2), (9.8, 11.2)]
+    windows = speech_windows([(0, 157, 'a')], 157)
+    assert max(b-a for a,b in windows) <= 20
+    assert sum(b-a for a,b in windows) == 157
+    bounded = assemble([dict(start=i*5,end=i*5+5,text='Synthetic sentence.') for i in range(30)], [], 'microphone')
+    assert max(s['end']-s['start'] for s in bounded) <= 15
+    try:
+        assemble([dict(start=2, end=2, text='zero')], [], 'system')
+        raise AssertionError('zero duration accepted')
+    except ValueError:
+        pass
     try:
         assemble([dict(start=float('nan'), end=2, text="bad")], [], "system")
         raise AssertionError("invalid timestamp accepted")
@@ -58,4 +71,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    with tempfile.TemporaryDirectory() as temp, patch.dict(os.environ, SCRIBEBOT_SUPPORT=temp):
+        main()

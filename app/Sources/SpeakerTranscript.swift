@@ -18,6 +18,35 @@ struct SpeakerTranscript: Codable, Sendable, Equatable {
     var remoteSpeakerCount: Int
     var warnings: [String]
     var engine: String? = nil
+    var correctionUndo: [SpeakerSegment]? = nil
+
+    mutating func joinWithPrevious(_ id: String) throws {
+        guard let index = segments.firstIndex(where: { $0.id == id }), index > 0,
+              segments[index - 1].source == segments[index].source else {
+            throw RecordingFailure(message: "Only adjacent turns from the same audio source can be joined.")
+        }
+        correctionUndo = segments
+        let current = segments.remove(at: index)
+        segments[index - 1].end = max(segments[index - 1].end, current.end)
+        segments[index - 1].text += " " + current.text
+        segments[index - 1].rawText += " " + current.rawText
+        revision = UUID().uuidString
+    }
+
+    mutating func assign(_ id: String, to speaker: String) throws {
+        guard let index = segments.firstIndex(where: { $0.id == id }), names[speaker] != nil,
+              segments.contains(where: { $0.speaker == speaker && $0.source == segments[index].source }) else {
+            throw RecordingFailure(message: "Choose a speaker from the same audio source.")
+        }
+        correctionUndo = segments
+        segments[index].speaker = speaker
+        revision = UUID().uuidString
+    }
+
+    mutating func undoCorrection() {
+        guard let previous = correctionUndo else { return }
+        segments = previous; correctionUndo = nil; revision = UUID().uuidString
+    }
 
     func validate() throws {
         guard version == 1, (0...100).contains(remoteSpeakerCount), Set(segments.map(\.id)).count == segments.count,

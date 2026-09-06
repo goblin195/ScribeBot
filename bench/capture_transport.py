@@ -15,7 +15,8 @@ def main():
     swift = shutil.which("swiftc")
     if not swift:
         raise SystemExit("swiftc required for capture transport checks")
-    with tempfile.TemporaryDirectory(prefix="scribebot-capture-check-") as temp:
+    with tempfile.TemporaryDirectory(prefix="scribebot-capture-check-") as temp, \
+            tempfile.TemporaryDirectory(prefix="scribebot-test-support-") as support:
         root = Path(temp)
         (root / "recordings").mkdir()
         # No model, microphone, system tap, user library, or network is involved.
@@ -44,6 +45,7 @@ def main():
         '''))
         helper.chmod(0o755)
         shutil.copy2(ROOT / "recovery.py", root / "recovery.py")
+        shutil.copy2(ROOT / "userdata.py", root / "userdata.py")
         (root / "live.py").write_text("import time\ntime.sleep(60)\n")
         (root / "scribebot.py").write_text(textwrap.dedent('''\
             import sys, wave
@@ -72,6 +74,7 @@ def main():
             print(build.stderr)
             return build.returncode
         env = dict(os.environ, SCRIBEBOT_CAPTURE_TEST_ROOT=temp,
+                   SCRIBEBOT_SUPPORT=support,
                    SCRIBEBOT_CAPTURE_TEST_PYTHON=sys.executable)
         result = subprocess.run([str(binary)], env=env, capture_output=True,
                                 text=True, timeout=90)

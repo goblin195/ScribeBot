@@ -55,7 +55,9 @@ def placeholder(addr: str) -> bool:
     "a@b.co.il" and "x@y.com" appear in a doc comment and a name-cleaning test.
     Both were flagged on the first run, and a guard that flags the codebase it
     guards is a guard someone deletes. A one- or two-letter mailbox at a one- or
-    two-letter domain is nobody's real address; "gs@company.com" still is.
+    two-letter domain is nobody's real address; two initials at a real company
+    domain still is. No example of that shape is written here - this guard reads
+    its own source, and an illustrative address would make it fail on itself.
     """
     local, _, domain = addr.partition("@")
     return len(local) <= 2 and len(domain.split(".")[0]) <= 2
