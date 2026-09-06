@@ -36,7 +36,7 @@ def main():
     RUNTIME.mkdir(parents=True)
     copy(ROOT / 'app/Info.plist', APP / 'Contents/Info.plist')
     with (APP / 'Contents/Info.plist').open('rb') as f:
-        assert plistlib.load(f)['CFBundleShortVersionString'] == '0.2'
+        assert plistlib.load(f)['CFBundleShortVersionString'] == '0.1'
     copy(ROOT / 'app/icon/Scribebot.icns', APP / 'Contents/Resources/Scribebot.icns')
     binary = APP / 'Contents/MacOS/Scribebot'
     binary.parent.mkdir(parents=True)
@@ -91,10 +91,10 @@ def main():
     run('codesign', '--verify', '--deep', '--strict', APP)
     copy(ROOT / 'docs/release/INSTALL.md', STAGE / 'Read Me.md')
     (STAGE / 'Applications').symlink_to('/Applications')
-    dmg = BUILD / 'Scribebot-0.2-macOS-arm64.dmg'
+    dmg = BUILD / 'Scribebot-0.1-macOS-arm64.dmg'
     if dmg.exists():
         raise SystemExit('Release DMG already exists; refusing to overwrite it.')
-    run('hdiutil', 'create', '-volname', 'Scribebot 0.2', '-srcfolder', STAGE,
+    run('hdiutil', 'create', '-volname', 'Scribebot 0.1', '-srcfolder', STAGE,
         '-format', 'UDZO', '-ov', dmg)
     run('hdiutil', 'verify', dmg)
     checksum = hashlib.sha256(dmg.read_bytes()).hexdigest()
