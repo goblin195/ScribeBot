@@ -43,7 +43,7 @@ def main():
     run('swiftc', '-target', 'arm64-apple-macos14.2', '-parse-as-library',
         '-module-cache-path', BUILD / 'swift-module-cache', '-o', binary,
         *sorted((ROOT / 'app/Sources').glob('*.swift')))
-    for name in ['scribebot.py', 'speaker_transcript.py', 'recovery.py', 'live.py', 'stream.py', 'toolpaths.py', 'languages.py', 'providers.py', 'meeting.py', 'summarize.py', 'export.py', 'attribute.py']:
+    for name in ['scribebot.py', 'speaker_transcript.py', 'recovery.py', 'live.py', 'stream.py', 'toolpaths.py', 'languages.py', 'providers.py', 'meeting.py', 'summarize.py', 'export.py', 'attribute.py', 'userdata.py']:
         copy(ROOT / name, RUNTIME / name)
     # summarize.py and the app both read this; shipping one without it leaves
     # the Summary menu empty and every template but the fallback missing.
@@ -78,6 +78,18 @@ def main():
                 destination = licenses / 'Python' / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_bytes(data)
+    # 0.1.1 shipped without userdata.py: the list above is hand-maintained, and
+    # adding an import to languages.py does not add a line to it. Every
+    # transcription in that DMG died on ModuleNotFoundError, and nothing caught
+    # it because ./check runs from the checkout, where the module exists.
+    # Import what was staged, with the interpreter that was staged.
+    modules = sorted(p.stem for p in RUNTIME.glob('*.py'))
+    subprocess.run([str(RUNTIME / 'python/bin/python3'), '-B', '-c',
+                    'import ' + ', '.join(modules)],
+                   check=True, cwd=RUNTIME,
+                   env={'PATH': '/usr/bin:/bin:/usr/sbin:/sbin',
+                        'PYTHONDONTWRITEBYTECODE': '1'})
+
     # Sign nested Mach-O files first, including Python extension modules.
     magic = {b'\xcf\xfa\xed\xfe', b'\xfe\xed\xfa\xcf', b'\xca\xfe\xba\xbe', b'\xbe\xba\xfe\xca'}
     for path in sorted(APP.rglob('*')):
