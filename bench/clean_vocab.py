@@ -37,7 +37,9 @@ def keep(term: str, count: int) -> bool:
     return True
 
 def main():
-    raw = json.loads((ROOT / "bench/vocab.json").read_text())
+    import userdata
+    src = userdata.resolve(userdata.VOCAB_NAME) or userdata.vocab()
+    raw = json.loads(src.read_text())
     kept = [t for t in raw["terms"] if keep(t["term"], t["count"])]
     # Split hyphen/underscore compounds harvested from titles ("Palo-Alto"),
     # otherwise the restored text carries punctuation nobody spoke.
@@ -46,7 +48,8 @@ def main():
         for part in re.split(r"[-_]", t["term"]):
             if len(part) >= MIN_LEN and part.lower() not in seen and part.lower() not in BOILER:
                 seen.add(part.lower()); words.append(part)
-    (ROOT / "bench/vocab_clean.json").write_text(
+    userdata.vocab_clean().parent.mkdir(parents=True, exist_ok=True)
+    userdata.vocab_clean().write_text(
         json.dumps(words, ensure_ascii=False, indent=1))
     print(f"raw harvested : {len(raw['terms'])}")
     print(f"after filter  : {len(kept)} entries -> {len(words)} words")

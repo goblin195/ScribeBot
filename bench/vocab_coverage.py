@@ -11,9 +11,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LAT = re.compile(r"[A-Za-z][A-Za-z0-9]*")
 
-vocab_path = ROOT / "bench" / "vocab.json"
+sys.path.insert(0, str(ROOT))
+import userdata
+vocab_path = userdata.resolve(userdata.VOCAB_NAME) or userdata.vocab()
 if not vocab_path.exists():
-    sys.exit("bench/vocab.json not found - run the vocabulary extractor first")
+    sys.exit(f"no vocabulary index at {userdata.vocab()} - "
+             "run the extractor, or ./userdata.py --migrate")
 
 vocab = json.loads(vocab_path.read_text())
 harvested = {t["term"] for t in vocab["terms"]}

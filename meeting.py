@@ -12,7 +12,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-MEETINGS = ROOT / "bench/meetings.json"
+import userdata
+# Not ROOT/"bench" any more: a calendar export inside the repo is what
+# got 850 attendee names published. userdata.py owns the location.
+MEETINGS = userdata.resolve(userdata.MEETINGS_NAME) or userdata.meetings()
 # A recording rarely starts exactly on the hour - people join late and start
 # recording once the conversation is under way.
 SLACK = timedelta(minutes=15)
@@ -109,7 +112,9 @@ def main() -> None:
           else datetime.now().astimezone())
     ms = load()
     if not ms:
-        sys.exit("no meetings.json - run the vocabulary/calendar scanner first")
+        sys.exit(f"no calendar index at {userdata.meetings()}\n"
+                 "run the calendar scanner, or ./userdata.py --migrate "
+                 "if you have an older copy in bench/")
     m = find(at, ms)
     if not m:
         print(f"no meeting found around {at:%Y-%m-%d %H:%M}"); return

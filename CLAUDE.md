@@ -47,6 +47,33 @@ Finder does not inherit your shell environment.** It gets
   app's environment and is wired into `./check`. If you add a dependency that is
   resolved through the shell, this is what catches it. Do not weaken it.
 
+## The user's own data is not repository content
+
+`bench/meetings.json` held 439 real meetings and 850 attendee names. It was
+committed in the first public commit and stayed reachable for two days. Two
+files from the same calendar scan, `vocab.json` and `vocab_clean.json`, went
+with it. Removing them took a history rewrite, a forced push, deleting a
+release — and the objects were still fetchable by SHA afterwards, because
+GitHub keeps unreferenced blobs until it collects them.
+
+It was the third instance, not the first: `docs/progress.html` carried real
+transcript text through seventeen commits, and `audio/he-en/transcripts.json`
+carried transcripts through one. Each time the fix was another `.gitignore`
+line, which only ever names the path that already went wrong.
+
+**Anything derived from the user's calendar, contacts, recordings or transcripts
+lives in `~/Library/Application Support/Scribebot/`, never in the checkout.**
+`userdata.py` owns those locations and `Paths.support` mirrors it in Swift. A
+generated file full of real names inside a directory git watches is one
+`git add -A` away from being published, and this project uses `git add -A`.
+
+`bench/no_personal_data.py` is wired into `./check` and reads content, not
+filenames: a JSON object carrying an `attendees` or `organizer` field is a
+calendar export whatever it is called. Do not weaken it, and do not silence it
+by renaming a file.
+
+Before any push, ask what a file is *derived from*, not what it is called.
+
 ## Testing reality
 
 Passing `./check` does **not** mean the product works. Every serious defect in

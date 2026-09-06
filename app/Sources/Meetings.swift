@@ -1,6 +1,6 @@
 // The calendar side of the library: who was in the room.
 //
-// bench/meetings.json is the same file meeting.py reads, and the matching rule
+// index/meetings.json is the same file meeting.py reads, and the matching rule
 // here is a straight port of meeting.py's find(): a recording belongs to the
 // invitation it started inside, and overlapping invitations break toward the
 // one with the most named attendees so a real meeting beats a personal block.
@@ -54,7 +54,11 @@ final class MeetingIndex: ObservableObject {
     /// quarter of an hour early or runs a quarter of an hour long.
     private let slack: TimeInterval = 15 * 60
 
-    init(url: URL = Paths.root.appendingPathComponent("bench/meetings.json")) {
+    /// Beside the recordings, not in the checkout. The old location put a file
+    /// of 850 real attendee names where git could see it, and it was published.
+    /// Mirrors userdata.py, which owns this path on the Python side.
+    init(url: URL = Paths.support
+             .appendingPathComponent("index/meetings.json")) {
         let iso = ISO8601DateFormatter()
         iso.formatOptions = [.withInternetDateTime]
         guard let data = try? Data(contentsOf: url),

@@ -38,12 +38,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 
 
-def support_dir() -> Path:
-    """The library root. SCRIBEBOT_SUPPORT moves it, exactly as the app does."""
-    env = os.environ.get("SCRIBEBOT_SUPPORT", "").strip()
-    if env:
-        return Path(env).expanduser()
-    return Path.home() / "Library/Application Support/Scribebot"
+# One definition of where the library lives, shared with userdata.py, so the
+# models and the indexes can never disagree about it.
+from userdata import support_dir
 
 
 def model_path(name: str) -> Path:
