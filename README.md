@@ -117,12 +117,17 @@ algorithm has to guess. For two-party calls it is exact and free.
 
 ## Download for Mac
 
-Get the **[Scribebot 0.1 DMG](https://github.com/goblin195/ScribeBot/releases/tag/v0.1)**
-for Apple Silicon and macOS 14.2+. Drag it into Applications. Python,
-whisper.cpp and the model are included. The release is ad-hoc signed, not
-Apple-notarized; see the release notes for first-launch instructions.
-Summaries need a local [Ollama](https://ollama.com) install, or the Claude Code
-or Codex CLI you already use.
+Get the **[latest DMG](https://github.com/goblin195/ScribeBot/releases/latest)**
+for Apple Silicon and macOS 14.2+. Drag it into Applications. Python and
+whisper.cpp are bundled; the speech model is not, and setup downloads it on
+first launch. Each release publishes a SHA256SUMS beside the DMG. The app is
+ad-hoc signed, not Apple-notarized; the release notes say what the first launch
+needs. Summaries need a local [Ollama](https://ollama.com) install, or the
+Claude Code or Codex CLI you already use.
+
+<!-- Links the releases page, not a version. A pinned link goes stale on every
+     release, and the pinned one here also promised a bundled model that had
+     already been taken out of the DMG. -->
 
 ## Build from source
 

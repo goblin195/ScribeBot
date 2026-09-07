@@ -1,4 +1,4 @@
-# Scribebot 0.1
+# Scribebot
 
 Requires an Apple Silicon Mac running macOS 14.2 or later.
 
